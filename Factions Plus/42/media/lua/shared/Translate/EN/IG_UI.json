@@ -1,0 +1,5 @@
+{
+	"IGUI_Player_Connected": "connected",
+	"IGUI_Player_Disconnected": "disconnected",
+	"IGUI_Player_Dead": "died"
+}

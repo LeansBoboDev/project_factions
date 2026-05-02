@@ -18,8 +18,6 @@ Forked from [SSR: Safehouse](https://steamcommunity.com/sharedfiles/filedetails/
 Consider downloading the safehouse limit remover in the folder [Server Configuration](https://github.com/LeandroTheDev/project_factions/tree/main/Server%20Configuration) and place it in the main project zomboid dedicated server folder
 
 # Factions Economy
-Singleplayer Compatibility: Yes
-
 Add a new shop system, forked from [Server Points](https://steamcommunity.com/sharedfiles/filedetails/?id=2823055977&searchtext=Server+Points), and a Global Trade system, includes Loot Boxes and farm economy system by exploring and local farming vegetables/fruits.
 
 - Shop UI
@@ -31,14 +29,12 @@ Add a new shop system, forked from [Server Points](https://steamcommunity.com/sh
 - Scrap Weapons to earn the stackable scrap (bigger the scrap the more economy currency you will earn)
 
 # Factions Plus
-Singleplayer Compatibility: Yes
-
 Add new features and adjustments for playing in any anarchy/infinite server.
 
 - Reduced seed drop by crops
 - Reduced water need for fully crop
 - Disable rotten crops mechanic
-- > I recommend changing vanilla sandbox ``Plant Resilience`` to ``Very Low`` to not lose water when player is offline or busy in crop final stage
+- > I recommend changing vanilla sandbox ``Plant Resilience`` to ``Very High`` to not lose water when player is offline or busy in crop final stage
 - Connections/Disconnections/Death player messages events (Multiplayer only)
 - Weekly turn off and on water and electric
 - Reset world start age making food and itens not spawn as rotten or broken

@@ -1,5 +1,0 @@
-IGUI_PTBR = {
-	IGUI_Player_Connected = "conectou",
-	IGUI_Player_Disconnected = "desconectou",
-	IGUI_Player_Dead = "morreu",
-}

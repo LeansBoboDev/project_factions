@@ -3,10 +3,10 @@ local function OnServerCommand(module, command, arguments)
 	-- because the client also need to update their sandbox options
 	-- indie stone....
 	if module == "ResetWorldAge" and command == "updateSandbox" then
-		local gameTime = getGameTime();
-		local actualDay = arguments.actualMonth;
-		local actualMonth = arguments.actualDay;
-		local actualYear = arguments.actualYear;
+		local gameTime    = getGameTime()
+		local actualDay   = arguments.actualDay
+		local actualMonth = arguments.actualMonth
+		local actualYear  = arguments.actualYear
 
 		DebugPrintFactionsPlus("Actual Calendar: " .. "D:" .. actualDay .. " M:" .. actualMonth .. " Y:" .. actualYear);
 

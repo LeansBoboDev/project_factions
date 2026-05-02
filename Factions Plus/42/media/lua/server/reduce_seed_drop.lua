@@ -1,4 +1,3 @@
-if isClient() and not FactionsIsSinglePlayer then return end;
 if not getSandboxOptions():getOptionByName("FactionsPlus.EnableReduceSeedDrop"):getValue() then return end
 
 -- Default Function for harvest
