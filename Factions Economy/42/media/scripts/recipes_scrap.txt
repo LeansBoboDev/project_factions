@@ -3,146 +3,136 @@ module Base
     /* --------------- */
     /* Crafting Scraps */
     /* --------------- */
-
     craftRecipe StackScrapSmall {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 10 [Base.ScrapMoney],
-		}
-		outputs
-		{
+        inputs
+        {
+            item 10 [Base.ScrapMoney] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapStack1,
-		}
-	}
-
+        }
+    }
     craftRecipe StackScrapMedium {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 10 [Base.ScrapStack1],
-		}
-		outputs
-		{
+        inputs
+        {
+            item 10 [Base.ScrapStack1] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapStack2,
-		}
-	}
-
+        }
+    }
     craftRecipe StackScrapLarge {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 10 [Base.ScrapStack2],
-		}
-		outputs
-		{
+        inputs
+        {
+            item 10 [Base.ScrapStack2] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapStack3,
-		}
-	}
-
+        }
+    }
     craftRecipe ScrapAmmo {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Metalworking,
-		xpAward = Maintenance:1,
-		inputs
-		{
-			item 1 [Base.44Clip;Base.45Clip;Base.556Clip;Base.9mmClip;Base.M14Clip],
-		}
-		outputs
-		{
+        xpAward = Maintenance:1,
+        inputs
+        {
+            item 1 [Base.44Clip;Base.JS14_Clip;Base.556Clip;Base.45Clip;Base.M14Clip;Base.9mmClip] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapMoney,
-		}
-	}
-
-	craftRecipe ScrapAmmoBox {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        }
+    }
+    craftRecipe ScrapAmmoBox {
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Metalworking,
-		xpAward = Maintenance:1,
-		inputs
-		{
-			item 1 [Base.223Box;Base.308Box;Base.556Box;Base.Bullets38Box;Base.Bullets44Box;Base.Bullets45Box;Base.Bullets9mmBox;Base.ShotgunShellsBox],
-		}
-		outputs
-		{
+        xpAward = Maintenance:1,
+        inputs
+        {
+            item 1 [Base.3030Box;Base.Bullets357Box;Base.Bullets38Box;Base.Bullets44Box;Base.Bullets45Box;Base.ShotgunShellsBox;Base.556Box;Base.308Box;Base.Bullets9mmBox] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapMoney,
-		}
-	}
-
+        }
+    }
     craftRecipe ScrapWeapon {
-		timedAction = Making,
-		Time = 25,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Metalworking,
-		xpAward = Maintenance:5;Aiming:1,
-		inputs
-		{
-			item 1 [Base.AssaultRifle;Base.AssaultRifle2;Base.DoubleBarrelShotgun;Base.DoubleBarrelShotgunSawnoff;Base.HuntingRifle;Base.Pistol;Base.Pistol2;Base.Pistol3;Base.Revolver;Base.Revolver_Long;Base.Revolver_Short;Base.Shotgun;Base.ShotgunSawnoff;Base.VarmintRifle],
-		}
-		outputs
-		{
+        xpAward = Maintenance:5;Aiming:1,
+        inputs
+        {
+            item 1 [Base.JS14_Rifle;Base.Shotgun;Base.JS3T_Shotgun;Base.L92_Carbine;Base.L94_Rifle;Base.AssaultRifle;Base.Pistol2;Base.AssaultRifle2;Base.Pistol;Base.VarmintRifle;Base.HuntingRifle;Base.MSR7T_Rifle;Base.Revolver_Long;Base.Revolver;Base.Revolver_Short;Base.DoubleBarrelShotgunSawnoff;Base.ShotgunSawnoff] flags[Prop1],
+        }
+        outputs
+        {
             item 1 Base.ScrapMoney,
-		}
-	}
-
+        }
+    }
     /* ------------------- */
     /* Return Stack Scraps */
     /* ------------------- */
-
     craftRecipe SellSmallStackValuableScrap {
-		timedAction = Making,
-		Time = 25,
-		OnCreate = FactionsEconomyCurrencyRecipe.SellSmallScrap,
-		Tags = InHandCraft;CanBeDoneInDark,
+        timedAction = Making,
+        Time = 25,
+        OnCreate = FactionsEconomyCurrencyRecipe.SellSmallScrap,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 1 [Base.ScrapStack1],
-		}
-		outputs
-		{            
-		}
-	}
-
-	craftRecipe SellMediumStackValuableScrap {
-		timedAction = Making,
-		Time = 25,
-		OnCreate = FactionsEconomyCurrencyRecipe.SellMediumScrap,
-		Tags = InHandCraft;CanBeDoneInDark,
+        inputs
+        {
+            item 1 [Base.ScrapStack1] flags[Prop1],
+        }
+        outputs
+        {
+        }
+    }
+    craftRecipe SellMediumStackValuableScrap {
+        timedAction = Making,
+        Time = 25,
+        OnCreate = FactionsEconomyCurrencyRecipe.SellMediumScrap,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 1 [Base.ScrapStack2],
-		}
-		outputs
-		{            
-		}
-	}
-
-	craftRecipe SellLargeStackValuableScrap {
-		timedAction = Making,
-		Time = 25,
-		OnCreate = FactionsEconomyCurrencyRecipe.SellLargeScrap,
-		Tags = InHandCraft;CanBeDoneInDark,
+        inputs
+        {
+            item 1 [Base.ScrapStack2] flags[Prop1],
+        }
+        outputs
+        {
+        }
+    }
+    craftRecipe SellLargeStackValuableScrap {
+        timedAction = Making,
+        Time = 25,
+        OnCreate = FactionsEconomyCurrencyRecipe.SellLargeScrap,
+        Tags = InHandCraft;CanBeDoneInDark,
         category = Miscellaneous,
-		inputs
-		{
-			item 1 [Base.ScrapStack3],
-		}
-		outputs
-		{            
-		}
-	}
+        inputs
+        {
+            item 1 [Base.ScrapStack3] flags[Prop1],
+        }
+        outputs
+        {
+        }
+    }
 }

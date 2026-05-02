@@ -47,7 +47,7 @@ module Base
 		DisplayName = Loot Box Ammo,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Ammo,
         WorldStaticModel = Base.LootBoxAmmoModel,
     }
@@ -56,7 +56,7 @@ module Base
 		DisplayName = Loot Box Clothes,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Clothes,
         WorldStaticModel = Base.LootBoxClothesModel,
     }
@@ -65,7 +65,7 @@ module Base
 		DisplayName = Loot Box Melee,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Melee,
         WorldStaticModel = Base.LootBoxMeleeModel,
     }
@@ -74,7 +74,7 @@ module Base
 		DisplayName = Loot Box Weapon,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Weapon,
         WorldStaticModel = Base.LootBoxWeaponModel,
     }
@@ -83,7 +83,7 @@ module Base
 		DisplayName = Loot Box Attachment,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Attachment,
         WorldStaticModel = Base.LootBoxAttachmentModel,
     }
@@ -92,7 +92,7 @@ module Base
 		DisplayName = Loot Box Clip,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_Clip,
         WorldStaticModel = Base.LootBoxClipModel,
     }
@@ -101,7 +101,7 @@ module Base
 		DisplayName = Loot Box Special Weapon,
         DisplayCategory = Special,
         Weight = 0.0,
-        Type	=	Normal,
+        ItemType = base:normal,
         Icon = Lootbox_special_Weapon,
         WorldStaticModel = Base.LootBoxSpecialWeaponModel,
     }

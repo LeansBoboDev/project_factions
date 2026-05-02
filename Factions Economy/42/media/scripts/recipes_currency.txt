@@ -8,7 +8,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.FactionsEconomy_Currency],
+			item 1 [Base.FactionsEconomy_Currency] flags[Prop1],
 		}
 		outputs
 		{

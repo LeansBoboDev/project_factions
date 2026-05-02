@@ -8,7 +8,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Avocado],
+			item 50 [Base.Avocado] flags[Prop1],
 		}
 		outputs
 		{
@@ -23,7 +23,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.BellPepper],
+			item 50 [Base.BellPepper] flags[Prop1],
 		}
 		outputs
 		{
@@ -38,7 +38,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Blackbeans],
+			item 50 [Base.Blackbeans] flags[Prop1],
 		}
 		outputs
 		{
@@ -53,7 +53,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Broccoli],
+			item 50 [Base.Broccoli] flags[Prop1],
 		}
 		outputs
 		{
@@ -68,7 +68,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.BrusselSprouts],
+			item 50 [Base.BrusselSprouts] flags[Prop1],
 		}
 		outputs
 		{
@@ -83,7 +83,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Carrots],
+			item 50 [Base.Carrots] flags[Prop1],
 		}
 		outputs
 		{
@@ -98,7 +98,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Cauliflower],
+			item 50 [Base.Cauliflower] flags[Prop1],
 		}
 		outputs
 		{
@@ -113,7 +113,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Corn],
+			item 50 [Base.Corn] flags[Prop1],
 		}
 		outputs
 		{
@@ -128,7 +128,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.CornFrozen],
+			item 50 [Base.CornFrozen] flags[Prop1],
 		}
 		outputs
 		{
@@ -143,7 +143,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Cucumber],
+			item 50 [Base.Cucumber] flags[Prop1],
 		}
 		outputs
 		{
@@ -158,7 +158,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Daikon],
+			item 50 [Base.Daikon] flags[Prop1],
 		}
 		outputs
 		{
@@ -173,7 +173,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Edamame],
+			item 50 [Base.Edamame] flags[Prop1],
 		}
 		outputs
 		{
@@ -188,7 +188,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Eggplant],
+			item 50 [Base.Eggplant] flags[Prop1],
 		}
 		outputs
 		{
@@ -203,7 +203,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Garlic],
+			item 50 [Base.Garlic] flags[Prop1],
 		}
 		outputs
 		{
@@ -218,7 +218,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.GreenOnions],
+			item 50 [Base.GreenOnions] flags[Prop1],
 		}
 		outputs
 		{
@@ -233,7 +233,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Greenpeas],
+			item 50 [Base.Greenpeas] flags[Prop1],
 		}
 		outputs
 		{
@@ -248,7 +248,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Kale],
+			item 50 [Base.Kale] flags[Prop1],
 		}
 		outputs
 		{
@@ -263,7 +263,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Leek],
+			item 50 [Base.Leek] flags[Prop1],
 		}
 		outputs
 		{
@@ -278,7 +278,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Lettuce],
+			item 50 [Base.Lettuce] flags[Prop1],
 		}
 		outputs
 		{
@@ -293,7 +293,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MixedVegetables],
+			item 50 [Base.MixedVegetables] flags[Prop1],
 		}
 		outputs
 		{
@@ -308,7 +308,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Onion],
+			item 50 [Base.Onion] flags[Prop1],
 		}
 		outputs
 		{
@@ -323,7 +323,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Peas],
+			item 50 [Base.Peas] flags[Prop1],
 		}
 		outputs
 		{
@@ -338,7 +338,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PepperHabanero],
+			item 50 [Base.PepperHabanero] flags[Prop1],
 		}
 		outputs
 		{
@@ -353,7 +353,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PepperHabaneroDried],
+			item 50 [Base.PepperHabaneroDried] flags[Prop1],
 		}
 		outputs
 		{
@@ -368,7 +368,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PepperJalapeno],
+			item 50 [Base.PepperJalapeno] flags[Prop1],
 		}
 		outputs
 		{
@@ -383,7 +383,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PepperJalapenoDried],
+			item 50 [Base.PepperJalapenoDried] flags[Prop1],
 		}
 		outputs
 		{
@@ -398,7 +398,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Pickles],
+			item 50 [Base.Pickles] flags[Prop1],
 		}
 		outputs
 		{
@@ -413,7 +413,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Pumpkin],
+			item 50 [Base.Pumpkin] flags[Prop1],
 		}
 		outputs
 		{
@@ -428,7 +428,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PumpkinSliced],
+			item 50 [Base.PumpkinSliced] flags[Prop1],
 		}
 		outputs
 		{
@@ -443,7 +443,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.PumpkinSmashed],
+			item 50 [Base.PumpkinSmashed] flags[Prop1],
 		}
 		outputs
 		{
@@ -458,7 +458,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Soybeans],
+			item 50 [Base.Soybeans] flags[Prop1],
 		}
 		outputs
 		{
@@ -473,7 +473,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Spinach],
+			item 50 [Base.Spinach] flags[Prop1],
 		}
 		outputs
 		{
@@ -488,7 +488,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Squash],
+			item 50 [Base.Squash] flags[Prop1],
 		}
 		outputs
 		{
@@ -503,7 +503,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.SugarBeet],
+			item 50 [Base.SugarBeet] flags[Prop1],
 		}
 		outputs
 		{
@@ -518,7 +518,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.SweetPotato],
+			item 50 [Base.SweetPotato] flags[Prop1],
 		}
 		outputs
 		{
@@ -533,7 +533,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Turnip],
+			item 50 [Base.Turnip] flags[Prop1],
 		}
 		outputs
 		{
@@ -548,7 +548,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Zucchini],
+			item 50 [Base.Zucchini] flags[Prop1],
 		}
 		outputs
 		{
@@ -563,7 +563,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 150 [Base.RedRadish],
+			item 150 [Base.RedRadish] flags[Prop1],
 		}
 		outputs
 		{
@@ -578,7 +578,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 100 [Base.Strewberrie],
+			item 100 [Base.Strewberrie] flags[Prop1],
 		}
 		outputs
 		{
@@ -593,7 +593,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 100 [Base.Tomato],
+			item 100 [Base.Tomato] flags[Prop1],
 		}
 		outputs
 		{
@@ -608,7 +608,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 100 [Base.Potato],
+			item 100 [Base.Potato] flags[Prop1],
 		}
 		outputs
 		{
@@ -623,7 +623,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Cabbage],
+			item 50 [Base.Cabbage] flags[Prop1],
 		}
 		outputs
 		{
@@ -640,7 +640,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric1],
+			item 50 [Base.MushroomGeneric1] flags[Prop1],
 		}
 		outputs
 		{
@@ -655,7 +655,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric2],
+			item 50 [Base.MushroomGeneric2] flags[Prop1],
 		}
 		outputs
 		{
@@ -670,7 +670,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric3],
+			item 50 [Base.MushroomGeneric3] flags[Prop1],
 		}
 		outputs
 		{
@@ -685,7 +685,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric4],
+			item 50 [Base.MushroomGeneric4] flags[Prop1],
 		}
 		outputs
 		{
@@ -700,7 +700,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric5],
+			item 50 [Base.MushroomGeneric5] flags[Prop1],
 		}
 		outputs
 		{
@@ -715,7 +715,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric6],
+			item 50 [Base.MushroomGeneric6] flags[Prop1],
 		}
 		outputs
 		{
@@ -730,7 +730,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomGeneric7],
+			item 50 [Base.MushroomGeneric7] flags[Prop1],
 		}
 		outputs
 		{
@@ -745,7 +745,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.MushroomsButton],
+			item 50 [Base.MushroomsButton] flags[Prop1],
 		}
 		outputs
 		{
@@ -762,7 +762,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.GingerPickled],
+			item 50 [Base.GingerPickled] flags[Prop1],
 		}
 		outputs
 		{
@@ -777,7 +777,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.HalloweenPumpkin],
+			item 50 [Base.HalloweenPumpkin] flags[Prop1],
 		}
 		outputs
 		{
@@ -792,7 +792,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Tofu],
+			item 50 [Base.Tofu] flags[Prop1],
 		}
 		outputs
 		{

@@ -8,7 +8,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxAmmo],
+			item 1 [Base.LootBoxAmmo] flags[Prop1],
 		}
 		outputs
 		{
@@ -22,7 +22,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxClothes],
+			item 1 [Base.LootBoxClothes] flags[Prop1],
 		}
 		outputs
 		{
@@ -36,7 +36,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxMelee],
+			item 1 [Base.LootBoxMelee] flags[Prop1],
 		}
 		outputs
 		{
@@ -50,7 +50,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxWeapon],
+			item 1 [Base.LootBoxWeapon] flags[Prop1],
 		}
 		outputs
 		{
@@ -64,7 +64,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxAttachment],
+			item 1 [Base.LootBoxAttachment] flags[Prop1],
 		}
 		outputs
 		{
@@ -78,7 +78,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxClip],
+			item 1 [Base.LootBoxClip] flags[Prop1],
 		}
 		outputs
 		{
@@ -92,7 +92,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 1 [Base.LootBoxSpecialWeapon],
+			item 1 [Base.LootBoxSpecialWeapon] flags[Prop1],
 		}
 		outputs
 		{

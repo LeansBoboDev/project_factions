@@ -1,65 +1,112 @@
-local oldMainScreen_render = MainScreen.render;
+-- ============================================================
+-- MainMenu Overwrite - Shop Integration
+-- ============================================================
 
-function MainScreen:render()
-    oldMainScreen_render(self);
+local LABEL_SEPARATOR = 16
+local SHOP_WIDTH      = 800
+local SHOP_HEIGHT     = 600
+local LABEL_PADDING   = 8
 
-    -- Main menu is not ingame
-    if not self.quitToDesktop then return end
+-- ── Helpers ─────────────────────────────────────────────────
 
-    local labelSeparator = 16;
-    local newY = self.quitToDesktop:getBottom() + labelSeparator;
-    self.shopOption:setY(newY);
-
-    self.bottomPanel:setHeight(self.shopOption:getBottom());
+local function getFontScale()
+    return getTextManager():getFontHeight(UIFont.Small) / 14
+end
+local function getLargeLineHeight()
+    return getTextManager():getFontHeight(UIFont.Large) + LABEL_PADDING * 2
 end
 
-local onMenuItemMouseDownMainMenu = function(item, x, y)
-    local joypadData = JoypadState.getMainMenuJoypad();
-    DebugPrintFactionsEconomy("Shop button pressed");
+-- ── Custom Click Handler ─────────────────────────────────────
 
-    MainScreen.instance.shop:setVisible(true, joypadData);
+-- This function opens the shop WITHOUT hiding the main menu.
+local function onShopClicked(item, x, y)
+    getSoundManager():playUISound("UIActivateMainMenuItem")
+    local joypad = JoypadState.getMainMenuJoypad()
+    -- Apenas torna a loja visível. NÃO escondemos o bottomPanel aqui.
+    MainScreen.instance.shop:setVisible(true, joypad)
 end
 
--- Get the default function from pause menu
-local oldMainScreen_instantiate = MainScreen.instantiate;
--- Overwrite the pause menu
+-- ── Shop UI Factory ─────────────────────────────────────────
+
+local function createShopPanel(parent)
+    local scale  = getFontScale()
+    local core   = getCore()
+    local width  = SHOP_WIDTH * scale
+    local height = SHOP_HEIGHT * scale
+    local x      = (core:getScreenWidth() - width) / 2
+    local y      = (core:getScreenHeight() - height) / 2
+    local shop   = ISShop:new(x, y, width, height)
+    shop:initialise()
+    shop:setVisible(false)
+    shop:setAnchorRight(true)
+    shop:setAnchorBottom(true)
+    parent:addChild(shop)
+    DebugPrintFactionsEconomy(string.format(
+        "Shop panel created — parent size: %dx%d",
+        parent.width, parent.height
+    ))
+    return shop
+end
+
+-- ── Shop Label Factory ───────────────────────────────────────
+
+local function createShopLabel(parent, anchorWidget)
+    local lineHgt     = getLargeLineHeight()
+    local labelY      = anchorWidget:getBottom() + LABEL_SEPARATOR
+    local label       = ISLabel:new(0, labelY, lineHgt,
+        getText("IGUI_Shop"), 1, 1, 1, 1, UIFont.Large, true)
+    label.internal    = "SHOP"
+    label.onMouseDown = onShopClicked -- Usa o handler personalizado
+    label:initialise()
+    parent:addChild(label)
+    -- CRITICAL: Adiciona transição de fade para o efeito de hover
+    -- Isso é necessário para que o fundo do botão destaque ao passar o mouse
+    label.fade = UITransition.new()
+    label.fade:setFadeIn(false)
+    label.prerender = MainScreen.prerenderBottomPanelLabel
+    DebugPrintFactionsEconomy(string.format(
+        "Shop label created — labelY: %d, anchorY: %d, lineHgt: %d",
+        labelY, anchorWidget:getBottom(), lineHgt
+    ))
+    return label
+end
+
+-- ── MainScreen.instantiate Overwrite ────────────────────────
+
+local oldMainScreen_instantiate = MainScreen.instantiate
 function MainScreen:instantiate()
-    -- Default behavior
-    oldMainScreen_instantiate(self);
+    oldMainScreen_instantiate(self)
+    -- Se estiver no jogo (Pause Menu), adiciona o botão
+    if not self.inGame then return end
+    self.shop             = createShopPanel(self)
+    self.shopOption       = createShopLabel(self.bottomPanel, self.quitToDesktop)
 
-    -- Shop instanciate
-    if self.inGame then
-        local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14;
-        local core = getCore();
-        local width = 800 * FONT_SCALE;
-        local height = 600 * FONT_SCALE;
-
-        self.shop = ISShop:new((core:getScreenWidth() - width) / 2, (core:getScreenHeight() - height) / 2,
-            width, height);
-        self.shop:initialise();
-        self.shop:setVisible(false);
-        self.shop:setAnchorRight(true);
-        self.shop:setAnchorBottom(true);
-        self:addChild(self.shop);
-
-        DebugPrintFactionsEconomy("Shop interface created, additional infos: self.width: " ..
-            self.width .. ", self.height: " .. self.height);
+    -- Recalcula a largura máxima para garantir alinhamento correto dos itens
+    self.maxMenuItemWidth = 0
+    for _, child in pairs(self.bottomPanel:getChildren()) do
+        if child.Type == "ISLabel" then
+            self.maxMenuItemWidth = math.max(self.maxMenuItemWidth, child:getWidth())
+        end
     end
-
-    -- Shop option in main menu
-    if self.inGame then
-        local labelHgt = getTextManager():getFontHeight(UIFont.Large) + 8 * 2;
-        local labelX = 0;
-        local labelY = self.quitToDesktop.y + labelHgt;
-
-        self.shopOption = ISLabel:new(labelX, labelY, labelHgt, getText("IGUI_Shop"), 1, 1, 1, 1,
-            UIFont.Large, true);
-        self.shopOption.internal = "SHOP";
-        self.shopOption:initialise();
-        self.bottomPanel:addChild(self.shopOption);
-        self.shopOption.onMouseDown = onMenuItemMouseDownMainMenu;
-
-        DebugPrintFactionsEconomy("Shop option label created, additional infos: labelY: " ..
-            labelY .. ", quitToDesktop.y: " .. self.quitToDesktop.y .. ", labelHgt: " .. labelHgt);
+    local logoScale = getCore():getScreenWidth() / 1920
+    local tex = self.logoTexture
+    local logoWidth = tex:getWidth() * logoScale
+    local maxWidth = math.max(logoWidth / 2, self.maxMenuItemWidth)
+    for _, child in pairs(self.bottomPanel:getChildren()) do
+        if child.Type == "ISLabel" then
+            child:setWidth(maxWidth)
+        end
     end
+    self.bottomPanel:setWidth(maxWidth)
+end
+
+-- ── MainScreen.render Overwrite ──────────────────────────────
+
+local oldMainScreen_render = MainScreen.render
+function MainScreen:render()
+    oldMainScreen_render(self)
+    if not self.quitToDesktop then return end
+    local newY = self.quitToDesktop:getBottom() + LABEL_SEPARATOR
+    self.shopOption:setY(newY)
+    self.bottomPanel:setHeight(self.shopOption:getBottom())
 end

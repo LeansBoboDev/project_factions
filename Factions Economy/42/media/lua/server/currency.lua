@@ -1,135 +1,119 @@
-if isClient() and not FactionsIsSinglePlayer then return end;
+-- ============================================================
+-- Currency System — Server Side
+-- ============================================================
 
-FactionsEconomyCurrencyData = {};
-FactionsEconomyCurrencyRecipe = FactionsEconomyCurrencyRecipe or {};
-local currencyPertick = getSandboxOptions():getOptionByName("FactionsEconomy.CurrencyPerTick"):getValue();
+if isClient() and not FactionsIsSinglePlayer then return end
 
---#region Tick
+FactionsEconomyCurrencyData   = {}
+FactionsEconomyCurrencyRecipe = FactionsEconomyCurrencyRecipe or {}
 
-function GiveCurrencyToPlayers()
+-- ── Sandbox Options Cache ────────────────────────────────────
+
+local function getSandboxOption(name)
+    return getSandboxOptions():getOptionByName(name):getValue()
+end
+
+-- ── Helpers ──────────────────────────────────────────────────
+
+local function ensurePlayerData(username)
+    if not FactionsEconomyCurrencyData[username] then
+        FactionsEconomyCurrencyData[username] = 0
+    end
+end
+
+local function addCurrency(username, amount)
+    ensurePlayerData(username)
+    FactionsEconomyCurrencyData[username] = FactionsEconomyCurrencyData[username] + amount
+    DebugPrintFactionsEconomy(string.format("%s currency: %d", username, FactionsEconomyCurrencyData[username]))
+end
+
+local function notifyClient(player, textKey, amount)
+    sendServerCommand(player, "FactionsEconomyCurrency", "showSay", {
+        textKey = textKey,
+        amount  = amount,
+    })
+end
+
+-- ── Tick ─────────────────────────────────────────────────────
+
+local currencyPerTick = getSandboxOption("FactionsEconomy.CurrencyPerTick")
+
+local function giveCurrencyToPlayers()
     if FactionsEconomyIsSinglePlayer then
-        local player = getPlayer();
-        -- Check if the key exists, if not add the value 0
-        if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-        -- Increment player currency
-        FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-            currencyPertick;
-
-        DebugPrintFactionsEconomy(player:getUsername() .. " currency: " .. FactionsEconomyCurrencyData[player:getUsername()]);
+        local player = getPlayer()
+        addCurrency(player:getUsername(), currencyPerTick)
     else
-        local onlinePlayers = getOnlinePlayers();
+        local onlinePlayers = getOnlinePlayers()
         for i = 0, onlinePlayers:size() - 1 do
-            local player = onlinePlayers:get(i);
-            -- Check if the key exists, if not add the value 0
-            if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-            -- Increment player currency
-            FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-                currencyPertick;
-
-            DebugPrintFactionsEconomy(player:getUsername() .. " currency: " .. FactionsEconomyCurrencyData[player:getUsername()]);
+            addCurrency(onlinePlayers:get(i):getUsername(), currencyPerTick)
         end
     end
 end
 
-if getSandboxOptions():getOptionByName("FactionsEconomy.CurrencyFrequency"):getValue() == 1 then
-    DebugPrintFactionsEconomy("Points Frequency: EveryOneMinute");
-    Events.EveryOneMinute.Add(GiveCurrencyToPlayers);
-elseif getSandboxOptions():getOptionByName("FactionsEconomy.CurrencyFrequency"):getValue() == 2 then
-    DebugPrintFactionsEconomy("Points Frequency: EveryTenMinutes");
-    Events.EveryTenMinutes.Add(GiveCurrencyToPlayers);
-elseif getSandboxOptions():getOptionByName("FactionsEconomy.CurrencyFrequency"):getValue() == 3 then
-    DebugPrintFactionsEconomy("Points Frequency: EveryHours");
-    Events.EveryHours.Add(GiveCurrencyToPlayers);
-elseif getSandboxOptions():getOptionByName("FactionsEconomy.CurrencyFrequency"):getValue() == 4 then
-    DebugPrintFactionsEconomy("Points Frequency: EveryDays");
-    Events.EveryDays.Add(GiveCurrencyToPlayers);
+local frequencyEvents = {
+    [1] = { event = Events.EveryOneMinute, label = "EveryOneMinute" },
+    [2] = { event = Events.EveryTenMinutes, label = "EveryTenMinutes" },
+    [3] = { event = Events.EveryHours, label = "EveryHours" },
+    [4] = { event = Events.EveryDays, label = "EveryDays" },
+}
+
+local freq = getSandboxOption("FactionsEconomy.CurrencyFrequency")
+local selected = frequencyEvents[freq]
+if selected then
+    DebugPrintFactionsEconomy(string.format("Points Frequency: %s", selected.label))
+    selected.event.Add(giveCurrencyToPlayers)
 end
 
+-- ── Mod Data ─────────────────────────────────────────────────
+
 Events.OnInitGlobalModData.Add(function(isNewGame)
-    FactionsEconomyCurrencyData = ModData.getOrCreate("FactionsEconomyCurrency");
+    FactionsEconomyCurrencyData = ModData.getOrCreate("FactionsEconomyCurrency")
 end)
 
---#endregion
-
---#region Recipe Functions
+-- ── Recipe Functions ─────────────────────────────────────────
 
 FactionsEconomyCurrencyRecipe.ReturnCurrency = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " returned currency");
-
-    if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-    FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] + 1;
-
-    player:Say(getText("IGUI_Shop_Return"));
+    DebugPrintFactionsEconomy(string.format("%s returned currency", player:getUsername()))
+    addCurrency(player:getUsername(), 1)
+    notifyClient(player, "IGUI_Shop_Sell")
 end
 
 FactionsEconomyCurrencyRecipe.SellSmallScrap = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " sell small scrap");
-
-    if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-    local smallScrapPrice = getSandboxOptions():getOptionByName("FactionsEconomy.SmallStackScrapValue"):getValue();
-
-    FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-        smallScrapPrice;
-
-    player:Say(getText("IGUI_Shop_Sell") .. " + " .. smallScrapPrice);
+    DebugPrintFactionsEconomy(string.format("%s sell small scrap", player:getUsername()))
+    local price = getSandboxOption("FactionsEconomy.SmallStackScrapValue")
+    addCurrency(player:getUsername(), price)
+    notifyClient(player, "IGUI_Shop_Sell", price)
 end
 
 FactionsEconomyCurrencyRecipe.SellMediumScrap = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " sell medium scrap");
-
-    if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-    local mediumScrapPrice = getSandboxOptions():getOptionByName("FactionsEconomy.MediumStackScrapValue"):getValue();
-
-    FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-        mediumScrapPrice;
-
-    player:Say(getText("IGUI_Shop_Sell") .. " + " .. mediumScrapPrice);
+    DebugPrintFactionsEconomy(string.format("%s sell medium scrap", player:getUsername()))
+    local price = getSandboxOption("FactionsEconomy.MediumStackScrapValue")
+    addCurrency(player:getUsername(), price)
+    notifyClient(player, "IGUI_Shop_Sell", price)
 end
 
 FactionsEconomyCurrencyRecipe.SellLargeScrap = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " sell large scrap");
-
-    if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-    local largeScrapPrice = getSandboxOptions():getOptionByName("FactionsEconomy.LargeStackScrapValue"):getValue();
-
-    FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-        largeScrapPrice;
-
-    player:Say(getText("IGUI_Shop_Sell") .. " + " .. largeScrapPrice);
+    DebugPrintFactionsEconomy(string.format("%s sell large scrap", player:getUsername()))
+    local price = getSandboxOption("FactionsEconomy.LargeStackScrapValue")
+    addCurrency(player:getUsername(), price)
+    notifyClient(player, "IGUI_Shop_Sell", price)
 end
 
 FactionsEconomyCurrencyRecipe.SellVegetable = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " sell vegetable");
-
-    if not FactionsEconomyCurrencyData[player:getUsername()] then FactionsEconomyCurrencyData[player:getUsername()] = 0 end;
-
-    local vegetablePrice = getSandboxOptions():getOptionByName("FactionsEconomy.VegetableValue"):getValue();
-
-    FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] +
-        vegetablePrice;
-
-    player:Say(getText("IGUI_Shop_Sell") .. " + " .. vegetablePrice);
+    DebugPrintFactionsEconomy(string.format("%s sell vegetable", player:getUsername()))
+    local price = getSandboxOption("FactionsEconomy.VegetableValue")
+    addCurrency(player:getUsername(), price)
+    notifyClient(player, "IGUI_Shop_Sell", price)
 end
 
---#endregion
-
---#region Client Requests
-
-local function getCurrency(module, command, player, args)
-    sendServerCommand(player, "FactionsEconomyCurrency", "receiveCurrency",
-        { FactionsEconomyCurrencyData[player:getUsername()] or 0 })
-end
+-- ── Client Requests ──────────────────────────────────────────
 
 Events.OnClientCommand.Add(function(module, command, player, args)
-    if module == "FactionsEconomyCurrency" and command == "getCurrency" then
-        getCurrency(module, command, player, args);
+    if module ~= "FactionsEconomyCurrency" then return end
+
+    if command == "getCurrency" then
+        sendServerCommand(player, "FactionsEconomyCurrency", "receiveCurrency", {
+            balance = FactionsEconomyCurrencyData[player:getUsername()] or 0
+        })
     end
 end)
-
---#endregion
