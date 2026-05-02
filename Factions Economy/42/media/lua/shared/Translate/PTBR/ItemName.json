@@ -1,0 +1,14 @@
+{
+	"ItemName_Base.LootBoxAmmo": "Loot Box (Balas)",
+	"ItemName_Base.LootBoxClothes": "Loot Box (Roupas)",
+	"ItemName_Base.LootBoxMelee": "Loot Box (Armas Brancas)",
+	"ItemName_Base.LootBoxWeapon": "Loot Box (Armas)",
+	"ItemName_Base.LootBoxAttachment": "Loot Box (Modificadores)",
+	"ItemName_Base.LootBoxClip": "Loot Box (Clipes)",
+	"ItemName_Base.LootBoxSpecialWeapon": "Loot Box (Armas Premium)",
+	"ItemName_Base.FactionsEconomy_Currency": "Moeda",
+	"ItemName_Base.ScrapMoney": "Sucata Valiosa",
+	"ItemName_Base.ScrapStack1": "Pilha de Sucata Valiosa Pequena",
+	"ItemName_Base.ScrapStack2": "Pilha de Sucata Valiosa Mediana",
+	"ItemName_Base.ScrapStack3": "Pilha de Sucata Valiosa Grande"
+}

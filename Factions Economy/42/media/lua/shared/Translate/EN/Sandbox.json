@@ -1,0 +1,22 @@
+{
+    "Sandbox_FactionsEconomy": "Factions Economy",
+    "Sandbox_FactionsEconomy_CurrencyFrequency": "Frequency Points",
+    "Sandbox_CurrencyFrequency": "Award Frequency",
+    "Sandbox_CurrencyFrequency_option1": "Disabled",
+    "Sandbox_CurrencyFrequency_option2": "Every Ten Minutes",
+    "Sandbox_CurrencyFrequency_option3": "Every Hour",
+    "Sandbox_CurrencyFrequency_option4": "Every Day",
+    "Sandbox_FactionsEconomy_PointsPerTick": "Points Per Tick",
+    "Sandbox_FactionsEconomy_SmallStackScrapValue": "Small Stack Scrap Value",
+    "Sandbox_FactionsEconomy_MediumStackScrapValue": "Medium Stack Scrap Value",
+    "Sandbox_FactionsEconomy_LargeStackScrapValue": "Large Stack Scrap Value",
+    "Sandbox_FactionsEconomy_VegetableValue": "Vegetable Value",
+    "Sandbox_FactionsEconomyLootBox": "Factions Loot Box",
+    "Sandbox_LootBox_LootBoxAmmo": "Items in the Loot Box (Ammo)",
+    "Sandbox_LootBox_LootBoxClothes": "Items in the Loot Box( Clothes)",
+    "Sandbox_LootBox_LootBoxMelee": "Items in the Loot Box (Melee)",
+    "Sandbox_LootBox_LootBoxWeapon": "Items in the Loot Box (Weapon)",
+    "Sandbox_LootBox_LootBoxAttachment": "Items in the Loot Box (Attachment)",
+    "Sandbox_LootBox_LootBoxClip": "Items in the Loot Box (Clip)",
+    "Sandbox_LootBox_LootBoxSpecialWeapon": "Items in the Loot Box (Special Weapon)"
+}
