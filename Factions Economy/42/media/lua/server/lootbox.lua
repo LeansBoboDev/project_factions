@@ -1,65 +1,86 @@
-if isClient() and not FactionsIsSinglePlayer then return end;
+-- ── Helper ───────────────────────────────────────────────────
 
-FactionsEconomyLootBoxRecipe = FactionsEconomyLootBoxRecipe or {};
+local function giveItemToPlayer(player, itemFullName)
+    local item = instanceItem(itemFullName)
+    if not item then
+        DebugPrintFactionsEconomy(string.format("Failed to instance item: %s", itemFullName))
+        return false
+    end
+    if item:getType() == "CorpseAnimal" then
+        item:createAndStoreDefaultDeadBody(nil)
+    end
+
+    player:getInventory():AddItem(item)
+    sendAddItemToContainer(player:getInventory(), item);
+
+    return true
+end
+
+-- ── LootBox Recipe ───────────────────────────────────────────
+
+if isClient() and not FactionsIsSinglePlayer then return end
+
+FactionsEconomyLootBoxRecipe = FactionsEconomyLootBoxRecipe or {}
 
 FactionsEconomyLootBoxRecipe.OpenLootBox = function(craftRecipeData, player)
-    DebugPrintFactionsEconomy(player:getUsername() .. " trying to open a loot box...");
+    DebugPrintFactionsEconomy(string.format("%s trying to open a loot box...", player:getUsername()))
 
-    local consumedItems = craftRecipeData:getAllConsumedItems();
+    local consumedItems = craftRecipeData:getAllConsumedItems()
 
     for i = 0, consumedItems:size() - 1 do
-        local item = consumedItems:get(i);
-        local sandboxTable = "FactionsEconomy." .. item:getType();
+        local item         = consumedItems:get(i)
+        local sandboxTable = "FactionsEconomy." .. item:getType()
 
-        DebugPrintFactionsEconomy(player:getUsername() ..
-            " lootbox opened: " .. item:getType() .. ", Sandbox Table: " .. sandboxTable);
-        local chanceTable = getSandboxOptions():getOptionByName(sandboxTable):getValue();
+        DebugPrintFactionsEconomy(string.format(
+            "%s lootbox opened: %s, Sandbox Table: %s",
+            player:getUsername(), item:getType(), sandboxTable
+        ))
 
-        -- Convert string to table
+        local chanceTable = getSandboxOptions():getOptionByName(sandboxTable):getValue()
+
+        -- ── Parse chance table string ────────────────────────
         local result = {}
         for key, value in chanceTable:gmatch("([^/]+)/([^/]+)/") do
-            table.insert(result, { key = key, value = tonumber(value) });
+            table.insert(result, { key = key, value = tonumber(value) })
         end
 
-        local function shuffle(table)
-            for j = #table, 2, -1 do
-                local x = ZombRand(j) + 1;
-                table[j], table[x] = table[x], table[j];
-            end
-        end
-        shuffle(result);
-
-        -- Check if table value exist
         if #result <= 0 then
-            DebugPrintFactionsEconomy("No values found for lootbox: " .. item:getType());
-            return;
+            DebugPrintFactionsEconomy(string.format("No values found for lootbox: %s", item:getType()))
+            return
         end
 
-        -- Items iteration
-        local maxChances = 0;
+        -- ── Shuffle ──────────────────────────────────────────
+        for j = #result, 2, -1 do
+            local x = ZombRand(j) + 1
+            result[j], result[x] = result[x], result[j]
+        end
+
+        -- ── Roll ─────────────────────────────────────────────
+        local maxChances = 0
         while true do
             if maxChances > 20 then
-                DebugPrintFactionsEconomy(player:getUsername() .. " has reach the loot box row limit, wow!");
-
-                local randomEntry = result[ZombRand(#result) + 1];
-                player:getInventory():AddItems(randomEntry.key, 1);
-
-                DebugPrintFactionsEconomy(player:getUsername() ..
-                    " received: " .. randomEntry.key .. ", from lootbox: " .. item:getType());
-                return;
+                local randomEntry = result[ZombRand(#result) + 1]
+                giveItemToPlayer(player, randomEntry.key)
+                DebugPrintFactionsEconomy(string.format(
+                    "%s hit roll limit — forced item: %s from lootbox: %s",
+                    player:getUsername(), randomEntry.key, item:getType()
+                ))
+                return
             end
 
             for _, entry in ipairs(result) do
-                local chance = ZombRand(100) + 1;
+                local chance = ZombRand(100) + 1
                 if entry.value > chance then
-                    player:getInventory():AddItems(entry.key, 1);
-
-                    DebugPrintFactionsEconomy(player:getUsername() ..
-                        " received: " .. entry.key .. ", from lootbox: " .. item:getType());
-                    return;
+                    giveItemToPlayer(player, entry.key)
+                    DebugPrintFactionsEconomy(string.format(
+                        "%s received: %s from lootbox: %s",
+                        player:getUsername(), entry.key, item:getType()
+                    ))
+                    return
                 end
             end
-            maxChances = maxChances + 1;
+
+            maxChances = maxChances + 1
         end
     end
 end

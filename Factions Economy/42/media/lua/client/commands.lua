@@ -32,8 +32,4 @@ Events.OnServerCommand.Add(function(module, command, args)
 
         player:setHaloNote(message)
     end
-
-    if command == "receiveCurrency" then
-        DebugPrintFactionsEconomy(string.format("Balance received: %d", args.balance))
-    end
 end)

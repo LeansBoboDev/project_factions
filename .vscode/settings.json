@@ -99,7 +99,9 @@
         "ISMouseDrag",
         "getTextOrNull",
         "CharacterStat",
-        "CharacterProfessionDefinition"
+        "CharacterProfessionDefinition",
+        "instanceItem",
+        "sendAddItemToContainer"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
