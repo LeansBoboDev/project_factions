@@ -497,52 +497,61 @@ end
 -- args.rowIndex, example: 1,2,3
 -- args.rowId, example: "survival", "farming"
 local function buyItem(module, command, player, args)
-    local rowId = args.rowId;
-    local index = args.rowIndex;
+    local rowId    = args.rowId
+    local index    = args.rowIndex
 
+    -- Validate category
     local category = ShopItems[rowId]
     if not category then
-        DebugPrintFactionsEconomy("Row not found: " .. tostring(rowId) .. ", for player: " .. player:getUsername());
+        DebugPrintFactionsEconomy(string.format("Row not found: %s, player: %s", tostring(rowId), player:getUsername()))
         return
     end
 
-    --type
-    --target
-    --quantity
-    --price
+    -- Validate item
+    -- item.type, item.target, item.quantity, item.price
     local item = category[index]
     if not item then
-        DebugPrintFactionsEconomy("Item not found on index: " .. tostring(index) .. ", for player: " .. player:getUsername());
+        DebugPrintFactionsEconomy(string.format("Item not found at index: %s, player: %s", tostring(index),
+            player:getUsername()))
         return
     end
 
-    if item.type == "ITEM" then
-        -- No currency registered for the player
-        if not FactionsEconomyCurrencyData[player:getUsername()] then
-            DebugPrintFactionsEconomy("No currency registered for player: " .. player:getUsername());
-            return
-        end
+    if item.type ~= "ITEM" then return end
 
-        -- Check if player have currency available to buy the item
-        if FactionsEconomyCurrencyData[player:getUsername()] >= item.price then
-            FactionsEconomyCurrencyData[player:getUsername()] = FactionsEconomyCurrencyData[player:getUsername()] -
-                item.price;
+    local username = player:getUsername()
 
-            DebugPrintFactionsEconomy(player:getUsername() ..
-                ", bought: " .. item.target .. " for " .. item.price);
+    -- No currency registered for the player
+    local balance = FactionsEconomyCurrencyData[username]
+    if not balance then
+        DebugPrintFactionsEconomy(string.format("No currency registered for: %s", username))
+        return
+    end
 
-            player:getInventory():AddItems(item.target, item.quantity);
-        else -- Nope
-            DebugPrintFactionsEconomy("Not enough currency for player: " ..
-                player:getUsername() .. ", " .. FactionsEconomyCurrencyData[player:getUsername()] .. "/" .. item.price);
-            return
+    -- Check if player has enough currency to buy the item
+    if balance < item.price then
+        DebugPrintFactionsEconomy(string.format("Not enough currency — %s: %d/%d", username, balance, item.price))
+        return
+    end
+
+    -- Deduct the price from the player's balance
+    FactionsEconomyCurrencyData[username] = balance - item.price
+    DebugPrintFactionsEconomy(string.format("%s bought %s for %d", username, item.target, item.price))
+
+    -- Spawn and deliver items to the player
+    -- B42: instanceItem + AddItem + sendAddItemToContainer per unit
+    for i = 1, item.quantity do
+        local newItem = instanceItem(item.target)
+        if newItem then
+            player:getInventory():AddItem(newItem)
+            sendAddItemToContainer(player:getInventory(), newItem)
+        else
+            DebugPrintFactionsEconomy(string.format("Failed to instance item: %s", item.target))
         end
     end
 end
 
 local function getShopItems(module, command, player, args)
-    sendServerCommand(player, "FactionsEconomyShop", "receiveShopItems",
-        ShopItems)
+    sendServerCommand(player, "FactionsEconomyShop", "receiveShopItems", ShopItems)
 end
 
 Events.OnClientCommand.Add(function(module, command, player, args)

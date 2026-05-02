@@ -31,21 +31,10 @@ local function onReceiveShopItems(module, command, args)
     ISShop.instance:populateTabs(args)
 end
 
-local function requestShopItems()
-    Events.OnGameStart.Remove(requestShopItems)
-    if FactionsEconomyIsSinglePlayer then
-        ISShop.instance:populateTabs(ShopItems)
-    else
-        Events.OnServerCommand.Add(onReceiveShopItems)
-        sendClientCommand("FactionsEconomyShop", "getShopItems", nil)
-    end
-end
-
-Events.OnGameStart.Add(requestShopItems)
-
 -- ── Tab Population ───────────────────────────────────────────
 
 function ISShop:populateTabs(items)
+    DebugPrintFactionsEconomy("POPULATING TABS!")
     for category, entries in pairs(items) do
         DebugPrintFactionsEconomy(string.format("Populating category: %s", category))
 
@@ -163,18 +152,16 @@ function ISShop.BuyType.ITEM(row)
     if FactionsEconomyIsSinglePlayer then
         buySinglePlayer(row)
     else
-        sendClientCommand("FactionsEconomyShop", "buyShop", row)
+        sendClientCommand("FactionsEconomyShop", "buyItem", row)
     end
 end
 
 function ISShop.BuyType.VEHICLE(row)
-    sendClientCommand("FactionsEconomyShop", "buyShop", { row.price, row.target })
-    sendClientCommand("FactionsEconomyShop", "vehicleShop", { row.target })
+    sendClientCommand("FactionsEconomyShop", "buyVehicle", { row.price, row.target })
 end
 
 function ISShop.BuyType.XP(row)
-    sendClientCommand("FactionsEconomyShop", "buyShop", { row.price, row.target })
-    getPlayer():getXp():AddXP(Perks[row.target], row.quantity, true, false, false)
+    sendClientCommand("FactionsEconomyShop", "buyXP", { row.price, row.target })
 end
 
 -- ── DrawType Handlers ────────────────────────────────────────
@@ -294,7 +281,10 @@ function ISShop:setVisible(visible)
     if self.javaObject == nil then self:instantiate() end
     self.javaObject:setVisible(visible)
     if self.preview then self.preview:setVisible(visible) end
-    if visible then self:refreshCurrency() end
+    if visible then
+        self:refreshCurrency()
+        self:onReload()
+    end
 end
 
 -- ── UI Construction ──────────────────────────────────────────
