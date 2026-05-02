@@ -68,7 +68,7 @@ option FactionsEconomy.VegetableValue
 option FactionsEconomy.LootBoxAmmo
 {
 	type = string,
-    default = Base.223Box/12/Base.308Box/12/Base.Bullets38Box/12/Base.Bullets44Box/12/Base.Bullets45Box/13/Base.556Box/13/Base.Bullets9mmBox/13/Base.ShotgunShellsBox/13/,
+    default = Base.308Box/11/Base.Bullets38Box/11/Base.Bullets44Box/11/Base.Bullets45Box/11/Base.556Box/11/Base.Bullets9mmBox/11/Base.ShotgunShellsBox/11/Base.3030Box/11/Base.Bullets357Box/12/,
 	page = FactionsEconomyLootBox,
     translation = LootBox_LootBoxAmmo,
 }
@@ -89,7 +89,7 @@ option FactionsEconomy.LootBoxMelee
 option FactionsEconomy.LootBoxWeapon
 {
 	type = string,
-    default = Base.Pistol3/8/Base.DoubleBarrelShotgun/8/Base.Shotgun/8/Base.AssaultRifle2/8/Base.AssaultRifle/8/Base.Revolver_Short/8/Base.Revolver/8/Base.Pistol/8/Base.VarmintRifle/8/Base.HuntingRifle/7/Base.Revolver_Long/7/Base.DoubleBarrelShotgunSawnoff/7/Base.ShotgunSawnoff/7/,
+    default = Base.Shotgun/6/Base.AssaultRifle2/6/Base.AssaultRifle/6/Base.Revolver_Short/6/Base.Revolver/6/Base.Pistol/6/Base.VarmintRifle/6/Base.HuntingRifle/6/Base.Revolver_Long/6/Base.DoubleBarrelShotgunSawnoff/6/Base.ShotgunSawnoff/6/Base.JS14_Rifle/6/Base.JS3T_Shotgun/6/Base.L92_Carbine/6/Base.L94_Rifle/6/Base.Pistol2/5/Base.MSR7T_Rifle/5/,
 	page = FactionsEconomyLootBox,
     translation = LootBox_LootBoxWeapon,
 }
@@ -103,14 +103,14 @@ option FactionsEconomy.LootBoxAttachment
 option FactionsEconomy.LootBoxClip
 {
 	type = string,
-    default = Base.44Clip/14/Base.M14Clip/14/Base.556Clip/14/Base.45Clip/14/Base.9mmClip/14/Base.223Clip/15/Base.308Clip/15/,
+    default = Base.44Clip/17/Base.JS14_Clip/17/Base.556Clip/17/Base.45Clip/17/Base.M14Clip/16/Base.9mmClip/16/,
 	page = FactionsEconomyLootBox,
     translation = LootBox_LootBoxClip,
 }
 option FactionsEconomy.LootBoxSpecialWeapon
 {
 	type = string,
-    default = Base.Pistol3/8/Base.DoubleBarrelShotgun/8/Base.Shotgun/8/Base.AssaultRifle2/8/Base.AssaultRifle/8/Base.Revolver_Short/8/Base.Revolver/8/Base.Pistol/8/Base.VarmintRifle/8/Base.HuntingRifle/7/Base.Revolver_Long/7/Base.DoubleBarrelShotgunSawnoff/7/Base.ShotgunSawnoff/7/,
+    default = Base.Shotgun/6/Base.AssaultRifle2/6/Base.AssaultRifle/6/Base.Revolver_Short/6/Base.Revolver/6/Base.Pistol/6/Base.VarmintRifle/6/Base.HuntingRifle/6/Base.Revolver_Long/6/Base.DoubleBarrelShotgunSawnoff/6/Base.ShotgunSawnoff/6/Base.JS14_Rifle/6/Base.JS3T_Shotgun/6/Base.L92_Carbine/6/Base.L94_Rifle/6/Base.Pistol2/5/Base.MSR7T_Rifle/5/,
 	page = FactionsEconomyLootBox,
     translation = LootBox_LootBoxSpecialWeapon,
 }
