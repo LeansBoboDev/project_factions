@@ -73,6 +73,16 @@ option FactionsPlus.EnableReduceWaterNeed
 	translation = FactionsPlus_EnableReduceWaterNeed,
 }
 
+option FactionsPlus.ReduceWaterNeedPercentage
+{
+	type = double,
+	min = 0,
+	max = 100,
+	default = 0.5,
+	page = FactionsPlus,
+	translation = SmokeFlare_GunStoreSpawnChance,
+}
+
 option FactionsPlus.WaterLevelIncreasePerTick
 {
     type = integer,

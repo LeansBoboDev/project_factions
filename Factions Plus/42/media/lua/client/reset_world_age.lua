@@ -19,7 +19,7 @@ local function OnServerCommand(module, command, arguments)
 		getSandboxOptions():set("StartMonth", actualMonth);
 		getSandboxOptions():set("StartDay", actualDay);
 		getSandboxOptions():set("StartYear", actualYear);
-		getSandboxOptions():set("TimeSinceApo", 0);
+		getSandboxOptions():set("TimeSinceApo", 1);
 	end
 end
 

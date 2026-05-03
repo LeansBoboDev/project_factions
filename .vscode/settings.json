@@ -101,7 +101,8 @@
         "CharacterStat",
         "CharacterProfessionDefinition",
         "instanceItem",
-        "sendAddItemToContainer"
+        "sendAddItemToContainer",
+        "ZomboidGlobals"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",

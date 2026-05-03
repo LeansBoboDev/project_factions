@@ -1,4 +1,4 @@
-if FactionsIsSinglePlayer then return end;
+if isClient() and not FactionsIsSinglePlayer then return end;
 
 local ticksToDetectPlayers = getSandboxOptions():getOptionByName("FactionsPlus.MessagesCheckPerTick"):getValue();
 local actualTicks = 0;

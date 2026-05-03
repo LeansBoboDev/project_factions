@@ -1,3 +1,4 @@
+if isClient() and not FactionsIsSinglePlayer then return end;
 -- ============================================================
 -- Calendar Reset — Server Side
 -- ============================================================
@@ -34,7 +35,7 @@ Events.EveryDays.Add(function()
     getSandboxOptions():set("StartMonth", actualMonth)
     getSandboxOptions():set("StartDay", actualDay)
     getSandboxOptions():set("StartYear", actualYear)
-    getSandboxOptions():set("TimeSinceApo", 0)
+    getSandboxOptions():set("TimeSinceApo", 1)
 
     -- Notify all clients to sync their sandbox
     if FactionsPlusIsSinglePlayer then

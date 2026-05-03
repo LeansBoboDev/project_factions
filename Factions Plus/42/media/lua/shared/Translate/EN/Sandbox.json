@@ -16,6 +16,8 @@
     "Sandbox_FactionsPlus_ReduceSeedDropPercentage_tooltip": "How much seed drop will be reduced",
     "Sandbox_FactionsPlus_EnableReduceWaterNeed": "Enable Reduced Crops Watering",
     "Sandbox_FactionsPlus_EnableReduceWaterNeed_tooltip": "Crops will need much less water to be fully watered",
+    "Sandbox_FactionsPlus_ReduceWaterNeedPercentage": "Watering Crops Reduce Percentage",
+    "Sandbox_FactionsPlus_ReduceWaterNeedPercentage_tooltip": "How much water will be reduced on watering, 0.5 50% reduce, 1.0 vanilla, 1.5 50% increase",
     "Sandbox_FactionsPlus_WaterLevelIncreasePerTick": "Water Level Increased per Tick",
     "Sandbox_FactionsPlus_WaterLevelIncreasePerTick_tooltip": "How much less water will be needed to be fully watered, vanilla = 10",
     "Sandbox_FactionsPlus_EnableWaterLightCycle": "Enable Water Light Cycle",
