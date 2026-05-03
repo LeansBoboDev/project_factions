@@ -105,7 +105,8 @@
         "ZomboidGlobals",
         "ISSleepDialog",
         "ISWorldObjectContextMenu",
-        "sendPlayerStat"
+        "sendPlayerStat",
+        "getSleepingEvent"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
