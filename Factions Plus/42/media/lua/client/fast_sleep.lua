@@ -90,8 +90,10 @@ local function OnTick(tick)
 			))
 
 			-- aplicar
-			stats:add(CharacterStat.FATIGUE, -fatigueToRecover)
+			stats:remove(CharacterStat.FATIGUE, fatigueToRecover)
+			sendPlayerStat(getPlayer(), CharacterStat.FATIGUE)
 			stats:add(CharacterStat.ENDURANCE, enduranceToRecover)
+			sendPlayerStat(getPlayer(), CharacterStat.ENDURANCE)
 
 			-- valores depois
 			local newFatigue   = stats:get(CharacterStat.FATIGUE)
@@ -134,7 +136,7 @@ function ISWorldObjectContextMenu.onSleepWalkToComplete(player, bed)
 		and currentWake - currentTime
 		or currentWake + 24 - currentTime
 
-	local reducedHours  = math.max(1, originalHours * reducer)
+	local reducedHours  = originalHours * reducer
 	local newWakeTime   = currentTime + reducedHours
 	if newWakeTime >= 24 then newWakeTime = newWakeTime - 24 end
 

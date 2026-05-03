@@ -104,7 +104,8 @@
         "sendAddItemToContainer",
         "ZomboidGlobals",
         "ISSleepDialog",
-        "ISWorldObjectContextMenu"
+        "ISWorldObjectContextMenu",
+        "sendPlayerStat"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
