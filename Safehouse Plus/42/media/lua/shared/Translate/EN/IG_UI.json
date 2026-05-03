@@ -1,0 +1,11 @@
+{
+	"IGUI_Door_Create_Key": "Make Key",
+	"IGUI_Door_Key_Created": "Key Created",
+	"IGUI_Door_Lock": "Doorlock",
+	"IGUI_Door_Key_Not_Created": "I cant do that",
+	"IGUI_Respawn_SayRespawn": "Respawn Point Set",
+	"IGUI_Respawn_DeathUI_Respawn": "RESPAWN",
+	"IGUI_Respawn_CCC_Respawn": "RESPAWN",
+	"IGUI_Respawn_Bed": "Bed",
+	"IGUI_Respawn_In_Bed": "Respawn in Bed"
+}
