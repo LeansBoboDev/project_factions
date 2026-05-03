@@ -21,7 +21,7 @@ option FactionsPlus.SleepFatigueReducer
     type = integer,
     min = 1,
     max = 100,
-    default = 1,
+    default = 90,
 
     page = FactionsPlus,
     translation = FactionsPlus_SleepFatigueReducer,
@@ -32,7 +32,7 @@ option FactionsPlus.SleepEnduranceReceive
     type = integer,
     min = 1,
     max = 100,
-    default = 1,
+    default = 90,
 
     page = FactionsPlus,
     translation = FactionsPlus_SleepEnduranceReceive,
@@ -80,7 +80,7 @@ option FactionsPlus.ReduceWaterNeedPercentage
 	max = 100,
 	default = 0.5,
 	page = FactionsPlus,
-	translation = SmokeFlare_GunStoreSpawnChance,
+	translation = FactionsPlus_ReduceWaterNeedPercentage,
 }
 
 option FactionsPlus.WaterLevelIncreasePerTick

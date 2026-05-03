@@ -83,7 +83,7 @@ module Base
         category = Miscellaneous,
 		inputs
 		{
-			item 50 [Base.Carrots] flags[Prop1],
+			item 150 [Base.Carrots] flags[Prop1],
 		}
 		outputs
 		{

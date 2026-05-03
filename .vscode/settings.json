@@ -102,7 +102,9 @@
         "CharacterProfessionDefinition",
         "instanceItem",
         "sendAddItemToContainer",
-        "ZomboidGlobals"
+        "ZomboidGlobals",
+        "ISSleepDialog",
+        "ISWorldObjectContextMenu"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
