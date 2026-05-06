@@ -106,7 +106,14 @@
         "ISSleepDialog",
         "ISWorldObjectContextMenu",
         "sendPlayerStat",
-        "getSleepingEvent"
+        "getSleepingEvent",
+        "CharacterTraitDefinition",
+        "transformIntoKahluaTable",
+        "sendPlayerStatsChange",
+        "SyncXp",
+        "ItemType",
+        "SkillBook",
+        "getZomboidRadio"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
