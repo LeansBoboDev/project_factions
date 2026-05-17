@@ -113,7 +113,12 @@
         "SyncXp",
         "ItemType",
         "SkillBook",
-        "getZomboidRadio"
+        "getZomboidRadio",
+        "ImmutableColor",
+        "sendRemoveItemFromContainer",
+        "CharacterTrait",
+        "ResourceLocation",
+        "sendClothing"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",

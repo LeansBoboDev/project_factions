@@ -8,29 +8,38 @@ local RespawnData = {};
 local function clearInventory(player)
     local isUnlimitedCarry = player:isUnlimitedCarry();
     player:setUnlimitedCarry(true);
+    local inventory = player:getInventory();
 
-    --Need to unequip default equped items
-    local WornItems = {};
-
-    --Remove item while looping will cause an error
+    -- Collect worn items before removing (loop while modifying causes errors)
+    local wornItems = {};
     for i = 0, player:getWornItems():size() - 1 do
-        WornItems[i] = player:getWornItems():get(i):getItem();
+        wornItems[i + 1] = player:getWornItems():get(i):getItem();
+    end
+    for _, item in ipairs(wornItems) do
+        player:removeWornItem(item);
     end
 
-    --Unequip worn items
-    for i, WornItem in pairs(WornItems or {}) do
-        player:removeWornItem(WornItem);
+    -- Collect inventory items before clearing (needed for sendRemoveItemFromContainer)
+    local inventoryItems = {};
+    local items = inventory:getItems();
+    for i = 0, items:size() - 1 do
+        inventoryItems[i + 1] = items:get(i);
     end
 
     player:getWornItems():clear();
     player:getAttachedItems():clear();
     player:setPrimaryHandItem(nil);
     player:setSecondaryHandItem(nil);
+    inventory:getItems():clear();
+    inventory:removeAllItems();
+    player:setInventory(inventory);
 
-    local playerInventory = player:getInventory();
-    playerInventory:getItems():clear();
-    playerInventory:removeAllItems();
-    player:setInventory(playerInventory);
+    -- Notify client of all removals
+    sendEquip(player);
+    for _, item in ipairs(inventoryItems) do
+        sendRemoveItemFromContainer(inventory, item);
+    end
+
     player:setUnlimitedCarry(isUnlimitedCarry);
 end
 
@@ -252,27 +261,29 @@ local function saveRespawnBaseLocation(player)
 end
 
 local function savePlayerModel(player)
-    RespawnData[getUniqueId(player)].Visual = {};
-    RespawnData[getUniqueId(player)].Visual.SkinTexture = player:getVisual():getSkinTextureIndex();
-    RespawnData[getUniqueId(player)].Visual.SkinTextureName = player:getVisual():getSkinTexture();
-    RespawnData[getUniqueId(player)].Visual.NonAttachedHair = player:getVisual():getNonAttachedHair();
-    RespawnData[getUniqueId(player)].Visual.BodyHair = player:getVisual():getBodyHairIndex();
-    RespawnData[getUniqueId(player)].Visual.Outfit = player:getVisual():getOutfit();
-    RespawnData[getUniqueId(player)].Visual.HairModel = player:getVisual():getHairModel();
-    RespawnData[getUniqueId(player)].Visual.BeardModel = player:getVisual():getBeardModel();
-    RespawnData[getUniqueId(player)].Visual.SkinColor = player:getVisual():getSkinColor();
-    RespawnData[getUniqueId(player)].Visual.HairColor = player:getVisual():getHairColor();
-    RespawnData[getUniqueId(player)].Visual.BeardColor = player:getVisual():getBeardColor();
-
-    if (RespawnData[getUniqueId(player)].Visual.Outfit) then
-        RespawnData[getUniqueId(player)].Visual.Outfit = RespawnData[getUniqueId(player)].Visual.Outfit:clone();
+    local function colorToTable(color)
+        if not color then return nil end;
+        return { r = color:getRedFloat(), g = color:getGreenFloat(), b = color:getBlueFloat() };
     end
 
-    RespawnData[getUniqueId(player)].Descriptor = {};
-    RespawnData[getUniqueId(player)].Descriptor.Age = player:getAge();
-    RespawnData[getUniqueId(player)].Descriptor.Female = player:isFemale();
-    RespawnData[getUniqueId(player)].Descriptor.Forename = player:getDescriptor():getForename();
-    RespawnData[getUniqueId(player)].Descriptor.Surname = player:getDescriptor():getSurname();
+    local visual                           = player:getHumanVisual();
+    local id                               = getUniqueId(player);
+    RespawnData[id].Visual                 = {};
+    RespawnData[id].Visual.SkinTexture     = visual:getSkinTextureIndex();
+    RespawnData[id].Visual.SkinTextureName = visual:getSkinTexture();
+    RespawnData[id].Visual.NonAttachedHair = visual:getNonAttachedHair();
+    RespawnData[id].Visual.BodyHair        = visual:getBodyHairIndex();
+    RespawnData[id].Visual.HairModel       = visual:getHairModel();
+    RespawnData[id].Visual.BeardModel      = visual:getBeardModel();
+    RespawnData[id].Visual.SkinColor       = colorToTable(visual:getSkinColor());
+    RespawnData[id].Visual.HairColor       = colorToTable(visual:getHairColor());
+    RespawnData[id].Visual.BeardColor      = colorToTable(visual:getBeardColor());
+
+    RespawnData[id].Descriptor             = {};
+    RespawnData[id].Descriptor.Age         = player:getAge();
+    RespawnData[id].Descriptor.Female      = player:isFemale();
+    RespawnData[id].Descriptor.Forename    = player:getDescriptor():getForename();
+    RespawnData[id].Descriptor.Surname     = player:getDescriptor():getSurname();
 end
 
 local function savePlayerNutrition(player)
@@ -284,17 +295,6 @@ local function savePlayerNutrition(player)
     RespawnData[getUniqueId(player)].Nutrition.Weight = player:getNutrition():getWeight();
 end
 
-local function savePlayerFitness(player)
-    RespawnData[getUniqueId(player)].Fitness = {};
-    RespawnData[getUniqueId(player)].Fitness.Regularity = player:getFitness():getRegularityMap();
-    RespawnData[getUniqueId(player)].Fitness.Stiffness = {};
-
-    local parts = player:getBodyDamage():getBodyParts();
-
-    for i = 0, parts:size() - 1 do
-        RespawnData[getUniqueId(player)].Fitness.Stiffness[i] = parts:get(i):getStiffness();
-    end
-end
 
 local function savePlayerStats(player)
     local playerStatus = player:getStats();
@@ -357,7 +357,6 @@ local function savePlayer(player)
     savePlayerMultipliers(player);
     savePlayerModel(player);
     savePlayerNutrition(player);
-    savePlayerFitness(player);
 
     if getSandboxOptions():getOptionByName("SafehousePlus.KeepStats"):getValue() then
         savePlayerStats(player);
@@ -368,9 +367,11 @@ local function savePlayer(player)
 
     local knownTraits = player:getCharacterTraits():getKnownTraits();
     local savedTraits = {};
-    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(player:getDescriptor():getCharacterProfession());
+    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(player:getDescriptor()
+        :getCharacterProfession());
     for i = 0, knownTraits:size() - 1 do
-        local traitName = tostring(CharacterTraitDefinition.getCharacterTraitDefinition(knownTraits:get(i)):getType():getName());
+        local traitName = tostring(CharacterTraitDefinition.getCharacterTraitDefinition(knownTraits:get(i)):getType()
+            :getName());
         table.insert(savedTraits, traitName);
     end
     for i = 0, prof:getGrantedTraits():size() - 1 do
@@ -438,7 +439,8 @@ local function loadPlayerTraits(player)
         player:getCharacterTraits():add(CharacterTrait.get(ResourceLocation.of(traitName)));
     end
 
-    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(RespawnData[getUniqueId(player)].Profession);
+    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(RespawnData[getUniqueId(player)]
+        .Profession);
     for i = 0, prof:getGrantedTraits():size() - 1 do
         player:getCharacterTraits():add(prof:getGrantedTraits():get(i));
     end
@@ -479,40 +481,47 @@ local function loadPlayerMedia(player)
 end
 
 local function loadPlayerInventory(player)
+    local id = getUniqueId(player);
+    local inventory = player:getInventory();
+
     --Needed in case if player inventory will be full
     local isUnlimitedCarry = player:isUnlimitedCarry();
     player:setUnlimitedCarry(true);
 
-    --Assign new player's container to old items
-    for i = 0, RespawnData[getUniqueId(player)].Items:size() - 1 do
-        RespawnData[getUniqueId(player)].Items:get(i):setEquipParent(player);
-        RespawnData[getUniqueId(player)].Items:get(i):setContainer(player:getInventory());
+    --Add items one by one and notify client
+    for i = 0, RespawnData[id].Items:size() - 1 do
+        local item = RespawnData[id].Items:get(i);
+        item:setEquipParent(player);
+        item:setContainer(inventory);
+        inventory:AddItem(item);
+        sendAddItemToContainer(inventory, item);
     end
 
-    --Set items
-    player:getInventory():setItems(RespawnData[getUniqueId(player)].Items);
-
     --Set back worn items, clothes, belts, etc
-    for _, WornItem in pairs(RespawnData[getUniqueId(player)].WornItems or {}) do
-        player:getWornItems():setItem(WornItem:getLocation(), WornItem:getItem());
+    for _, WornItem in pairs(RespawnData[id].WornItems or {}) do
+        local location = WornItem:getLocation();
+        local item = WornItem:getItem();
+        player:getWornItems():setItem(location, item);
+        sendClothing(player, location, item);
     end
 
     --Set back attached items, items in belts
-    for _, AttachedItem in pairs(RespawnData[getUniqueId(player)].AttachedItems or {}) do
+    for _, AttachedItem in pairs(RespawnData[id].AttachedItems or {}) do
         player:getAttachedItems():setItem(AttachedItem:getLocation(), AttachedItem:getItem());
     end
 
     --Restore hotbar UI order
-    if (RespawnData[getUniqueId(player)].Hotbar ~= nil) then
-        player:getModData().hotbar = RespawnData[getUniqueId(player)].Hotbar
+    if (RespawnData[id].Hotbar ~= nil) then
+        player:getModData().hotbar = RespawnData[id].Hotbar;
     end
 
     --Put item in hand/s
-    player:setPrimaryHandItem(RespawnData[getUniqueId(player)].PrimaryHandItem);
-    player:setSecondaryHandItem(RespawnData[getUniqueId(player)].SecondaryHandItem);
+    player:setPrimaryHandItem(RespawnData[id].PrimaryHandItem);
+    player:setSecondaryHandItem(RespawnData[id].SecondaryHandItem);
 
     --Revert unlimited carry
     player:setUnlimitedCarry(isUnlimitedCarry);
+    DebugPrintSafehousePlus("[Respawn] loadPlayerInventory: " .. RespawnData[id].Items:size() .. " items restored");
 end
 
 local function loadRespawnLocation(player)
@@ -525,16 +534,17 @@ end
 
 local function loadPlayerModel(player)
     if (RespawnData[getUniqueId(player)].Visual) then
-        player:getVisual():setSkinTextureIndex(RespawnData[getUniqueId(player)].Visual.SkinTexture)
-        player:getVisual():setSkinTextureName(RespawnData[getUniqueId(player)].Visual.SkinTextureName);
-        player:getVisual():setNonAttachedHair(RespawnData[getUniqueId(player)].Visual.NonAttachedHair);
-        player:getVisual():setBodyHairIndex(RespawnData[getUniqueId(player)].Visual.BodyHair);
-        player:getVisual():setOutfit(RespawnData[getUniqueId(player)].Visual.Outfit);
-        player:getVisual():setHairModel(RespawnData[getUniqueId(player)].Visual.HairModel);
-        player:getVisual():setBeardModel(RespawnData[getUniqueId(player)].Visual.BeardModel);
-        player:getVisual():setSkinColor(RespawnData[getUniqueId(player)].Visual.SkinColor);
-        player:getVisual():setHairColor(RespawnData[getUniqueId(player)].Visual.HairColor);
-        player:getVisual():setBeardColor(RespawnData[getUniqueId(player)].Visual.BeardColor);
+        local visual = player:getHumanVisual();
+        local v = RespawnData[getUniqueId(player)].Visual;
+        visual:setSkinTextureIndex(v.SkinTexture);
+        visual:setSkinTextureName(v.SkinTextureName);
+        visual:setNonAttachedHair(v.NonAttachedHair);
+        visual:setBodyHairIndex(v.BodyHair);
+        visual:setHairModel(v.HairModel);
+        visual:setBeardModel(v.BeardModel);
+        if v.SkinColor then visual:setSkinColor(ImmutableColor.new(v.SkinColor.r, v.SkinColor.g, v.SkinColor.b, 1)) end;
+        if v.HairColor then visual:setHairColor(ImmutableColor.new(v.HairColor.r, v.HairColor.g, v.HairColor.b, 1)) end;
+        if v.BeardColor then visual:setBeardColor(ImmutableColor.new(v.BeardColor.r, v.BeardColor.g, v.BeardColor.b, 1)) end;
     end
 
     if (RespawnData[getUniqueId(player)].Descriptor) then
@@ -554,20 +564,6 @@ local function loadPlayerNutrition(player)
     player:getNutrition():setWeight(RespawnData[getUniqueId(player)].Nutrition.Weight);
 end
 
-local function loadPlayerFitness(player)
-    local regularity = RespawnData[getUniqueId(player)].Fitness.Regularity;
-    if regularity ~= nil then
-        player:getFitness():setRegularityMap(regularity);
-    else
-        DebugPrintSafehousePlus("[Respawn] WARNING: Fitness.Regularity is nil, skipping setRegularityMap");
-    end
-
-    local parts = player:getBodyDamage():getBodyParts();
-
-    for i, _ in pairs(RespawnData[getUniqueId(player)].Fitness.Stiffness or {}) do
-        parts:get(i):setStiffness(RespawnData[getUniqueId(player)].Fitness.Stiffness[i]);
-    end
-end
 
 local function loadPlayerStats(player)
     local playerStatus = player:getStats();
@@ -627,7 +623,6 @@ local function loadPlayer(player)
     loadPlayerFavoriteRecipes(player);
     loadPlayerMedia(player);
     loadPlayerNutrition(player);
-    loadPlayerFitness(player);
 
     if getSandboxOptions():getOptionByName("SafehousePlus.KeepStats"):getValue() then
         loadPlayerStats(player);
@@ -712,7 +707,7 @@ else -- If not create a server command
         loadPlayerFavoriteRecipes(player);
         loadPlayerMedia(player);
         loadPlayerNutrition(player);
-        loadPlayerFitness(player);
+        loadPlayerModel(player);
         DebugPrintSafehousePlus("All necessary loades finished!");
     end
 
