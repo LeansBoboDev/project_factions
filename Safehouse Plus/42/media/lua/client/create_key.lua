@@ -20,17 +20,20 @@ doorlocksystem.onFillWorldObjectContextMenu = function(playerId, context, worldo
 	end
 end
 
--- Secondary function to check if player is on the safehouse, returns true if belongs to the safehouse
--- false if not belongs to the safehouse or the safehouse is not exist
-local function BelongsToTheSafehouse()
-	-- TO DO
-	return true;
+-- Returns true if the door's square belongs to a safehouse the player owns or is a member of
+local function BelongsToTheSafehouse(player, door)
+    local square = door:getSquare();
+    if not square then return false end;
+    local safe = SafeHouse.getSafeHouse(square);
+    if not safe then return false end;
+    local username = player:getUsername();
+    return safe:getOwner() == username or safe:getPlayers():contains(username);
 end
 
--- Creates the gey for the user
+-- Creates the key for the user
 doorlocksystem.userGetKey = function(worldobjects, player, door)
 	-- Verify if the player belongs to the safehouse
-	if BelongsToTheSafehouse() then
+	if BelongsToTheSafehouse(player, door) then
 		-- Gets the door id
 		local keycode = door:getKeyId();
 		-- Create a key

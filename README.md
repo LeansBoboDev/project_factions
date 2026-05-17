@@ -27,6 +27,8 @@ Add a new shop system, forked from [Server Points](https://steamcommunity.com/sh
 - Sell vegetables/fruits
 - > I recommend changing vanilla sandbox ``Farming Speed`` to ``50`` and ``Farming Abundance`` to ``0.1`` to make vegetables balanced
 - Scrap Weapons to earn the stackable scrap (bigger the scrap the more economy currency you will earn)
+- Safehouse Passive Currency Give (Reworking...)
+- Upgrade Safehouse (Reworking...)
 
 # Factions Plus
 Add new features and adjustments for playing in any anarchy/infinite server.
@@ -45,13 +47,8 @@ Singleplayer Compatibility: Yes
 Add several new mechanics to safehouses, with the upgrader you can increase the house level to gain more Points in the Server, you can easily create keys for your safehouse, and new
 respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829)
 
-- Create key in Safehouse (Need Factions Mod) (Reworking...)
-- Safehouse Passive Currency Give (Need Factions Economy Mod) (Reworking...)
-- Upgrade Safehouse (Need Factions Economy Mod) (Reworking...)
-- Safehouse Protection Item (Need Factions Mod) (Reworking...)
-- Respawn character keep stats
-- Respawn in Safehouse bed
-- Keep inventory
+- Create key in Safehouse
+- Respawn Keep Inventory
 
 #
 
