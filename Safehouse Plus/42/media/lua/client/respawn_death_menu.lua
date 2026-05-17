@@ -159,18 +159,40 @@ function CoopMapSpawnSelect:clickNext(...)
         local function receiveRespawnStats(module, command, arguments)
             if module == "SafehousePlusRespawn" and command == "receiveRespawnStats" then
                 Events.OnServerCommand.Remove(receiveRespawnStats);
+                DebugPrintSafehousePlus("[Respawn] receiveRespawnStats received on client");
 
                 if not arguments then
+                    DebugPrintSafehousePlus("[Respawn] ERROR: receiveRespawnStats arguments is nil");
                     return;
                 end
 
+                DebugPrintSafehousePlus("[Respawn] Calling UnsafeLocallyUpdate...");
                 UnsafeLocallyUpdate(arguments);
+                DebugPrintSafehousePlus("[Respawn] UnsafeLocallyUpdate done");
             end
         end
         Events.OnServerCommand.Add(receiveRespawnStats);
 
-        DebugPrintSafehousePlus("Request player load...");
-        sendClientCommand("SafehousePlusRespawn", "loadPlayer", nil);
-        -- triggerEvent("OnClothingUpdated", getPlayer());
+        SafehousePlusPendingLoad = true;
+        DebugPrintSafehousePlus("[Respawn] Pending load set, awaiting player spawn...");
     end
 end
+
+local function onCreatePlayer()
+    DebugPrintSafehousePlus("[Respawn] OnCreatePlayer fired, registering spawn watcher");
+
+    local function waitForSpawn()
+        if not SafehousePlusPendingLoad then return end;
+        if not getPlayer():isPlayerMoving() then return end;
+
+        Events.OnPlayerUpdate.Remove(waitForSpawn);
+        SafehousePlusPendingLoad = false;
+
+        DebugPrintSafehousePlus("[Respawn] Player is moving, sending loadPlayer command to server");
+        sendClientCommand("SafehousePlusRespawn", "loadPlayer", nil);
+    end
+
+    Events.OnPlayerUpdate.Add(waitForSpawn);
+end
+
+Events.OnCreatePlayer.Add(onCreatePlayer);

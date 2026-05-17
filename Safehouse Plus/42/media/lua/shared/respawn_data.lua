@@ -159,6 +159,7 @@ local function savePlayerLevels(player)
         RespawnData[getUniqueId(player)].Levels[perk] = player:getPerkLevel(perk);
         RespawnData[getUniqueId(player)].Xp[perk] = player:getXp():getXP(perk);
     end
+    DebugPrintSafehousePlus("[Respawn] Levels saved: " .. player:getUsername());
 end
 
 local function savePlayerBoosts(player)
@@ -365,7 +366,23 @@ local function savePlayer(player)
 
     savePlayerFavoriteRecipes(player);
 
-    RespawnData[getUniqueId(player)].Traits = player:getCharacterTraits():getTraits();
+    local knownTraits = player:getCharacterTraits():getKnownTraits();
+    local savedTraits = {};
+    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(player:getDescriptor():getCharacterProfession());
+    for i = 0, knownTraits:size() - 1 do
+        local traitName = tostring(CharacterTraitDefinition.getCharacterTraitDefinition(knownTraits:get(i)):getType():getName());
+        table.insert(savedTraits, traitName);
+    end
+    for i = 0, prof:getGrantedTraits():size() - 1 do
+        local grantedName = tostring(prof:getGrantedTraits():get(i):getName());
+        for j = #savedTraits, 1, -1 do
+            if savedTraits[j] == grantedName then
+                table.remove(savedTraits, j);
+                break;
+            end
+        end
+    end
+    RespawnData[getUniqueId(player)].Traits = savedTraits;
     RespawnData[getUniqueId(player)].Profession = player:getDescriptor():getCharacterProfession();
     RespawnData[getUniqueId(player)].Recipes = player:getKnownRecipes();
     RespawnData[getUniqueId(player)].ZombieKills = player:getZombieKills();
@@ -381,11 +398,12 @@ end
 
 local function loadPlayerLevels(player)
     for perk, level in pairs(RespawnData[getUniqueId(player)].Levels or {}) do
-        local perkLevel = player:getPerkLevel(perk);
+        player:level0(perk);
 
-        while (perkLevel > 0) do
-            player:LoseLevel(perk);
-            perkLevel = perkLevel - 1;
+        local i = 0;
+        while (i < level) do
+            player:LevelPerk(perk, false);
+            i = i + 1;
         end
 
         player:getXp():setXPToLevel(perk, level);
@@ -405,10 +423,24 @@ local function loadPlayerBoosts(player)
 end
 
 local function loadPlayerTraits(player)
-    player:getCharacterTraits():getTraits():clear();
+    local traits = RespawnData[getUniqueId(player)].Traits;
+    if not traits then
+        DebugPrintSafehousePlus("[Respawn] WARNING: no Traits data to load");
+        return;
+    end
 
-    for i = 0, RespawnData[getUniqueId(player)].Traits:size() - 1 do
-        player:getCharacterTraits():getTraits():add(RespawnData[getUniqueId(player)].Traits:get(i));
+    local knownTraits = player:getCharacterTraits():getKnownTraits();
+    for i = knownTraits:size() - 1, 0, -1 do
+        player:getCharacterTraits():remove(knownTraits:get(i));
+    end
+
+    for _, traitName in pairs(traits) do
+        player:getCharacterTraits():add(CharacterTrait.get(ResourceLocation.of(traitName)));
+    end
+
+    local prof = CharacterProfessionDefinition.getCharacterProfessionDefinition(RespawnData[getUniqueId(player)].Profession);
+    for i = 0, prof:getGrantedTraits():size() - 1 do
+        player:getCharacterTraits():add(prof:getGrantedTraits():get(i));
     end
 end
 
@@ -523,7 +555,12 @@ local function loadPlayerNutrition(player)
 end
 
 local function loadPlayerFitness(player)
-    player:getFitness():setRegularityMap(RespawnData[getUniqueId(player)].Fitness.Regularity);
+    local regularity = RespawnData[getUniqueId(player)].Fitness.Regularity;
+    if regularity ~= nil then
+        player:getFitness():setRegularityMap(regularity);
+    else
+        DebugPrintSafehousePlus("[Respawn] WARNING: Fitness.Regularity is nil, skipping setRegularityMap");
+    end
 
     local parts = player:getBodyDamage():getBodyParts();
 
@@ -560,17 +597,31 @@ local function loadPlayerStats(player)
 end
 
 local function loadPlayer(player)
+    DebugPrintSafehousePlus("[Respawn] loadPlayer started: " .. player:getUsername());
+
+    local id = getUniqueId(player);
+    if not RespawnData[id] then
+        DebugPrintSafehousePlus("[Respawn] ERROR: no RespawnData found for id=" .. tostring(id));
+        return;
+    end
+
     clearInventory(player);
 
     if getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory"):getValue() then
         loadPlayerInventory(player);
+        DebugPrintSafehousePlus("[Respawn] Inventory loaded: " .. player:getUsername());
     end
 
     -- Requires to be done on client side too
-    sendServerCommand(player, "SafehousePlusRespawn", "receiveRespawnStats", RespawnData[getUniqueId(player)]);
+    sendServerCommand(player, "SafehousePlusRespawn", "receiveRespawnStats", RespawnData[id]);
+    DebugPrintSafehousePlus("[Respawn] receiveRespawnStats sent to client: " .. player:getUsername());
 
     loadPlayerLevels(player);
+    DebugPrintSafehousePlus("[Respawn] Levels loaded: " .. player:getUsername());
+
     loadPlayerBooks(player);
+    DebugPrintSafehousePlus("[Respawn] Books loaded: " .. player:getUsername());
+
     loadPlayerMultipliers(player);
     loadPlayerRecipes(player);
     loadPlayerFavoriteRecipes(player);
@@ -580,18 +631,21 @@ local function loadPlayer(player)
 
     if getSandboxOptions():getOptionByName("SafehousePlus.KeepStats"):getValue() then
         loadPlayerStats(player);
+        DebugPrintSafehousePlus("[Respawn] Stats loaded: " .. player:getUsername());
     end
 
-    player:setZombieKills(RespawnData[getUniqueId(player)].ZombieKills);
-    player:setSurvivorKills(RespawnData[getUniqueId(player)].SurvivorKills);
-    player:setHoursSurvived(RespawnData[getUniqueId(player)].HoursSurvived);
+    player:setZombieKills(RespawnData[id].ZombieKills);
+    player:setSurvivorKills(RespawnData[id].SurvivorKills);
+    player:setHoursSurvived(RespawnData[id].HoursSurvived);
     clearWounds(player);
 
     loadPlayerModel(player);
     loadPlayerBoosts(player);
     loadPlayerTraits(player);
-    player:setLevelUpMultiplier(RespawnData[getUniqueId(player)].LevelUpMultiplier);
+    player:setLevelUpMultiplier(RespawnData[id].LevelUpMultiplier);
     clearBandages(player);
+
+    DebugPrintSafehousePlus("[Respawn] loadPlayer finished: " .. player:getUsername());
 end
 
 --#endregion
