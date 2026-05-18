@@ -30,7 +30,7 @@ Add a new shop system, forked from [Server Points](https://steamcommunity.com/sh
 - > I recommend changing vanilla sandbox ``Farming Speed`` to ``50`` and ``Farming Abundance`` to ``0.1`` to make vegetables balanced
 - Scrap Weapons to earn the stackable scrap (bigger the scrap the more economy currency you will earn)
 - [Random Hordes](https://github.com/LeandroTheDev/random_hordes) currency give on horde survival
-- Safehouse Passive Currency Give (Reworking...)
+- Safehouse Passive Currency Give
 - Upgrade Safehouse (Reworking...)
 
 # Factions Plus
@@ -45,8 +45,6 @@ Add new features and adjustments for playing in any anarchy/infinite server.
 - Reset world start age making food and items (prevent respawning rotten foods or broken equipment)
 
 # Safehouse Plus
-Singleplayer Compatibility: Yes
-
 Respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829), and create door key system
 
 - Create key in Safehouse

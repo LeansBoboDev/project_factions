@@ -28,5 +28,6 @@
 	"IGUI_Shop_Message": "Buy items from Server Market",
 	"IGUI_Shop_Return": "Returned",
 	"IGUI_Shop_Sell": "Sold",
-	"IGUI_Safehouse_Redeem": "Redeemed"
+	"IGUI_Safehouse_Redeem": "Redeemed",
+	"IGUI_Safehouse_Upgraded": "Upgraded"
 }

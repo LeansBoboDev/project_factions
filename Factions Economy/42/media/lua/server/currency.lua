@@ -111,6 +111,39 @@ FactionsEconomyCurrencyRecipe.ReturnCurrency = function(craftRecipeData, player)
     notifyClient(player, "IGUI_Shop_Sell")
 end
 
+FactionsEconomyCurrencyRecipe.UpgradeSafehouse = function(craftRecipeData, player)
+    local username = player:getUsername()
+    DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] %s requested upgrade", username))
+
+    local square = player:getCurrentSquare()
+    if not square then
+        DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] %s has no current square", username))
+        return
+    end
+
+    local safehouse = SafeHouse.getSafeHouse(square)
+    if not safehouse then
+        DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] %s is not standing in a safehouse", username))
+        return
+    end
+
+    if safehouse:getOwner() ~= username then
+        DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] %s is not the owner of %s", username,
+            safehouse:getTitle()))
+        return
+    end
+
+    local data = FactionsEconomySafehouseCurrencyData[username]
+    if not data then
+        DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] no data found for %s", username))
+        return
+    end
+
+    data.Tier = data.Tier + 1
+    DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] %s upgraded to tier %d", safehouse:getTitle(), data.Tier))
+    notifyClient(player, "IGUI_Safehouse_Upgraded")
+end
+
 FactionsEconomyCurrencyRecipe.SellSmallScrap = function(craftRecipeData, player)
     DebugPrintFactionsEconomy(string.format("%s sell small scrap", player:getUsername()))
     local price = getSandboxOption("FactionsEconomy.SmallStackScrapValue")

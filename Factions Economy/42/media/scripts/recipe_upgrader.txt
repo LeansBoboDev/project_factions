@@ -1,0 +1,17 @@
+module Base
+{
+    craftRecipe UpgradeSafehouse {
+		timedAction = Making,
+		Time = 25,
+		OnCreate = FactionsEconomyCurrencyRecipe.UpgradeSafehouse,		
+		Tags = InHandCraft;CanBeDoneInDark,
+        category = Miscellaneous,
+		inputs
+		{
+			item 1 [Base.FactionsEconomy_UpgradeSafehouse] flags[Prop1],
+		}
+		outputs
+		{
+		}
+	}
+}

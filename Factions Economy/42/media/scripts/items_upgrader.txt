@@ -1,0 +1,12 @@
+module Base
+{
+    item FactionsEconomy_UpgradeSafehouse
+	{
+		DisplayName = Upgrade Safehouse,
+		DisplayCategory = Memento,
+		Weight	=	0.1,
+        Type	=	Normal,
+		Icon = upgrade_safehouse,
+		WorldStaticModel = Money
+	}
+}
