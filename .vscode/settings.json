@@ -118,7 +118,8 @@
         "sendRemoveItemFromContainer",
         "CharacterTrait",
         "ResourceLocation",
-        "sendClothing"
+        "sendClothing",
+        "LuaEventManager"
     ],
     "Lua.diagnostics.disable": [
         "deprecated",

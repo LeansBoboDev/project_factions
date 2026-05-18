@@ -3,9 +3,6 @@
     "IGUI_Door_Key_Created": "Chave Criada",
     "IGUI_Door_Lock": "Fechadura",
     "IGUI_Door_Key_Not_Created": "Não posso fazer isso",
-    "IGUI_Respawn_SayRespawn": "Ponto de Renascimento Definido",
     "IGUI_Respawn_DeathUI_Respawn": "RENASCER",
-    "IGUI_Respawn_CCC_Respawn": "RENASCER",
-    "IGUI_Respawn_Bed": "Cama",
-    "IGUI_Respawn_In_Bed": "Renascer na Cama"
+    "IGUI_Respawn_CCC_Respawn": "RENASCER"
 }

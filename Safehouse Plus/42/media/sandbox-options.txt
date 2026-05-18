@@ -8,36 +8,10 @@ option SafehousePlus.EnableSafehouseCreateKey
 	translation = SafehousePlus_EnableSafehouseCreateKey,
 }
 
-option SafehousePlus.EnableRespawnMechanic
-{
-	type = boolean,
-	default = true,
-	page = Safehouse,
-	translation = SafehousePlus_EnableRespawnMechanic,
-}
-
-option SafehousePlus.EnableSafehouseRespawn
-{
-	type = boolean,
-	default = true,
-	page = Safehouse,
-	translation = SafehousePlus_EnableSafehouseRespawn,
-}
-
-option SafehousePlus.SpawnpointTimer
-{
-	type = integer,
-	default = 1000,
-	min = 0,
-	max = 2147483647,
-	page = Safehouse,
-	translation = SafehousePlus_SpawnpointTimer,
-}
-
 option SafehousePlus.RespawnCooldown
 {
 	type = integer,
-	default = 30,
+	default = 1,
 	min = -1,
 	max = 2147483647,
 	page = Safehouse,

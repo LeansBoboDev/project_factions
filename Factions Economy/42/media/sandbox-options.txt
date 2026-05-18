@@ -21,6 +21,49 @@ option FactionsEconomy.CurrencyPerTick
     translation = FactionsEconomy_PointsPerTick,
 }
 
+option FactionsEconomy.CurrencyPerHordeSurvived
+{
+    type = integer,
+    min = 0,
+    max = 2147483647,
+    default = 10,
+
+    page = FactionsEconomy,
+    translation = FactionsEconomy_CurrencyPerHordeSurvived,
+}
+
+option FactionsEconomy.SafehouseCurrencyFrequency
+{
+    type = enum,
+    numValues = 4,
+    default = 4,
+
+    page = FactionsEconomy,
+    translation = FactionsEconomy_SafehouseCurrencyFrequency
+}
+
+option FactionsEconomy.SafehouseCurrencyPerTick
+{
+    type = integer,
+    min = 0,
+    max = 2147483647,
+    default = 1,
+
+    page = FactionsEconomy,
+    translation = FactionsEconomy_SafehousePointsPerTick,
+}
+
+option FactionsEconomy.SafehouseCurrencyAdditionalPerTier
+{
+    type = double,
+    min = 0,
+    max = 2147483647,
+    default = 1.0,
+
+    page = FactionsEconomy,
+    translation = FactionsEconomy_SafehouseCurrencyAdditionalPerTier,
+}
+
 option FactionsEconomy.SmallStackScrapValue
 {
     type = integer,
