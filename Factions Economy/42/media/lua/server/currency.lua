@@ -165,10 +165,12 @@ local function redeemSafehouseCurrency(player)
         return
     end
 
-    DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] %s is allowed, safehouse id: %s", username,
-        safehouse:getId()))
+    DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] %s is allowed, safehouse: %s", username,
+        safehouse:getTitle()))
 
-    -- TODO: reward logic here
+    addCurrency(player:getUsername(), FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency)
+    notifyClient(player, "IGUI_Safehouse_Redeem", FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency)
+    FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency = 0
 end
 
 -- ── Safehouse Events ─────────────────────────────────────────
