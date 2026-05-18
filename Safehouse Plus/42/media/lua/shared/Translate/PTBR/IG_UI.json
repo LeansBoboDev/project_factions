@@ -3,6 +3,7 @@
     "IGUI_Door_Key_Created": "Chave Criada",
     "IGUI_Door_Lock": "Fechadura",
     "IGUI_Door_Key_Not_Created": "Não posso fazer isso",
+    "IGUI_Door_Key_No_Currency": "Moeda insuficiente para criar uma chave",
     "IGUI_Respawn_DeathUI_Respawn": "RENASCER",
     "IGUI_Respawn_CCC_Respawn": "RENASCER"
 }

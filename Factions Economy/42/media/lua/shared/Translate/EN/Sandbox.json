@@ -16,6 +16,8 @@
     "Sandbox_FactionsEconomy_SafehouseCurrencyAdditionalPerTier_tooltip": "How much the tier will increase the currency give by tick for safehouses: currency * (tier * this)",
     "Sandbox_FactionsEconomy_CurrencyPerHordeSurvived": "Currency Per Horde Survived",
     "Sandbox_FactionsEconomy_CurrencyPerHordeSurvived_tooltip": "If Random Hordes is enabled how much points player will receive on horde survival",
+    "Sandbox_FactionsEconomy_CreateKeyCost": "Create Key Cost",
+    "Sandbox_FactionsEconomy_CreateKeyCost_tooltip": "Currency cost to create a safehouse key",
     "Sandbox_FactionsEconomy_SmallStackScrapValue": "Small Stack Scrap Value",
     "Sandbox_FactionsEconomy_MediumStackScrapValue": "Medium Stack Scrap Value",
     "Sandbox_FactionsEconomy_LargeStackScrapValue": "Large Stack Scrap Value",

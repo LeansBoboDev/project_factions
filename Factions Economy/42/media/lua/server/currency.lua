@@ -285,5 +285,20 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         })
     elseif command == "redeemSafehouseCurrency" then
         redeemSafehouseCurrency(player)
+    elseif command == "requestCreateKey" then
+        local username = player:getUsername()
+        local cost     = getSandboxOption("FactionsEconomy.CreateKeyCost")
+        local balance  = FactionsEconomyCurrencyData[username] or 0
+
+        DebugPrintFactionsEconomy(string.format("[CreateKey] %s requested key (cost: %d, balance: %d)", username, cost, balance))
+
+        if balance >= cost then
+            FactionsEconomyCurrencyData[username] = balance - cost
+            sendServerCommand(player, "FactionsEconomyCurrency", "confirmCreateKey", { keycode = args.keycode })
+            DebugPrintFactionsEconomy(string.format("[CreateKey] %s key confirmed, new balance: %d", username, FactionsEconomyCurrencyData[username]))
+        else
+            sendServerCommand(player, "FactionsEconomyCurrency", "denyCreateKey", {})
+            DebugPrintFactionsEconomy(string.format("[CreateKey] %s insufficient funds", username))
+        end
     end
 end)

@@ -31,7 +31,7 @@ Add a new shop system, forked from [Server Points](https://steamcommunity.com/sh
 - Scrap Weapons to earn the stackable scrap (bigger the scrap the more economy currency you will earn)
 - [Random Hordes](https://github.com/LeandroTheDev/random_hordes) currency give on horde survival
 - Safehouse Passive Currency Give
-- Upgrade Safehouse (Reworking...)
+- Upgrade Safehouse
 
 # Factions Plus
 Add new features and adjustments for playing in any anarchy/infinite server.
