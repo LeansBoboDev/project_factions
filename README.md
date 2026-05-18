@@ -2,6 +2,8 @@ Legacy b41 version: access [Last commit from B41](https://github.com/LeandroTheD
 
 B42: currently
 # Factions (Reworking...) do not use it
+## I don't know what indie stone is doing behind the scenes but i think there will be a native pvp factions, better not lose time reworking this until the native system
+
 Singleplayer Compatibility: No, theres is no reason to add a capture system in singleplayer
 
 Forked from [SSR: Safehouse](https://steamcommunity.com/sharedfiles/filedetails/?id=1178772929&searchtext=Safehouse) to create a complete new system to safehouse claim and capture
@@ -39,13 +41,12 @@ Add new features and adjustments for playing in any anarchy/infinite server.
 - > I recommend changing vanilla sandbox ``Plant Resilience`` to ``Very High`` to not lose water when player is offline or busy in crop final stage
 - Connections/Disconnections/Death player messages events (Multiplayer only)
 - Weekly turn off and on water and electric
-- Reset world start age making food and itens not spawn as rotten or broken
+- Reset world start age making food and items (prevent respawning rotten foods or broken equipment)
 
 # Safehouse Plus
 Singleplayer Compatibility: Yes
 
-Add several new mechanics to safehouses, with the upgrader you can increase the house level to gain more Points in the Server, you can easily create keys for your safehouse, and new
-respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829)
+Respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829), and create door key system
 
 - Create key in Safehouse
 - Respawn Keep Inventory
