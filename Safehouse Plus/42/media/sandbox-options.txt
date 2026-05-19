@@ -8,6 +8,14 @@ option SafehousePlus.EnableSafehouseCreateKey
 	translation = SafehousePlus_EnableSafehouseCreateKey,
 }
 
+option SafehousePlus.EnableRespawnMechanic
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableRespawnMechanic,
+}
+
 option SafehousePlus.RespawnCooldown
 {
 	type = integer,

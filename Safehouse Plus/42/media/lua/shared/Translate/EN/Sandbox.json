@@ -2,6 +2,7 @@
     "Sandbox_Safehouse": "Safehouse Plus",
     "Sandbox_SafehousePlus_EnableSafehouseCreateKey": "Enable Safehouse Create Key",
     "Sandbox_SafehousePlus_EnableSafehouseCreateKey_tooltip": "Add the option to create a house key in the player safehouses",
+    "Sandbox_SafehousePlus_EnableRespawnMechanic": "Enable Respawn",
     "Sandbox_SafehousePlus_RespawnCooldown": "Respawn Cooldown",
     "Sandbox_SafehousePlus_RespawnCooldown_tooltip": "When you die you need to wait this seconds before respawn",
     "Sandbox_SafehousePlus_HealthOnRespawn": "Respawn Health",
