@@ -10,7 +10,9 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
 
     DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] Right-click by: %s", player:getUsername()))
 
-    local square = worldobjects:get(0):getSquare()
+    local firstObject = worldobjects[1]
+    if not firstObject then return end
+    local square = firstObject:getSquare()
     if not square then
         DebugPrintFactionsEconomy("[RedeemSafehouse] No square found")
         return

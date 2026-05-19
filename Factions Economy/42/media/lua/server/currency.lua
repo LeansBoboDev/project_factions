@@ -29,6 +29,28 @@ end
 
 -- ── Helpers ──────────────────────────────────────────────────
 
+local function getSafehousePlayers(safehouse)
+    local players = {}
+    local playerList = safehouse:getPlayers()
+    for i = 0, playerList:size() - 1 do
+        table.insert(players, playerList:get(i))
+    end
+    return players
+end
+
+local function AddSafehouseToData(safehouse)
+    local owner = safehouse:getOwner()
+    local existing = FactionsEconomySafehouseCurrencyData[owner]
+    FactionsEconomySafehouseCurrencyData[owner] = {
+        Title           = safehouse:getTitle(),
+        Owner           = owner,
+        Players         = getSafehousePlayers(safehouse),
+        DateTimeCreated = safehouse:getDatetimeCreatedStr(),
+        Currency        = existing and existing.Currency or 0,
+        Tier            = existing and existing.Tier or 1
+    }
+end
+
 local function ensurePlayerData(username)
     if not FactionsEconomyCurrencyData[username] then
         FactionsEconomyCurrencyData[username] = 0
@@ -201,9 +223,18 @@ local function redeemSafehouseCurrency(player)
     DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] %s is allowed, safehouse: %s", username,
         safehouse:getTitle()))
 
-    addCurrency(player:getUsername(), FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency)
-    notifyClient(player, "IGUI_Safehouse_Redeem", FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency)
-    FactionsEconomySafehouseCurrencyData[safehouse:getOwner()].Currency = 0
+    local owner = safehouse:getOwner()
+    local safeData = FactionsEconomySafehouseCurrencyData[owner]
+    if not safeData then
+        DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] No tracking data for safehouse owner: %s", owner))
+        AddSafehouseToData(safehouse)
+        notifyClient(player, "IGUI_Safehouse_Redeem", 0)
+        return
+    end
+
+    addCurrency(player:getUsername(), safeData.Currency)
+    notifyClient(player, "IGUI_Safehouse_Redeem", safeData.Currency)
+    safeData.Currency = 0
 end
 
 -- ── Safehouse Events ─────────────────────────────────────────
@@ -211,15 +242,6 @@ end
 LuaEventManager.AddEvent("OnFactionsEconomySafehouseClaimed")
 LuaEventManager.AddEvent("OnFactionsEconomySafehouseUpdated")
 LuaEventManager.AddEvent("OnFactionsEconomySafehouseUnclaimed")
-
-local function getSafehousePlayers(safehouse)
-    local players = {}
-    local playerList = safehouse:getPlayers()
-    for i = 0, playerList:size() - 1 do
-        table.insert(players, playerList:get(i))
-    end
-    return players
-end
 
 local function OnSafehousesChanged()
     local list = SafeHouse.getSafehouseList()
@@ -235,29 +257,13 @@ local function OnSafehousesChanged()
                 "[SafehouseTracking] New safehouse claimed: %s (owner: %s, created: %s)",
                 safehouse:getTitle(), owner, safehouse:getDatetimeCreatedStr()))
 
-            FactionsEconomySafehouseCurrencyData[owner] = {
-                Title           = safehouse:getTitle(),
-                Owner           = owner,
-                Players         = getSafehousePlayers(safehouse),
-                DateTimeCreated = safehouse:getDatetimeCreatedStr(),
-                Currency        = 0,
-                Tier            = 1
-            }
-
+            AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseClaimed", safehouse)
         else
             DebugPrintFactionsEconomy(string.format("[SafehouseTracking] Safehouse updated: %s (owner: %s, created: %s)",
                 safehouse:getTitle(), owner, safehouse:getDatetimeCreatedStr()))
 
-            FactionsEconomySafehouseCurrencyData[owner] = {
-                Title           = safehouse:getTitle(),
-                Owner           = owner,
-                Players         = getSafehousePlayers(safehouse),
-                DateTimeCreated = safehouse:getDatetimeCreatedStr(),
-                Currency        = FactionsEconomySafehouseCurrencyData[owner].Currency,
-                Tier            = FactionsEconomySafehouseCurrencyData[owner].Tier
-            }
-
+            AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseUpdated", safehouse)
         end
     end
@@ -290,12 +296,14 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         local cost     = getSandboxOption("FactionsEconomy.CreateKeyCost")
         local balance  = FactionsEconomyCurrencyData[username] or 0
 
-        DebugPrintFactionsEconomy(string.format("[CreateKey] %s requested key (cost: %d, balance: %d)", username, cost, balance))
+        DebugPrintFactionsEconomy(string.format("[CreateKey] %s requested key (cost: %d, balance: %d)", username, cost,
+            balance))
 
         if balance >= cost then
             FactionsEconomyCurrencyData[username] = balance - cost
             sendServerCommand(player, "FactionsEconomyCurrency", "confirmCreateKey", { keycode = args.keycode })
-            DebugPrintFactionsEconomy(string.format("[CreateKey] %s key confirmed, new balance: %d", username, FactionsEconomyCurrencyData[username]))
+            DebugPrintFactionsEconomy(string.format("[CreateKey] %s key confirmed, new balance: %d", username,
+                FactionsEconomyCurrencyData[username]))
         else
             sendServerCommand(player, "FactionsEconomyCurrency", "denyCreateKey", {})
             DebugPrintFactionsEconomy(string.format("[CreateKey] %s insufficient funds", username))
