@@ -5,8 +5,8 @@ module Base
 		DisplayName = Upgrade Safehouse,
 		DisplayCategory = Memento,
 		Weight	=	0.1,
-        Type	=	Normal,
-		Icon = upgrade_safehouse,
+        ItemType = base:normal,
+		Icon = Upgrade_Safehouse,
 		WorldStaticModel = Money
 	}
 }
