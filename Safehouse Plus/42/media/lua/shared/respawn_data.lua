@@ -648,7 +648,7 @@ end
 --#region Server Communication
 
 -- On death we need to save player data
-Events.OnCharacterDeath.Add(function(player)
+Events.OnPlayerDeath.Add(function(player)
     DebugPrintSafehousePlus("[Respawn] Saving iso player: " .. player:getUsername());
 
     -- Save player data
