@@ -43,6 +43,24 @@ local function clearInventory(player)
     player:setUnlimitedCarry(isUnlimitedCarry);
 end
 
+-- Clear the inventory of any IsoDeadBody found on a given square
+local function clearDeadBodyOnSquare(sq)
+    if not sq then return false end
+    local objs = sq:getStaticMovingObjects()
+    for i = 0, objs:size() - 1 do
+        local obj = objs:get(i)
+        if instanceof(obj, "IsoDeadBody") then
+            local inv = obj:getContainer()
+            if inv then
+                inv:getItems():clear()
+                inv:removeAllItems()
+            end
+            return true
+        end
+    end
+    return false
+end
+
 -- Clear all bandages attached to the player
 local function clearBandages(player)
     local items = player:getWornItems();
@@ -139,17 +157,13 @@ local function setHealth(player, health)
 end
 
 -- Returns the player unique id
+-- username is used in MP: getSteamID() returns a Java long that tostring() formats as
+-- scientific notation (e.g. 7.65e16), which differs between client and server contexts.
 local function getUniqueId(player)
     if SafehousePlusIsSinglePlayer then
-        -- I don't know how to detect split screen players 🤭
-        -- Split screen players cannot die at same time
         return tostring(1);
     else
-        if player:getSteamID() then
-            return tostring(player:getSteamID());
-        else
-            return tostring(player:getOnlineID());
-        end
+        return player:getUsername();
     end
 end
 
@@ -498,11 +512,26 @@ local function loadPlayerInventory(player)
     end
 
     --Set back worn items, clothes, belts, etc
-    for _, WornItem in pairs(RespawnData[id].WornItems or {}) do
-        local location = WornItem:getLocation();
-        local item = WornItem:getItem();
-        player:getWornItems():setItem(location, item);
-        sendClothing(player, location, item);
+    if RespawnData[id].WornItems[0] ~= nil then
+        -- Original path: WornItem Java objects with location info (SP or pre-B42 MP)
+        for _, WornItem in pairs(RespawnData[id].WornItems) do
+            local location = WornItem:getLocation();
+            local item = WornItem:getItem();
+            player:getWornItems():setItem(location, item);
+            sendClothing(player, location, item);
+        end
+    elseif RespawnData[id].WornItemsLocations then
+        -- B42 MP path: locations were serialized as strings by the client
+        for _, wiData in ipairs(RespawnData[id].WornItemsLocations) do
+            local loc = ItemBodyLocation[wiData.loc]
+            if loc then
+                local item = inventory:FindAndReturn(wiData.type)
+                if item then
+                    player:getWornItems():setItem(loc, item)
+                    sendClothing(player, loc, item)
+                end
+            end
+        end
     end
 
     --Set back attached items, items in belts
@@ -525,10 +554,12 @@ local function loadPlayerInventory(player)
 end
 
 local function loadRespawnLocation(player)
-    if ((RespawnData[getUniqueId(player)].X ~= nil) and (RespawnData[getUniqueId(player)].Y ~= nil) and (RespawnData[getUniqueId(player)].Z ~= nil)) then
-        player:setX(RespawnData[getUniqueId(player)].X);
-        player:setY(RespawnData[getUniqueId(player)].Y);
-        player:setZ(RespawnData[getUniqueId(player)].Z);
+    local id = getUniqueId(player)
+    if not RespawnData[id] then return end
+    if ((RespawnData[id].X ~= nil) and (RespawnData[id].Y ~= nil) and (RespawnData[id].Z ~= nil)) then
+        player:setX(RespawnData[id].X);
+        player:setY(RespawnData[id].Y);
+        player:setZ(RespawnData[id].Z);
     end;
 end
 
@@ -598,7 +629,7 @@ local function loadPlayer(player)
     local id = getUniqueId(player);
     if not RespawnData[id] then
         DebugPrintSafehousePlus("[Respawn] ERROR: no RespawnData found for id=" .. tostring(id));
-        return;
+        return false;
     end
 
     clearInventory(player);
@@ -651,15 +682,95 @@ end
 Events.OnPlayerDeath.Add(function(player)
     DebugPrintSafehousePlus("[Respawn] Saving iso player: " .. player:getUsername());
 
-    -- Save player data
     savePlayer(player);
 
-    -- Clear inventory for our and other players if keep inventory is true
-    if getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory"):getValue() then
-        clearInventory(player);
-        DebugPrintSafehousePlus("[Respawn] Dead body cleared: " .. player:getUsername());
+    -- B42 MP: OnPlayerDeath only fires client-side. Signal the server to do its own save.
+    -- The client still has WornItems with location info before server sync arrives, so we
+    -- serialize them as {loc, type} strings and send along for the server to use.
+    if not SafehousePlusIsSinglePlayer and isClient() then
+        local wornData = {}
+        local wornItems = player:getWornItems()
+        if wornItems then
+            for i = 0, wornItems:size() - 1 do
+                local wi = wornItems:get(i)
+                if wi and wi:getItem() then
+                    table.insert(wornData, {
+                        loc  = tostring(wi:getLocation()),
+                        type = wi:getItem():getFullType()
+                    })
+                end
+            end
+        end
+        sendClientCommand("SafehousePlusRespawn", "serverSavePlayer", {worn = wornData});
+    end
 
-        -- Tell client the corpse is dead
+    local keepInvOption = getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory")
+    local keepInv = keepInvOption and keepInvOption:getValue()
+
+    -- Server-side: if B42 already moved items to the dead body before OnPlayerDeath fired,
+    -- recover Items/WornItems/AttachedItems directly from the dead body.
+    if not isClient() and keepInv then
+        local id = getUniqueId(player)
+        if RespawnData[id] then
+            local sq = player:getSquare()
+            if sq then
+                local objs = sq:getStaticMovingObjects()
+                for i = 0, objs:size() - 1 do
+                    local obj = objs:get(i)
+                    if instanceof(obj, "IsoDeadBody") then
+                        if RespawnData[id].Items and RespawnData[id].Items:size() == 0 then
+                            local deadInv = obj:getContainer()
+                            if deadInv then
+                                RespawnData[id].Items = deadInv:getItems():clone()
+                                deadInv:getItems():clear()
+                                deadInv:removeAllItems()
+                                DebugPrintSafehousePlus("[Respawn] Items recovered from dead body: " .. player:getUsername())
+                            end
+                        end
+                        if RespawnData[id].WornItems[0] == nil and obj.getWornItems then
+                            local deadWorn = obj:getWornItems()
+                            if deadWorn then
+                                for j = 0, deadWorn:size() - 1 do
+                                    RespawnData[id].WornItems[j] = deadWorn:get(j)
+                                end
+                                DebugPrintSafehousePlus("[Respawn] WornItems recovered from dead body: " .. player:getUsername())
+                            end
+                        end
+                        if RespawnData[id].AttachedItems[0] == nil and obj.getAttachedItems then
+                            local deadAttached = obj:getAttachedItems()
+                            if deadAttached then
+                                for j = 0, deadAttached:size() - 1 do
+                                    RespawnData[id].AttachedItems[j] = deadAttached:get(j)
+                                end
+                                DebugPrintSafehousePlus("[Respawn] AttachedItems recovered from dead body: " .. player:getUsername())
+                            end
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    -- Client-side (or SP): clear the dead body and signal death complete
+    if not isServer() and keepInv then
+        local sq = player:getSquare()
+        if not clearDeadBodyOnSquare(sq) then
+            local username = player:getUsername()
+            local attempts = 0
+            local function waitForDeadBody()
+                attempts = attempts + 1
+                if clearDeadBodyOnSquare(sq) then
+                    Events.OnTick.Remove(waitForDeadBody)
+                    DebugPrintSafehousePlus("[Respawn] Dead body inventory cleared (deferred): " .. username)
+                elseif attempts >= 60 then
+                    Events.OnTick.Remove(waitForDeadBody)
+                    DebugPrintSafehousePlus("[Respawn] Dead body not found after 60 ticks: " .. username)
+                end
+            end
+            Events.OnTick.Add(waitForDeadBody)
+        end
+        DebugPrintSafehousePlus("[Respawn] Dead body cleared: " .. player:getUsername());
         player:setOnDeathDone(true);
     end
 end);
@@ -712,15 +823,49 @@ else -- If not create a server command
     end
 
     Events.OnClientCommand.Add(function(module, command, player, args)
-        if module == "SafehousePlusRespawn" and command == "setRespawnRegion" then
+        if module == "SafehousePlusRespawn" and command == "serverSavePlayer" then
+            DebugPrintSafehousePlus("[Respawn] Server save triggered for: " .. player:getUsername())
+            savePlayer(player)
+
+            local keepInvOpt = getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory")
+            if keepInvOpt and keepInvOpt:getValue() then
+                local id = getUniqueId(player)
+                if RespawnData[id] then
+                    local sq = player:getSquare()
+                    if sq then
+                        local objs = sq:getStaticMovingObjects()
+                        for i = 0, objs:size() - 1 do
+                            local obj = objs:get(i)
+                            if instanceof(obj, "IsoDeadBody") then
+                                if RespawnData[id].Items and RespawnData[id].Items:size() == 0 then
+                                    local deadInv = obj:getContainer()
+                                    if deadInv then
+                                        RespawnData[id].Items = deadInv:getItems():clone()
+                                        deadInv:getItems():clear()
+                                        deadInv:removeAllItems()
+                                        DebugPrintSafehousePlus("[Respawn] Items recovered from dead body: " .. player:getUsername())
+                                    end
+                                end
+                                break
+                            end
+                        end
+                    end
+                    -- Store worn item location data sent by client (serialized as strings)
+                    RespawnData[id].WornItemsLocations = args and args.worn or {}
+                    DebugPrintSafehousePlus("[Respawn] WornItemsLocations stored: " .. #(RespawnData[id].WornItemsLocations) .. " entries")
+                end
+            end
+
+        elseif module == "SafehousePlusRespawn" and command == "setRespawnRegion" then
             removePlayerRespawn(player);
             setRespawnRegion(player, args.region);
         elseif module == "SafehousePlusRespawn" and command == "loadPlayer" then
             DebugPrintSafehousePlus("Player requested load: " .. player:getUsername());
 
-            loadPlayer(player);
+            if loadPlayer(player) == false then return end
 
-            setHealth(player, getSandboxOptions():getOptionByName("SafehousePlus.HealthOnRespawn"):getValue());
+            local healthOption = getSandboxOptions():getOptionByName("SafehousePlus.HealthOnRespawn")
+            setHealth(player, healthOption and healthOption:getValue() or 1);
 
             loadRespawnLocation(player);
 

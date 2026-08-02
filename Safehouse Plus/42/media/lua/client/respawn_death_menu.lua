@@ -1,4 +1,5 @@
-if not getSandboxOptions():getOptionByName("SafehousePlus.EnableRespawnMechanic"):getValue() then return end
+local enableRespawnOption = getSandboxOptions():getOptionByName("SafehousePlus.EnableRespawnMechanic")
+if not enableRespawnOption or not enableRespawnOption:getValue() then return end
 
 -- Default Functions
 local CoopMapSpawnSelect_clickNext = CoopMapSpawnSelect.clickNext;
@@ -9,7 +10,8 @@ local ISPostDeathUI_onRespawn = ISPostDeathUI.onRespawn;
 local alreadyChecked = false;
 
 function ISPostDeathUI:render(...)
-    local seconds = (self.timeOfDeath + getSandboxOptions():getOptionByName("SafehousePlus.RespawnCooldown"):getValue() + 4) -
+    local cooldownOption = getSandboxOptions():getOptionByName("SafehousePlus.RespawnCooldown")
+    local seconds = (self.timeOfDeath + (cooldownOption and cooldownOption:getValue() or 0) + 4) -
         getTimestamp();
     self.buttonQuit:setTitle(getText("IGUI_Respawn_DeathUI_Respawn") .. ((seconds > 0) and (" " .. seconds .. "") or ""));
     self.buttonQuit:setEnable(seconds <= 0);
@@ -49,7 +51,8 @@ function ISPostDeathUI:onQuitToDesktop(...)
     CCC.mapSpawnSelect.nextButton:setTitle(getText("IGUI_Respawn_CCC_Respawn"));
 
     -- Safehouse respawn is enabled
-    if getSandboxOptions():getOptionByName("SafehousePlus.EnableSafehouseRespawn"):getValue() then
+    local respawnOption = getSandboxOptions():getOptionByName("SafehousePlus.EnableSafehouseRespawn")
+    if respawnOption and respawnOption:getValue() then
         local function receiveRespawn(module, command, arguments)
             if module == "SafehousePlusRespawn" and command == "receiveRespawn" then
                 Events.OnServerCommand.Remove(receiveRespawn);
@@ -146,7 +149,8 @@ function CoopMapSpawnSelect:clickNext(...)
 
         -- Load player data
         LoadPlayer(getPlayer());
-        SetHealth(getPlayer(), getSandboxOptions():getOptionByName("SafehousePlus.HealthOnRespawn"):getValue());
+        local healthOption = getSandboxOptions():getOptionByName("SafehousePlus.HealthOnRespawn")
+        SetHealth(getPlayer(), healthOption and healthOption:getValue() or 1);
 
         -- Teleport player to respawn location
         if (selected.name == getText("IGUI_Respawn_Bed")) then
