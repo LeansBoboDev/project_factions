@@ -739,30 +739,6 @@ Events.OnPlayerDeath.Add(function(player)
 
     savePlayer(player);
 
-    -- B42 MP: OnPlayerDeath only fires client-side. Signal the server to do its own save.
-    -- The client still has WornItems with location info before server sync arrives, so we
-    -- serialize them as {loc, type} strings and send along for the server to use.
-    if not SafehousePlusIsSinglePlayer and isClient() then
-        local wornData = {}
-        local wornItems = player:getWornItems()
-        if wornItems then
-            for i = 0, wornItems:size() - 1 do
-                local wi = wornItems:get(i)
-                if wi and wi:getItem() then
-                    table.insert(wornData, {
-                        loc  = tostring(wi:getLocation()),
-                        type = wi:getItem():getFullType()
-                    })
-                end
-            end
-        end
-        DebugPrintSafehousePlus("[Respawn] Client sending worn data: " .. #wornData .. " items");
-        for _, wd in ipairs(wornData) do
-            DebugPrintSafehousePlus("[Respawn]   worn loc=" .. tostring(wd.loc) .. " type=" .. tostring(wd.type));
-        end
-        sendClientCommand("SafehousePlusRespawn", "serverSavePlayer", {worn = wornData});
-    end
-
     local keepInvOption = getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory")
     local keepInv = keepInvOption and keepInvOption:getValue()
 
@@ -882,66 +858,7 @@ else -- If not create a server command
     end
 
     Events.OnClientCommand.Add(function(module, command, player, args)
-        if module == "SafehousePlusRespawn" and command == "serverSavePlayer" then
-            DebugPrintSafehousePlus("[Respawn] Server save triggered for: " .. player:getUsername())
-            savePlayer(player)
-
-            local keepInvOpt = getSandboxOptions():getOptionByName("SafehousePlus.KeepInventory")
-            if keepInvOpt and keepInvOpt:getValue() then
-                local id = getUniqueId(player)
-                if RespawnData[id] then
-                    local sq = player:getSquare()
-                    if sq then
-                        local objs = sq:getStaticMovingObjects()
-                        for i = 0, objs:size() - 1 do
-                            local obj = objs:get(i)
-                            if instanceof(obj, "IsoDeadBody") then
-                                if RespawnData[id].Items and RespawnData[id].Items:size() == 0 then
-                                    local deadInv = obj:getContainer()
-                                    if deadInv then
-                                        RespawnData[id].Items = deadInv:getItems():clone()
-                                        deadInv:getItems():clear()
-                                        deadInv:removeAllItems()
-                                        DebugPrintSafehousePlus("[Respawn] Items recovered from dead body: " .. player:getUsername())
-                                    end
-                                end
-                                -- B42 MP: worn items also move to dead body before OnPlayerDeath fires
-                                if RespawnData[id].WornItems[0] == nil and obj.getWornItems then
-                                    local deadWorn = obj:getWornItems()
-                                    if deadWorn and deadWorn:size() > 0 then
-                                        for j = 0, deadWorn:size() - 1 do
-                                            RespawnData[id].WornItems[j] = deadWorn:get(j)
-                                        end
-                                        DebugPrintSafehousePlus("[Respawn] WornItems recovered from dead body (serverSavePlayer): " .. player:getUsername() .. " count=" .. deadWorn:size())
-                                    else
-                                        DebugPrintSafehousePlus("[Respawn] WornItems from dead body: empty or not available, will use client wornData")
-                                    end
-                                end
-                                break
-                            end
-                        end
-                    end
-                    -- Store worn item location data sent by client (serialized as strings)
-                    RespawnData[id].WornItemsLocations = args and args.worn or {}
-                    DebugPrintSafehousePlus("[Respawn] WornItemsLocations stored: " .. #(RespawnData[id].WornItemsLocations) .. " entries")
-                    for _, wd in ipairs(RespawnData[id].WornItemsLocations) do
-                        DebugPrintSafehousePlus("[Respawn]   stored loc=" .. tostring(wd.loc) .. " type=" .. tostring(wd.type));
-                    end
-
-                    -- B42 MP: recover hand item types from modData tracked by client
-                    local pmd = player:getModData()
-                    if RespawnData[id].PrimaryHandItem == nil and pmd.SPHandPrimary then
-                        RespawnData[id].PrimaryHandType = pmd.SPHandPrimary
-                        DebugPrintSafehousePlus("[Respawn] PrimaryHandType from modData: " .. tostring(pmd.SPHandPrimary))
-                    end
-                    if RespawnData[id].SecondaryHandItem == nil and pmd.SPHandSecondary then
-                        RespawnData[id].SecondaryHandType = pmd.SPHandSecondary
-                        DebugPrintSafehousePlus("[Respawn] SecondaryHandType from modData: " .. tostring(pmd.SPHandSecondary))
-                    end
-                end
-            end
-
-        elseif module == "SafehousePlusRespawn" and command == "setRespawnRegion" then
+        if module == "SafehousePlusRespawn" and command == "setRespawnRegion" then
             removePlayerRespawn(player);
             setRespawnRegion(player, args.region);
         elseif module == "SafehousePlusRespawn" and command == "loadPlayer" then
@@ -967,38 +884,13 @@ else -- If not create a server command
         end
     end)
 
-    -- Client-side: capture hand items on OnCharacterDeath, which fires inside DoDeath()
-    -- BEFORE dropHandItems() and BEFORE OnPlayerDeath — items are still in hand at this point.
-    if isClient() then
-        Events.OnCharacterDeath.Add(function(character)
-            if not character or not character.isLocalPlayer or not character:isLocalPlayer() then return end
-            local pmd = character:getModData()
-            local primary = character:getPrimaryHandItem()
-            local secondary = character:getSecondaryHandItem()
-            pmd.SPHandPrimary = primary and primary:getFullType() or nil
-            pmd.SPHandSecondary = secondary and secondary:getFullType() or nil
-            character:transmitModData()
-            DebugPrintSafehousePlus("[Respawn] OnCharacterDeath: primary=" .. tostring(pmd.SPHandPrimary) .. " secondary=" .. tostring(pmd.SPHandSecondary))
-        end)
-    end
-
-    -- Server-side: log what is accessible on OnCharacterDeath to verify direct access
+    -- Server-side: save player data directly in OnCharacterDeath, which fires inside DoDeath()
+    -- BEFORE dropHandItems() — items are still on the character at this point.
     if isServer() then
         Events.OnCharacterDeath.Add(function(character)
             if not character or not instanceof(character, "IsoPlayer") then return end
-            DebugPrintSafehousePlus("[Respawn] OnCharacterDeath SERVER: player=" .. character:getUsername())
-            local primary = character:getPrimaryHandItem()
-            local secondary = character:getSecondaryHandItem()
-            DebugPrintSafehousePlus("[Respawn]   primary=" .. tostring(primary and primary:getFullType() or "nil"))
-            DebugPrintSafehousePlus("[Respawn]   secondary=" .. tostring(secondary and secondary:getFullType() or "nil"))
-            local wornItems = character:getWornItems()
-            DebugPrintSafehousePlus("[Respawn]   wornItems count=" .. (wornItems and wornItems:size() or 0))
-            for i = 0, (wornItems and wornItems:size() - 1 or -1) do
-                local wi = wornItems:get(i)
-                DebugPrintSafehousePlus("[Respawn]   worn[" .. i .. "] loc=" .. tostring(wi:getLocation()) .. " type=" .. tostring(wi:getItem() and wi:getItem():getFullType() or "nil"))
-            end
-            local inv = character:getInventory()
-            DebugPrintSafehousePlus("[Respawn]   inventory count=" .. (inv and inv:getItems():size() or 0))
+            DebugPrintSafehousePlus("[Respawn] OnCharacterDeath SERVER: saving " .. character:getUsername())
+            savePlayer(character)
         end)
     end
 end
