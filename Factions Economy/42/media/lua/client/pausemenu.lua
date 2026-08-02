@@ -79,7 +79,7 @@ function MainScreen:instantiate()
     -- Se estiver no jogo (Pause Menu), adiciona o botão
     if not self.inGame then return end
     self.shop             = createShopPanel(self)
-    self.shopOption       = createShopLabel(self.bottomPanel, self.quitToDesktop)
+    self.shopOption       = createShopLabel(self.bottomPanel, self.quitToDesktopOption)
 
     -- Recalcula a largura máxima para garantir alinhamento correto dos itens
     self.maxMenuItemWidth = 0
@@ -105,8 +105,8 @@ end
 local oldMainScreen_render = MainScreen.render
 function MainScreen:render()
     oldMainScreen_render(self)
-    if not self.quitToDesktop then return end
-    local newY = self.quitToDesktop:getBottom() + LABEL_SEPARATOR
+    if not self.shopOption then return end
+    local newY = self.quitToDesktopOption:getBottom() + LABEL_SEPARATOR
     self.shopOption:setY(newY)
     self.bottomPanel:setHeight(self.shopOption:getBottom())
 end

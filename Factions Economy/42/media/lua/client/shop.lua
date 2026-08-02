@@ -431,9 +431,10 @@ end
 
 function ISShop:addView(name, view)
     local viewObject    = {}
+    viewObject.id       = #self.viewList + 1
     viewObject.name     = getText("IGUI_Shop_" .. name)
     viewObject.view     = view
-    viewObject.tabWidth = getTextManager():MeasureStringX(self.tabFont, name) + self.tabPadX
+    viewObject.tabWidth = getTextManager():MeasureStringX(self.tabFont, getText("IGUI_Shop_" .. name)) + self.tabPadX
     viewObject.fade     = UITransition.new()
     table.insert(self.viewList, viewObject)
     view:setY(self.tabHeight)
