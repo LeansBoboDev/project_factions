@@ -243,8 +243,13 @@ local function savePlayerInventory(player)
     local WornItems = player:getWornItems();
     RespawnData[getUniqueId(player)].WornItems = {};
 
+    DebugPrintSafehousePlus("[Respawn] savePlayerInventory: WornItems count=" .. WornItems:size() .. " context=" .. (isClient() and "client" or "server"));
     for i = 0, WornItems:size() - 1 do
-        RespawnData[getUniqueId(player)].WornItems[i] = WornItems:get(i);
+        local wi = WornItems:get(i);
+        RespawnData[getUniqueId(player)].WornItems[i] = wi;
+        local loc = wi and tostring(wi:getLocation()) or "nil";
+        local typ = wi and wi:getItem() and wi:getItem():getFullType() or "nil";
+        DebugPrintSafehousePlus("[Respawn]   WornItem[" .. i .. "] loc=" .. loc .. " type=" .. typ);
     end
 
     local AttachedItems = player:getAttachedItems();
@@ -254,7 +259,9 @@ local function savePlayerInventory(player)
         RespawnData[getUniqueId(player)].AttachedItems[i] = AttachedItems:get(i);
     end
 
-    RespawnData[getUniqueId(player)].Items = player:getInventory():getItems():clone();
+    local allItems = player:getInventory():getItems();
+    DebugPrintSafehousePlus("[Respawn] savePlayerInventory: inventory item count=" .. allItems:size());
+    RespawnData[getUniqueId(player)].Items = allItems:clone();
 end
 
 local function saveHandItems(player)
@@ -514,21 +521,57 @@ local function loadPlayerInventory(player)
     --Set back worn items, clothes, belts, etc
     if RespawnData[id].WornItems[0] ~= nil then
         -- Original path: WornItem Java objects with location info (SP or pre-B42 MP)
+        DebugPrintSafehousePlus("[Respawn] loadPlayerInventory: using WornItems (Java) path");
         for _, WornItem in pairs(RespawnData[id].WornItems) do
             local location = WornItem:getLocation();
             local item = WornItem:getItem();
+            DebugPrintSafehousePlus("[Respawn]   equipping loc=" .. tostring(location) .. " item=" .. tostring(item and item:getFullType() or "nil"));
             player:getWornItems():setItem(location, item);
             sendClothing(player, location, item);
         end
-    elseif RespawnData[id].WornItemsLocations then
+    elseif RespawnData[id].WornItemsLocations and #RespawnData[id].WornItemsLocations > 0 then
         -- B42 MP path: locations were serialized as strings by the client
+        DebugPrintSafehousePlus("[Respawn] loadPlayerInventory: using WornItemsLocations path, count=" .. #RespawnData[id].WornItemsLocations);
         for _, wiData in ipairs(RespawnData[id].WornItemsLocations) do
             local loc = ItemBodyLocation[wiData.loc]
+            DebugPrintSafehousePlus("[Respawn]   trying loc=" .. tostring(wiData.loc) .. " -> resolved=" .. tostring(loc) .. " type=" .. tostring(wiData.type));
             if loc then
                 local item = inventory:FindAndReturn(wiData.type)
+                DebugPrintSafehousePlus("[Respawn]   FindAndReturn result: " .. (item and item:getFullType() or "NOT FOUND"));
                 if item then
                     player:getWornItems():setItem(loc, item)
                     sendClothing(player, loc, item)
+                end
+            else
+                DebugPrintSafehousePlus("[Respawn]   WARNING: ItemBodyLocation['" .. tostring(wiData.loc) .. "'] is nil, skipping");
+            end
+        end
+    else
+        -- B42 MP fallback: worn items end up flat in the dead body container (no WornItems collection).
+        -- Derive the slot from each item's own body location definition.
+        DebugPrintSafehousePlus("[Respawn] loadPlayerInventory: using getBodyLocation() inference path");
+        local equippedSlots = {};
+        local invItems = inventory:getItems();
+        for i = 0, invItems:size() - 1 do
+            local item = invItems:get(i);
+            if item then
+                local loc = nil;
+                if item.IsClothing and item:IsClothing() then
+                    loc = item:getBodyLocation();
+                elseif item.IsInventoryContainer and item:IsInventoryContainer() and item.canBeEquipped then
+                    local canEquip = item:canBeEquipped();
+                    if type(canEquip) == "string" and canEquip ~= "" then
+                        loc = ItemBodyLocation.get(ResourceLocation.of(canEquip));
+                    end
+                end
+                if loc then
+                    local locStr = tostring(loc);
+                    DebugPrintSafehousePlus("[Respawn]   clothing item: " .. item:getFullType() .. " -> loc=" .. locStr .. " slotFree=" .. tostring(not equippedSlots[locStr]));
+                    if not equippedSlots[locStr] then
+                        equippedSlots[locStr] = true;
+                        player:getWornItems():setItem(loc, item);
+                        sendClothing(player, loc, item);
+                    end
                 end
             end
         end
@@ -701,6 +744,10 @@ Events.OnPlayerDeath.Add(function(player)
                 end
             end
         end
+        DebugPrintSafehousePlus("[Respawn] Client sending worn data: " .. #wornData .. " items");
+        for _, wd in ipairs(wornData) do
+            DebugPrintSafehousePlus("[Respawn]   worn loc=" .. tostring(wd.loc) .. " type=" .. tostring(wd.type));
+        end
         sendClientCommand("SafehousePlusRespawn", "serverSavePlayer", {worn = wornData});
     end
 
@@ -846,6 +893,18 @@ else -- If not create a server command
                                         DebugPrintSafehousePlus("[Respawn] Items recovered from dead body: " .. player:getUsername())
                                     end
                                 end
+                                -- B42 MP: worn items also move to dead body before OnPlayerDeath fires
+                                if RespawnData[id].WornItems[0] == nil and obj.getWornItems then
+                                    local deadWorn = obj:getWornItems()
+                                    if deadWorn and deadWorn:size() > 0 then
+                                        for j = 0, deadWorn:size() - 1 do
+                                            RespawnData[id].WornItems[j] = deadWorn:get(j)
+                                        end
+                                        DebugPrintSafehousePlus("[Respawn] WornItems recovered from dead body (serverSavePlayer): " .. player:getUsername() .. " count=" .. deadWorn:size())
+                                    else
+                                        DebugPrintSafehousePlus("[Respawn] WornItems from dead body: empty or not available, will use client wornData")
+                                    end
+                                end
                                 break
                             end
                         end
@@ -853,6 +912,9 @@ else -- If not create a server command
                     -- Store worn item location data sent by client (serialized as strings)
                     RespawnData[id].WornItemsLocations = args and args.worn or {}
                     DebugPrintSafehousePlus("[Respawn] WornItemsLocations stored: " .. #(RespawnData[id].WornItemsLocations) .. " entries")
+                    for _, wd in ipairs(RespawnData[id].WornItemsLocations) do
+                        DebugPrintSafehousePlus("[Respawn]   stored loc=" .. tostring(wd.loc) .. " type=" .. tostring(wd.type));
+                    end
                 end
             end
 
