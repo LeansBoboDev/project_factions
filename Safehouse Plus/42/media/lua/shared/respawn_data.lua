@@ -591,6 +591,18 @@ local function loadPlayerInventory(player)
     player:setPrimaryHandItem(RespawnData[id].PrimaryHandItem);
     player:setSecondaryHandItem(RespawnData[id].SecondaryHandItem);
 
+    -- B42 MP fallback: if direct reference was nil, restore by type from modData tracking
+    if not player:getPrimaryHandItem() and RespawnData[id].PrimaryHandType then
+        local item = inventory:FindAndReturn(RespawnData[id].PrimaryHandType)
+        DebugPrintSafehousePlus("[Respawn] PrimaryHandItem restore: type=" .. RespawnData[id].PrimaryHandType .. " found=" .. tostring(item ~= nil))
+        if item then player:setPrimaryHandItem(item) end
+    end
+    if not player:getSecondaryHandItem() and RespawnData[id].SecondaryHandType then
+        local item = inventory:FindAndReturn(RespawnData[id].SecondaryHandType)
+        DebugPrintSafehousePlus("[Respawn] SecondaryHandItem restore: type=" .. RespawnData[id].SecondaryHandType .. " found=" .. tostring(item ~= nil))
+        if item then player:setSecondaryHandItem(item) end
+    end
+
     --Revert unlimited carry
     player:setUnlimitedCarry(isUnlimitedCarry);
     DebugPrintSafehousePlus("[Respawn] loadPlayerInventory: " .. RespawnData[id].Items:size() .. " items restored");
@@ -915,6 +927,17 @@ else -- If not create a server command
                     for _, wd in ipairs(RespawnData[id].WornItemsLocations) do
                         DebugPrintSafehousePlus("[Respawn]   stored loc=" .. tostring(wd.loc) .. " type=" .. tostring(wd.type));
                     end
+
+                    -- B42 MP: recover hand item types from modData tracked by client
+                    local pmd = player:getModData()
+                    if RespawnData[id].PrimaryHandItem == nil and pmd.SPHandPrimary then
+                        RespawnData[id].PrimaryHandType = pmd.SPHandPrimary
+                        DebugPrintSafehousePlus("[Respawn] PrimaryHandType from modData: " .. tostring(pmd.SPHandPrimary))
+                    end
+                    if RespawnData[id].SecondaryHandItem == nil and pmd.SPHandSecondary then
+                        RespawnData[id].SecondaryHandType = pmd.SPHandSecondary
+                        DebugPrintSafehousePlus("[Respawn] SecondaryHandType from modData: " .. tostring(pmd.SPHandSecondary))
+                    end
                 end
             end
 
@@ -943,6 +966,41 @@ else -- If not create a server command
             setPlayerRespawn(player);
         end
     end)
+
+    -- Client-side: capture hand items on OnCharacterDeath, which fires inside DoDeath()
+    -- BEFORE dropHandItems() and BEFORE OnPlayerDeath — items are still in hand at this point.
+    if isClient() then
+        Events.OnCharacterDeath.Add(function(character)
+            if not character or not character.isLocalPlayer or not character:isLocalPlayer() then return end
+            local pmd = character:getModData()
+            local primary = character:getPrimaryHandItem()
+            local secondary = character:getSecondaryHandItem()
+            pmd.SPHandPrimary = primary and primary:getFullType() or nil
+            pmd.SPHandSecondary = secondary and secondary:getFullType() or nil
+            character:transmitModData()
+            DebugPrintSafehousePlus("[Respawn] OnCharacterDeath: primary=" .. tostring(pmd.SPHandPrimary) .. " secondary=" .. tostring(pmd.SPHandSecondary))
+        end)
+    end
+
+    -- Server-side: log what is accessible on OnCharacterDeath to verify direct access
+    if isServer() then
+        Events.OnCharacterDeath.Add(function(character)
+            if not character or not instanceof(character, "IsoPlayer") then return end
+            DebugPrintSafehousePlus("[Respawn] OnCharacterDeath SERVER: player=" .. character:getUsername())
+            local primary = character:getPrimaryHandItem()
+            local secondary = character:getSecondaryHandItem()
+            DebugPrintSafehousePlus("[Respawn]   primary=" .. tostring(primary and primary:getFullType() or "nil"))
+            DebugPrintSafehousePlus("[Respawn]   secondary=" .. tostring(secondary and secondary:getFullType() or "nil"))
+            local wornItems = character:getWornItems()
+            DebugPrintSafehousePlus("[Respawn]   wornItems count=" .. (wornItems and wornItems:size() or 0))
+            for i = 0, (wornItems and wornItems:size() - 1 or -1) do
+                local wi = wornItems:get(i)
+                DebugPrintSafehousePlus("[Respawn]   worn[" .. i .. "] loc=" .. tostring(wi:getLocation()) .. " type=" .. tostring(wi:getItem() and wi:getItem():getFullType() or "nil"))
+            end
+            local inv = character:getInventory()
+            DebugPrintSafehousePlus("[Respawn]   inventory count=" .. (inv and inv:getItems():size() or 0))
+        end)
+    end
 end
 
 --#endregion
