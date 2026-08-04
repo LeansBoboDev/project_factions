@@ -172,15 +172,15 @@ end
 --#region Save Player
 
 local function savePlayerLevels(player)
-    RespawnData[getUniqueId(player)].Xp = {};
-    RespawnData[getUniqueId(player)].Levels = {};
+    local id = getUniqueId(player)
+    RespawnData[id].Xp = {};
+    RespawnData[id].Levels = {};
     local perks = PerkFactory.PerkList;
 
     for i = 0, perks:size() - 1 do
         local perk = perks:get(i);
-
-        RespawnData[getUniqueId(player)].Levels[perk] = player:getPerkLevel(perk);
-        RespawnData[getUniqueId(player)].Xp[perk] = player:getXp():getXP(perk);
+        RespawnData[id].Levels[i] = player:getPerkLevel(perk);
+        RespawnData[id].Xp[i] = player:getXp():getXP(perk);
     end
     DebugPrintSafehousePlus("[Respawn] Levels saved: " .. player:getUsername());
 end
@@ -229,12 +229,13 @@ local function savePlayerMedia(player)
 end
 
 local function savePlayerMultipliers(player)
-    RespawnData[getUniqueId(player)].Multipliers = {};
+    local id = getUniqueId(player)
+    RespawnData[id].Multipliers = {};
     local perks = PerkFactory.PerkList;
 
     for i = 0, perks:size() - 1 do
         local perk = perks:get(i);
-        RespawnData[getUniqueId(player)].Multipliers[perk] = player:getXp():getMultiplier(perk);
+        RespawnData[id].Multipliers[i] = player:getXp():getMultiplier(perk);
     end
 end
 
@@ -419,17 +420,30 @@ end
 --#region Load Player
 
 local function loadPlayerLevels(player)
-    for perk, level in pairs(RespawnData[getUniqueId(player)].Levels or {}) do
-        player:level0(perk);
+    local id = getUniqueId(player)
+    local levels = RespawnData[id].Levels or {}
+    local xps = RespawnData[id].Xp or {}
+    local perks = PerkFactory.PerkList;
 
-        local i = 0;
-        while (i < level) do
-            player:LevelPerk(perk, false);
-            i = i + 1;
+    for i = 0, perks:size() - 1 do
+        local perk = perks:get(i);
+        local savedLevel = levels[i];
+        local savedXp = xps[i] or 0;
+
+        if savedLevel and savedLevel > 0 then
+            -- Mesma abordagem do ISPlayerStatsUI: delta até o threshold do nível
+            local currentXp = player:getXp():getXP(perk);
+            local targetXp = perk:getTotalXpForLevel(savedLevel);
+            local delta = targetXp - currentXp;
+            if delta ~= 0 then
+                player:getXp():AddXP(perk, delta, false, false, false, false);
+            end
+            -- Restaura progresso dentro do nível (XP acima do threshold)
+            local afterXp = player:getXp():getXP(perk);
+            if savedXp > afterXp then
+                player:getXp():AddXP(perk, savedXp - afterXp, false, false, false, false);
+            end
         end
-
-        player:getXp():setXPToLevel(perk, level);
-        player:getXp():AddXP(perk, RespawnData[getUniqueId(player)].Xp[perk], true, false, false);
     end
 end
 
@@ -474,8 +488,16 @@ local function loadPlayerBooks(player)
 end
 
 local function loadPlayerMultipliers(player)
-    for perk, amount in pairs(RespawnData[getUniqueId(player)].Multipliers or {}) do
-        player:getXp():addXpMultiplier(perk, amount, 0, 10);
+    local id = getUniqueId(player)
+    local multipliers = RespawnData[id].Multipliers or {}
+    local perks = PerkFactory.PerkList;
+
+    for i = 0, perks:size() - 1 do
+        local perk = perks:get(i);
+        local amount = multipliers[i];
+        if amount then
+            player:getXp():addXpMultiplier(perk, amount, 0, 10);
+        end
     end
 end
 

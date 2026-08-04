@@ -1,3 +1,1 @@
 Place this folder inside your project zomboid dedicated server and overwrite
-
-Currently multiplayer is not available for 42, so not scripts to fix safehouse yet...
