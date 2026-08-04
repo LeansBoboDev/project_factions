@@ -212,7 +212,7 @@ local function savePlayerBooks(player)
         local fullType = entry:getKey()
         local pages = entry:getValue():intValue()
 
-        RespawnData[id].SkillBooks[fullType] = pages
+        RespawnData[id].SkillBooks[tostring(fullType)] = pages
     end
 end
 
@@ -407,7 +407,14 @@ local function savePlayer(player)
     end
     RespawnData[getUniqueId(player)].Traits = savedTraits;
     RespawnData[getUniqueId(player)].Profession = player:getDescriptor():getCharacterProfession();
-    RespawnData[getUniqueId(player)].Recipes = player:getKnownRecipes();
+    local knownRecipes = player:getKnownRecipes();
+    local savedRecipes = {};
+    if knownRecipes then
+        for i = 0, knownRecipes:size() - 1 do
+            table.insert(savedRecipes, tostring(knownRecipes:get(i)));
+        end
+    end
+    RespawnData[getUniqueId(player)].Recipes = savedRecipes;
     RespawnData[getUniqueId(player)].ZombieKills = player:getZombieKills();
     RespawnData[getUniqueId(player)].SurvivorKills = player:getSurvivorKills();
     RespawnData[getUniqueId(player)].HoursSurvived = player:getHoursSurvived();
@@ -502,10 +509,8 @@ local function loadPlayerMultipliers(player)
 end
 
 local function loadPlayerRecipes(player)
-    if RespawnData[getUniqueId(player)].Recipes then
-        for i = 0, RespawnData[getUniqueId(player)].Recipes:size() - 1 do
-            player:learnRecipe(RespawnData[getUniqueId(player)].Recipes:get(i));
-        end
+    for _, recipe in ipairs(RespawnData[getUniqueId(player)].Recipes or {}) do
+        player:learnRecipe(recipe);
     end
 end
 
