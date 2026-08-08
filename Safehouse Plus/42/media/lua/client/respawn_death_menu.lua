@@ -39,6 +39,80 @@ function ISPostDeathUI:onRespawn(...)
     ISPostDeathUI_onRespawn(self, ...);
 end
 
+-- Bypass CoopCharacterCreation entirely and respawn directly.
+-- region: { name, region = { points = { unemployed = { {posX,posY,posZ} } } } } or nil (skip teleport)
+local function bypassCharacterCreation(CCC, playerIndex, region)
+    -- Tell server the spawn location so loadRespawnLocation can teleport there
+    if region then
+        sendClientCommand("SafehousePlusRespawn", "setRespawnRegion", region);
+    end
+
+    -- Remove CCC UI and restore game UI
+    CCC:removeFromUIManager();
+    CoopCharacterCreation.setVisibleAllUI(true);
+    CoopCharacterCreation.instance = nil;
+
+    if ISPostDeathUI.instance[playerIndex] then
+        ISPostDeathUI.instance[playerIndex]:removeFromUIManager();
+        ISPostDeathUI.instance[playerIndex] = nil;
+    end
+
+    if not CCC.joypadData then
+        setPlayerMouse(nil);
+    else
+        local controller = CCC.joypadData.controller;
+        local joypadData = JoypadState.joypads[playerIndex + 1];
+        JoypadState.players[playerIndex + 1] = joypadData;
+        joypadData.player = playerIndex;
+        joypadData:setController(controller);
+        joypadData:setActive(true);
+        local username = (isClient() and playerIndex > 0) and CoopUserName.instance:getUserName() or nil;
+        setPlayerJoypad(playerIndex, CCC.joypadIndex, nil, username);
+        CCC.joypadData.focus = nil;
+        CCC.joypadData.lastfocus = nil;
+        CCC.joypadData.prevfocus = nil;
+        CCC.joypadData.prevprevfocus = nil;
+    end
+
+    local function receiveRespawnStats(module, command, arguments)
+        if module == "SafehousePlusRespawn" and command == "receiveRespawnStats" then
+            Events.OnServerCommand.Remove(receiveRespawnStats);
+            if not arguments then return end;
+            DebugPrintSafehousePlus("[Respawn] receiveRespawnStats received on client");
+            UnsafeLocallyUpdate(arguments);
+        end
+    end
+    Events.OnServerCommand.Add(receiveRespawnStats);
+    SafehousePlusPendingLoad = true;
+    DebugPrintSafehousePlus("[Respawn] Bypassed character creation, awaiting player spawn...");
+end
+
+-- Returns the native PZ safehouse spawn region if the player has one configured, else nil.
+local function getNativeSafehouseRegion()
+    if not isClient() then return nil end
+    if not getServerOptions():getBoolean("SafehouseAllowRespawn") then return nil end
+    local username = getClientUsername()
+    for i = 0, SafeHouse.getSafehouseList():size() - 1 do
+        local safe = SafeHouse.getSafehouseList():get(i)
+        if safe:isRespawnInSafehouse(username) and
+           (safe:getPlayers():contains(username) or safe:getOwner() == username) then
+            return {
+                name = getText("UI_mapspawn_Safehouse"),
+                region = {
+                    points = {
+                        unemployed = {
+                            { posX = safe:getX() + (safe:getH() / 2),
+                              posY = safe:getY() + (safe:getW() / 2),
+                              posZ = 0 }
+                        }
+                    }
+                }
+            }
+        end
+    end
+    return nil
+end
+
 -- When "RESPAWN" button is clicked on death screen
 function ISPostDeathUI:onQuitToDesktop(...)
     alreadyChecked = false;
@@ -50,7 +124,15 @@ function ISPostDeathUI:onQuitToDesktop(...)
     -- Rename "NEXT" button to "RESPAWN"
     CCC.mapSpawnSelect.nextButton:setTitle(getText("IGUI_Respawn_CCC_Respawn"));
 
-    -- Safehouse respawn is enabled
+    -- Native PZ "Respawn in Safehouse" — bypass character creation and go directly
+    local safehouseRegion = getNativeSafehouseRegion()
+    if safehouseRegion then
+        DebugPrintSafehousePlus("[Respawn] Native safehouse respawn detected, bypassing character creation");
+        bypassCharacterCreation(CCC, self.playerIndex, safehouseRegion);
+        return;
+    end
+
+    -- Mod's own "EnableSafehouseRespawn" option (bed/custom respawn point)
     local respawnOption = getSandboxOptions():getOptionByName("SafehousePlus.EnableSafehouseRespawn")
     if respawnOption and respawnOption:getValue() then
         local function receiveRespawn(module, command, arguments)
@@ -78,6 +160,9 @@ function ISPostDeathUI:onQuitToDesktop(...)
                     CCC.mapSpawnSelect.listbox:insertItem(0, item.name, item);
                     -- Disable zoom for the spawn in bed
                     CCC.mapSpawnSelect.listbox.items[1].item.zoomS = 0;
+                    -- Auto-select "Respawn in Bed" and skip the spawn selection screen
+                    CCC.mapSpawnSelect.listbox.selected = 1;
+                    CCC.mapSpawnSelect:clickNext();
                 end;
             end
         end
