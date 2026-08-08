@@ -927,6 +927,7 @@ else -- If not create a server command
         loadPlayerMedia(player);
         loadPlayerNutrition(player);
         loadPlayerModel(player);
+        player:resetModelNextFrame();
         DebugPrintSafehousePlus("All necessary loades finished!");
     end
 
