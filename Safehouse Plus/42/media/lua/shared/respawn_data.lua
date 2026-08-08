@@ -176,11 +176,12 @@ local function savePlayerLevels(player)
     RespawnData[id].Xp = {};
     RespawnData[id].Levels = {};
     local perks = PerkFactory.PerkList;
+    local xpSystem = player:getXp();
 
     for i = 0, perks:size() - 1 do
         local perk = perks:get(i);
         RespawnData[id].Levels[i] = player:getPerkLevel(perk);
-        RespawnData[id].Xp[i] = player:getXp():getXP(perk);
+        RespawnData[id].Xp[i] = xpSystem and xpSystem:getXP(perk) or 0;
     end
     DebugPrintSafehousePlus("[Respawn] Levels saved: " .. player:getUsername());
 end
@@ -189,6 +190,7 @@ local function savePlayerBoosts(player)
     RespawnData[getUniqueId(player)].Boosts = {};
     local perks = PerkFactory.PerkList;
     local boosts = player:getXp();
+    if not boosts then return end
 
     for i = 0, perks:size() - 1 do
         local perk = perks:get(i);
@@ -916,6 +918,7 @@ else -- If not create a server command
     if isServer() then
         Events.OnCharacterDeath.Add(function(character)
             if not character or not instanceof(character, "IsoPlayer") then return end
+            if instanceof(character, "IsoAnimal") then return end
             DebugPrintSafehousePlus("[Respawn] OnCharacterDeath SERVER: saving " .. character:getUsername())
             savePlayer(character)
         end)
