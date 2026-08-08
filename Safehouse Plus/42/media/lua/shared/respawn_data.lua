@@ -203,19 +203,33 @@ local function savePlayerBooks(player)
     RespawnData[id].SkillBooks = {}
 
     local literatures = player:getReadLiterature()
-    if not literatures then return end
-
-    if literatures:isEmpty() then return end
-
-    local iterator = literatures:entrySet():iterator()
-
-    while iterator:hasNext() do
-        local entry = iterator:next()
-        local fullType = entry:getKey()
-        local pages = entry:getValue():intValue()
-
-        RespawnData[id].SkillBooks[tostring(fullType)] = pages
+    DebugPrintSafehousePlus("[Respawn] savePlayerBooks: literatures=" .. tostring(literatures))
+    if not literatures or literatures:isEmpty() then
+        DebugPrintSafehousePlus("[Respawn] savePlayerBooks: nothing to save")
+        return
     end
+    DebugPrintSafehousePlus("[Respawn] savePlayerBooks: literatures.size=" .. literatures:size())
+
+    -- entrySet():iterator() fails in Kahlua: HashMap$EntrySet is a private inner class.
+    -- ItemType enum is not available server-side, so no isItemType filter.
+    -- Instead: iterate all script items, probe the HashMap with public containsKey/get.
+    local allItems = getScriptManager():getAllItems()
+    DebugPrintSafehousePlus("[Respawn] savePlayerBooks: allItems.size=" .. allItems:size())
+    local count = 0
+    for i = 1, allItems:size() do
+        local item = allItems:get(i - 1)
+        -- ScriptManager items use getFullName() (e.g. "Base.ElectronicsMag4")
+        -- getFullType() only exists on InventoryItem, not on scripting.objects.Item
+        local fullName = item:getFullName()
+        if fullName and literatures:containsKey(fullName) then
+            local val = literatures:get(fullName)
+            DebugPrintSafehousePlus("[Respawn] savePlayerBooks: found " .. tostring(fullName) .. " val=" .. tostring(val) .. " type=" .. type(val))
+            local nights = type(val) == "number" and val or (val and val:intValue() or 0)
+            RespawnData[id].SkillBooks[fullName] = nights
+            count = count + 1
+        end
+    end
+    DebugPrintSafehousePlus("[Respawn] Books saved (" .. count .. "): " .. player:getUsername())
 end
 
 local function savePlayerMedia(player)
@@ -308,6 +322,9 @@ local function savePlayerModel(player)
     RespawnData[id].Descriptor.Female      = player:isFemale();
     RespawnData[id].Descriptor.Forename    = player:getDescriptor():getForename();
     RespawnData[id].Descriptor.Surname     = player:getDescriptor():getSurname();
+    RespawnData[id].Descriptor.VoiceType   = player:getDescriptor():getVoiceType();
+    RespawnData[id].Descriptor.VoicePitch  = player:getDescriptor():getVoicePitch();
+    RespawnData[id].Descriptor.VoicePrefix = player:getDescriptor():getVoicePrefix();
 end
 
 local function savePlayerNutrition(player)
@@ -491,9 +508,13 @@ local function loadPlayerTraits(player)
 end
 
 local function loadPlayerBooks(player)
-    for book, pages in pairs(RespawnData[getUniqueId(player)].SkillBooks or {}) do
-        player:setAlreadyReadPages(book, pages);
+    local count = 0
+    for book, nights in pairs(RespawnData[getUniqueId(player)].SkillBooks or {}) do
+        -- restore into readLiterature HashMap so isLiteratureRead() works correctly
+        player:addReadLiterature(book, nights)
+        count = count + 1
     end
+    DebugPrintSafehousePlus("[Respawn] Books loaded (" .. count .. "): " .. player:getUsername())
 end
 
 local function loadPlayerMultipliers(player)
@@ -519,7 +540,7 @@ end
 local function loadPlayerFavoriteRecipes(player)
     local pModData = player:getModData();
 
-    for k, v in pairs(RespawnData[getUniqueId(player)].FavoriteRecipes) do
+    for k, v in pairs(RespawnData[getUniqueId(player)].FavoriteRecipes or {}) do
         pModData[k] = v;
     end
 end
@@ -668,6 +689,10 @@ local function loadPlayerModel(player)
         player:getDescriptor():setFemale(RespawnData[getUniqueId(player)].Descriptor.Female);
         player:getDescriptor():setForename(RespawnData[getUniqueId(player)].Descriptor.Forename);
         player:getDescriptor():setSurname(RespawnData[getUniqueId(player)].Descriptor.Surname);
+        local d = RespawnData[getUniqueId(player)].Descriptor;
+        if d.VoiceType ~= nil then player:getDescriptor():setVoiceType(d.VoiceType) end;
+        if d.VoicePitch ~= nil then player:getDescriptor():setVoicePitch(d.VoicePitch) end;
+        if d.VoicePrefix ~= nil then player:getDescriptor():setVoicePrefix(d.VoicePrefix) end;
     end
 end
 
