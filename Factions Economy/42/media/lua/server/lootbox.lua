@@ -1,3 +1,5 @@
+if isClient() and not FactionsEconomyIsSinglePlayer then return end;
+
 -- ── Helper ───────────────────────────────────────────────────
 
 local function giveItemToPlayer(player, itemFullName)
@@ -17,8 +19,6 @@ local function giveItemToPlayer(player, itemFullName)
 end
 
 -- ── LootBox Recipe ───────────────────────────────────────────
-
-if isClient() and not FactionsIsSinglePlayer then return end
 
 FactionsEconomyLootBoxRecipe = FactionsEconomyLootBoxRecipe or {}
 

@@ -78,12 +78,14 @@ module Base
     craftRecipe ScrapWeapon {
         timedAction = Making,
         Time = 25,
+        OnCreate = FactionsEconomyScrapRecipe.ScrapWeapon,
         Tags = InHandCraft;CanBeDoneInDark,
         category = Metalworking,
         xpAward = Maintenance:5;Aiming:1,
         inputs
         {
-            item 1 [Base.JS14_Rifle;Base.Shotgun;Base.JS3T_Shotgun;Base.L92_Carbine;Base.L94_Rifle;Base.AssaultRifle;Base.Pistol2;Base.AssaultRifle2;Base.Pistol;Base.VarmintRifle;Base.HuntingRifle;Base.MSR7T_Rifle;Base.Revolver_Long;Base.Revolver;Base.Revolver_Short;Base.DoubleBarrelShotgunSawnoff;Base.ShotgunSawnoff] flags[Prop1],
+            item 1 [Base.JS14_Rifle;Base.Shotgun;Base.JS3T_Shotgun;Base.L92_Carbine;Base.L94_Rifle;Base.AssaultRifle;Base.Pistol2;Base.AssaultRifle2;Base.Pistol;Base.Pistol3;Base.VarmintRifle;Base.HuntingRifle;Base.MSR7T_Rifle;Base.Revolver_Long;Base.Revolver;Base.Revolver_Short;Base.DoubleBarrelShotgunSawnoff;Base.ShotgunSawnoff] flags[Prop1],
+            item 1 [Base.Screwdriver] mode:keep flags[MayDegradeVeryLight],
         }
         outputs
         {
