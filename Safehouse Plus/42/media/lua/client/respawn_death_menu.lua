@@ -178,10 +178,27 @@ end
 function CoopMapSpawnSelect:clickNext(...)
     alreadyChecked = false;
     --Check if it is custom spawn selection made by respawn
-    if (not CoopCharacterCreation.instance) then return end;
+    if (not CoopCharacterCreation.instance) then
+        DebugPrintSafehousePlus("[Respawn] clickNext: no CCC instance, skipping");
+        return;
+    end;
     local title = self.nextButton:getTitle();
-    if (title ~= getText("IGUI_Respawn_CCC_Respawn")) then return CoopMapSpawnSelect_clickNext(self, ...) end;
+    DebugPrintSafehousePlus("[Respawn] clickNext: button title=" .. tostring(title) .. " expected=" .. getText("IGUI_Respawn_CCC_Respawn"));
+    if (title ~= getText("IGUI_Respawn_CCC_Respawn")) then
+        DebugPrintSafehousePlus("[Respawn] clickNext: title mismatch, falling through to native clickNext");
+        return CoopMapSpawnSelect_clickNext(self, ...);
+    end;
     local selected = self.listbox.items[self.listbox.selected].item;
+    DebugPrintSafehousePlus("[Respawn] clickNext: selected.name=" .. tostring(selected and selected.name));
+    DebugPrintSafehousePlus("[Respawn] clickNext: selected.region=" .. tostring(selected and selected.region));
+    -- Set client-side spawn region so the player's initial spawn appears in the correct city,
+    -- rather than the PZ cached/default spawn from a previous session (e.g. Brandenburg).
+    -- Only applies to city respawn; bed respawn has no region and handles position via loadRespawnLocation.
+    if selected.region then
+        self.selectedRegion = selected.region;
+        setSpawnRegion(selected.region.key or selected.region.name);
+        DebugPrintSafehousePlus("[Respawn] clickNext: setSpawnRegion called for " .. tostring(selected.region.key or selected.region.name));
+    end
     local self = CoopCharacterCreation.instance;
 
     -- Hide spawn selection screen
@@ -197,6 +214,7 @@ function CoopMapSpawnSelect:clickNext(...)
 
     -- If selected respawn then update respawn location
     if (selected.name ~= getText("IGUI_Respawn_Bed")) then
+        DebugPrintSafehousePlus("[Respawn] clickNext: sending setRespawnRegion for " .. tostring(selected.name));
         if SafehousePlusIsSinglePlayer then
             RemovePlayerRespawn(getPlayer());
             SetRespawnRegion(getPlayer(), selected.region);
@@ -267,21 +285,9 @@ function CoopMapSpawnSelect:clickNext(...)
     end
 end
 
-local function onCreatePlayer()
-    DebugPrintSafehousePlus("[Respawn] OnCreatePlayer fired, registering spawn watcher");
-
-    local function waitForSpawn()
-        if not SafehousePlusPendingLoad then return end;
-        if not getPlayer():isPlayerMoving() then return end;
-
-        Events.OnPlayerUpdate.Remove(waitForSpawn);
-        SafehousePlusPendingLoad = false;
-
-        DebugPrintSafehousePlus("[Respawn] Player is moving, sending loadPlayer command to server");
-        sendClientCommand("SafehousePlusRespawn", "loadPlayer", nil);
-    end
-
-    Events.OnPlayerUpdate.Add(waitForSpawn);
-end
-
-Events.OnCreatePlayer.Add(onCreatePlayer);
+Events.OnCreatePlayer.Add(function(playerIndex)
+    if not SafehousePlusPendingLoad then return end;
+    SafehousePlusPendingLoad = false;
+    DebugPrintSafehousePlus("[Respawn] OnCreatePlayer(id=" .. tostring(playerIndex) .. "): sending loadPlayer");
+    sendClientCommand("SafehousePlusRespawn", "loadPlayer", nil);
+end);

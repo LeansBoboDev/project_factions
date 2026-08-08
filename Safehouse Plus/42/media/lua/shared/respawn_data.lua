@@ -116,11 +116,24 @@ end
 
 -- Set the player respawn based on the Menu Regions from map selector
 local function setRespawnRegion(player, region)
-    local spawn = region.points[player:getDescriptor():getCharacterProfession()];
+    DebugPrintSafehousePlus("[Respawn] setRespawnRegion called, region=" .. tostring(region));
+    if not region then
+        DebugPrintSafehousePlus("[Respawn] setRespawnRegion: region is nil, aborting");
+        return;
+    end
+    if not region.points then
+        DebugPrintSafehousePlus("[Respawn] setRespawnRegion: region.points is nil, aborting");
+        return;
+    end
+    local profession = player:getDescriptor():getCharacterProfession();
+    DebugPrintSafehousePlus("[Respawn] setRespawnRegion: profession=" .. tostring(profession));
+    local spawn = region.points[profession];
     if (not spawn) then spawn = region.points["unemployed"] end
+    DebugPrintSafehousePlus("[Respawn] setRespawnRegion: spawn=" .. tostring(spawn));
 
     if (spawn) then
         local randSpawnPoint = spawn[(ZombRand(#spawn) + 1)];
+        DebugPrintSafehousePlus("[Respawn] setRespawnRegion: chosen point posX=" .. tostring(randSpawnPoint.posX) .. " posY=" .. tostring(randSpawnPoint.posY));
         getWorld():setLuaPosX(randSpawnPoint.posX);
         getWorld():setLuaPosY(randSpawnPoint.posY);
         getWorld():setLuaPosZ(randSpawnPoint.posZ or 0);
@@ -129,6 +142,9 @@ local function setRespawnRegion(player, region)
         player:setY(randSpawnPoint.posY);
         player:setZ(randSpawnPoint.posZ or 0);
         setPlayerRespawn(player);
+        DebugPrintSafehousePlus("[Respawn] setRespawnRegion: pModData.RespawnX=" .. tostring(player:getModData().RespawnX));
+    else
+        DebugPrintSafehousePlus("[Respawn] setRespawnRegion: no spawn point found for profession or unemployed");
     end
 end
 
@@ -660,11 +676,14 @@ end
 
 local function loadRespawnLocation(player)
     local id = getUniqueId(player)
+    DebugPrintSafehousePlus("[Respawn] loadRespawnLocation: id=" .. tostring(id) .. " RespawnData[id]=" .. tostring(RespawnData[id]));
     if not RespawnData[id] then return end
-    if ((RespawnData[id].X ~= nil) and (RespawnData[id].Y ~= nil) and (RespawnData[id].Z ~= nil)) then
+    DebugPrintSafehousePlus("[Respawn] loadRespawnLocation: RespawnData.X=" .. tostring(RespawnData[id].X) .. " Y=" .. tostring(RespawnData[id].Y) .. " Z=" .. tostring(RespawnData[id].Z));
+    if RespawnData[id].X ~= nil and RespawnData[id].Y ~= nil and RespawnData[id].Z ~= nil then
         player:setX(RespawnData[id].X);
         player:setY(RespawnData[id].Y);
         player:setZ(RespawnData[id].Z);
+        DebugPrintSafehousePlus("[Respawn] loadRespawnLocation: teleported to " .. RespawnData[id].X .. "," .. RespawnData[id].Y);
     end;
 end
 
@@ -913,10 +932,29 @@ else -- If not create a server command
 
     Events.OnClientCommand.Add(function(module, command, player, args)
         if module == "SafehousePlusRespawn" and command == "setRespawnRegion" then
+            DebugPrintSafehousePlus("[Respawn] SERVER received setRespawnRegion for " .. player:getUsername());
+            DebugPrintSafehousePlus("[Respawn] SERVER setRespawnRegion args=" .. tostring(args));
+            DebugPrintSafehousePlus("[Respawn] SERVER setRespawnRegion args.region=" .. tostring(args and args.region));
+            DebugPrintSafehousePlus("[Respawn] SERVER setRespawnRegion args.name=" .. tostring(args and args.name));
             removePlayerRespawn(player);
             setRespawnRegion(player, args.region);
+            -- setRespawnRegion writes to pModData on the dead player object, but loadRespawnLocation
+            -- runs on the NEW player object whose pModData is reloaded from file (may be stale).
+            -- Sync to RespawnData (pure Lua in-memory table, survives the object swap) so
+            -- loadRespawnLocation finds the chosen coordinates reliably.
+            local id = getUniqueId(player)
+            if RespawnData[id] then
+                local pmd = player:getModData()
+                RespawnData[id].X = pmd.RespawnX
+                RespawnData[id].Y = pmd.RespawnY
+                RespawnData[id].Z = pmd.RespawnZ
+                DebugPrintSafehousePlus("[Respawn] setRespawnRegion: synced RespawnData.X=" .. tostring(pmd.RespawnX) .. " Y=" .. tostring(pmd.RespawnY));
+            else
+                DebugPrintSafehousePlus("[Respawn] setRespawnRegion: WARNING RespawnData[" .. tostring(id) .. "] is nil, cannot sync coords!");
+            end
         elseif module == "SafehousePlusRespawn" and command == "loadPlayer" then
             DebugPrintSafehousePlus("Player requested load: " .. player:getUsername());
+            DebugPrintSafehousePlus("[Respawn] SERVER loadPlayer: pModData.RespawnX=" .. tostring(player:getModData().RespawnX) .. " Y=" .. tostring(player:getModData().RespawnY));
 
             if loadPlayer(player) == false then return end
 
