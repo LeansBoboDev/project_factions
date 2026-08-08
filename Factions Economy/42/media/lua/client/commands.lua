@@ -30,6 +30,6 @@ Events.OnServerCommand.Add(function(module, command, args)
             message = getText(args.textKey)
         end
 
-        player:setHaloNote(message)
+        HaloTextHelper.addGoodText(player, message)
     end
 end)
