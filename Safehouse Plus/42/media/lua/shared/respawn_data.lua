@@ -927,7 +927,10 @@ else -- If not create a server command
         loadPlayerMedia(player);
         loadPlayerNutrition(player);
         loadPlayerModel(player);
-        player:resetModelNextFrame();
+        player:resetModel();
+        if player:getPlayerNum() then
+            getPlayerInfoPanel(player:getPlayerNum()).charScreen.refreshNeeded = true;
+        end
         DebugPrintSafehousePlus("All necessary loades finished!");
     end
 
