@@ -14,9 +14,9 @@ FactionsEconomyScrapRecipe.ScrapWeapon = function(craftRecipeData, player)
 
     for i = 0, consumedItems:size() - 1 do
         local weapon = consumedItems:get(i)
-        print("[ScrapWeapon] item[" .. i .. "] type=" .. tostring(weapon:getType()) .. " isWeapon=" .. tostring(weapon:isWeapon()))
+        print("[ScrapWeapon] item[" .. i .. "] type=" .. tostring(weapon:getType()) .. " isWeapon=" .. tostring(instanceof(weapon, "HandWeapon")))
 
-        if weapon:isWeapon() then
+        if instanceof(weapon, "HandWeapon") then
             local inventory = player:getInventory()
             local ammoCount = weapon:getCurrentAmmoCount()
             local containsClip = weapon:isContainsClip()
@@ -69,8 +69,8 @@ FactionsEconomyScrapRecipe.ScrapWeapon = function(craftRecipeData, player)
             end
 
             -- Return all attached upgrades/parts
-            local parts = weapon:getWeaponParts()
-            print("[ScrapWeapon] getWeaponParts() = " .. tostring(parts))
+            local parts = weapon:getDetachableWeaponParts(player)
+            print("[ScrapWeapon] getDetachableWeaponParts() = " .. tostring(parts))
             if parts then
                 print("[ScrapWeapon] parts count: " .. tostring(parts:size()))
                 for j = 0, parts:size() - 1 do
