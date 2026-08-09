@@ -140,10 +140,35 @@ local function TimeCheck()
 	broadcast(electricityOn);
 end
 
-local function OnPlayerConnect(player)
+local knownPlayers = {};
+local newPlayerCheckTicks = 0;
+local NEW_PLAYER_CHECK_INTERVAL = 60;
+
+local function OnTickCheckNewPlayers()
+	newPlayerCheckTicks = newPlayerCheckTicks + 1;
+	if newPlayerCheckTicks < NEW_PLAYER_CHECK_INTERVAL then return end;
+	newPlayerCheckTicks = 0;
+
 	local electricityOn = shouldUtilitiesBeOn();
-	sendUtilityStateToPlayer(player, electricityOn);
+	local onlinePlayers = getOnlinePlayers();
+	local currentPlayers = {};
+
+	for i = 0, onlinePlayers:size() - 1 do
+		local player = onlinePlayers:get(i);
+		local username = player:getUsername();
+		currentPlayers[username] = true;
+		if not knownPlayers[username] then
+			knownPlayers[username] = true;
+			sendUtilityStateToPlayer(player, electricityOn);
+		end
+	end
+
+	for username in pairs(knownPlayers) do
+		if not currentPlayers[username] then
+			knownPlayers[username] = nil;
+		end
+	end
 end
 
 Events.EveryHours.Add(TimeCheck);
-Events.OnPlayerConnect.Add(OnPlayerConnect);
+Events.OnTick.Add(OnTickCheckNewPlayers);
