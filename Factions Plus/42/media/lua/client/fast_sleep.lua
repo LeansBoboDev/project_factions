@@ -16,20 +16,10 @@ local function OnTick()
 	accumulator = 0
 
 	if player:isAsleep() then
-		local stats = player:getStats()
+		sendClientCommand(player, "FastSleep", "tick", {})
 
-		local fatigueReducer = getSandboxOptions():getOptionByName("FactionsPlus.SleepFatigueReducer"):getValue() / 100
-		local enduranceIncreaser = getSandboxOptions():getOptionByName("FactionsPlus.SleepEnduranceReceive"):getValue() /
-			100
-
-		stats:remove(CharacterStat.FATIGUE, fatigueReducer)
-		sendPlayerStat(player, CharacterStat.FATIGUE)
-
-		stats:add(CharacterStat.ENDURANCE, enduranceIncreaser)
-		sendPlayerStat(player, CharacterStat.ENDURANCE)
-
-		local currentFatigue = stats:get(CharacterStat.FATIGUE)
-		local currentEndurance = stats:get(CharacterStat.ENDURANCE)
+		local currentFatigue = player:getStats():get(CharacterStat.FATIGUE)
+		local currentEndurance = player:getStats():get(CharacterStat.ENDURANCE)
 
 		if currentFatigue <= 0 then
 			getSleepingEvent():wakeUp(player)

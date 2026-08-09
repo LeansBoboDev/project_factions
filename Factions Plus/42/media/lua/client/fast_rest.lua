@@ -16,16 +16,11 @@ local function OnTick()
     accumulator = 0
 
     if player:isResting() then
-        local stats = player:getStats()
-
-        local enduranceIncreaser = getSandboxOptions():getOptionByName("FactionsPlus.RestEnduranceReceive"):getValue() / 100
-
-        stats:add(CharacterStat.ENDURANCE, enduranceIncreaser)
-        sendPlayerStat(player, CharacterStat.ENDURANCE)
+        sendClientCommand(player, "FastRest", "addEndurance", {})
 
         DebugPrintFactionsPlus(string.format(
             "[FastRest] endurance=%.4f",
-            stats:get(CharacterStat.ENDURANCE)
+            player:getStats():get(CharacterStat.ENDURANCE)
         ))
     else
         Events.OnTick.Remove(OnTick)
