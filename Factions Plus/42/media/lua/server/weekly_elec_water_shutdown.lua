@@ -89,86 +89,61 @@ end
 -- only when the check is changed
 local printerHandler = "on";
 
-local function TimeCheck()
+local function shouldUtilitiesBeOn()
 	local currentTime = getCurrentTime(getSandboxOptions():getOptionByName("FactionsPlus.Timezone"):getValue());
-
-	local function enable()
-		if FactionsPlusIsSinglePlayer then
-			local player = getPlayer();
-
-			-- Turn on water, light
-			getSandboxOptions():set("ElecShutModifier", 2147483647);
-			getSandboxOptions():set("WaterShutModifier", 2147483647);
-			sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOn = true });
-			if printerHandler ~= "off" then
-				DebugPrintFactionsPlus('Day Check Water, Lights on: ' .. currentTime.tm_wday);
-				printerHandler = "off";
-			end
-		else
-			local onlinePlayers = getOnlinePlayers();
-			for i = 0, onlinePlayers:size() - 1 do
-				local player = onlinePlayers:get(i);
-
-				-- Turn on water, light
-				getSandboxOptions():set("ElecShutModifier", 2147483647);
-				getSandboxOptions():set("WaterShutModifier", 2147483647);
-				sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOn = true });
-				if printerHandler ~= "off" then
-					DebugPrintFactionsPlus('Day Check Water, Lights on: ' .. currentTime.tm_wday);
-					printerHandler = "off";
-				end
-			end
-		end
-	end
-	local function disable()
-		if FactionsPlusIsSinglePlayer then
-			local player = getPlayer();
-
-			-- Turn off water, light
-			getSandboxOptions():set("ElecShutModifier", -1);
-			getSandboxOptions():set("WaterShutModifier", -1);
-			sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOff = true });
-			if printerHandler ~= "on" then
-				DebugPrintFactionsPlus('Day Check Water, Lights off: ' .. currentTime.tm_wday);
-				printerHandler = "on";
-			end
-		else
-			local onlinePlayers = getOnlinePlayers();
-			for i = 0, onlinePlayers:size() - 1 do
-				local player = onlinePlayers:get(i);
-
-				-- Turn off water, light
-				getSandboxOptions():set("ElecShutModifier", -1);
-				getSandboxOptions():set("WaterShutModifier", -1);
-				sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOff = true });
-				if printerHandler ~= "on" then
-					DebugPrintFactionsPlus('Day Check Water, Lights off: ' .. currentTime.tm_wday);
-					printerHandler = "on";
-				end
-			end
-		end
-	end
-
 	local stringDays = getSandboxOptions():getOptionByName("FactionsPlus.WaterLightCycle"):getValue();
-
-	local shouldEnable = false;
-	-- Swipe the days into a variable
 	for day in string.gmatch(stringDays, "%d+") do
-		-- Get the day number
-		local dayNumber = tonumber(day);
-
-		-- Check if the dayNumber is equals the today number
-		if dayNumber == currentTime.tm_wday then
-			shouldEnable = true;
-			break;
+		if tonumber(day) == currentTime.tm_wday then
+			return true, currentTime.tm_wday;
 		end
 	end
+	return false, currentTime.tm_wday;
+end
 
-	if shouldEnable then
-		enable();
+local function sendUtilityStateToPlayer(player, on)
+	if on then
+		getSandboxOptions():set("ElecShutModifier", 2147483647);
+		getSandboxOptions():set("WaterShutModifier", 2147483647);
+		sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOn = true });
 	else
-		disable();
+		getSandboxOptions():set("ElecShutModifier", -1);
+		getSandboxOptions():set("WaterShutModifier", -1);
+		sendServerCommand(player, "ServerSafehouse", "updateSandbox", { electricityOff = true });
 	end
 end
 
+local function TimeCheck()
+	local electricityOn, dayOfWeek = shouldUtilitiesBeOn();
+
+	local function broadcast(on)
+		if FactionsPlusIsSinglePlayer then
+			sendUtilityStateToPlayer(getPlayer(), on);
+		else
+			local onlinePlayers = getOnlinePlayers();
+			for i = 0, onlinePlayers:size() - 1 do
+				sendUtilityStateToPlayer(onlinePlayers:get(i), on);
+			end
+		end
+		if on then
+			if printerHandler ~= "off" then
+				DebugPrintFactionsPlus('Day Check Water, Lights on: ' .. dayOfWeek);
+				printerHandler = "off";
+			end
+		else
+			if printerHandler ~= "on" then
+				DebugPrintFactionsPlus('Day Check Water, Lights off: ' .. dayOfWeek);
+				printerHandler = "on";
+			end
+		end
+	end
+
+	broadcast(electricityOn);
+end
+
+local function OnPlayerConnect(player)
+	local electricityOn = shouldUtilitiesBeOn();
+	sendUtilityStateToPlayer(player, electricityOn);
+end
+
 Events.EveryHours.Add(TimeCheck);
+Events.OnPlayerConnect.Add(OnPlayerConnect);
