@@ -68,6 +68,17 @@ FactionsEconomyScrapRecipe.ScrapWeapon = function(craftRecipeData, player)
                 end
             end
 
+            -- Return chambered round if present (the "+1" in "7+1")
+            if weapon:isRoundChambered() and ammoType then
+                local ammoKey = ammoType.getItemKey and ammoType:getItemKey() or tostring(ammoType)
+                local bullet = instanceItem(ammoKey)
+                if bullet then
+                    inventory:AddItem(bullet)
+                    sendAddItemToContainer(inventory, bullet)
+                    print("[ScrapWeapon] returned 1 chambered round: " .. ammoKey)
+                end
+            end
+
             -- Return all attached upgrades/parts
             local parts = weapon:getDetachableWeaponParts(player)
             print("[ScrapWeapon] getDetachableWeaponParts() = " .. tostring(parts))
