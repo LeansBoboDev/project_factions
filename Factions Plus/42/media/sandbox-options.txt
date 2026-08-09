@@ -8,6 +8,25 @@ option FactionsPlus.DisablePlantRotten
 	translation = FactionsPlus_DisablePlantRotten,
 }
 
+option FactionsPlus.EnableFastRest
+{
+	type = boolean,
+	default = true,
+	page = FactionsPlus,
+	translation = FactionsPlus_EnableFastRest,
+}
+
+option FactionsPlus.RestEnduranceReceive
+{
+    type = integer,
+    min = 1,
+    max = 1000,
+    default = 100,
+
+    page = FactionsPlus,
+    translation = FactionsPlus_RestEnduranceReceive,
+}
+
 option FactionsPlus.EnableFastSleep
 {
 	type = boolean,
