@@ -48,6 +48,7 @@ module Base
     craftRecipe ScrapAmmo {
         timedAction = Making,
         Time = 25,
+        OnCreate = FactionsEconomyScrapRecipe.ScrapAmmo,
         Tags = InHandCraft;CanBeDoneInDark,
         category = Metalworking,
         xpAward = Maintenance:1,

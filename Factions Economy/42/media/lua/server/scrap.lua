@@ -100,3 +100,36 @@ FactionsEconomyScrapRecipe.ScrapWeapon = function(craftRecipeData, player)
 
     print("[ScrapWeapon] done")
 end
+
+FactionsEconomyScrapRecipe.ScrapAmmo = function(craftRecipeData, player)
+    print("[ScrapAmmo] OnCreate fired for " .. player:getUsername())
+
+    local consumedItems = craftRecipeData:getAllConsumedItems()
+    local inventory = player:getInventory()
+
+    for i = 0, consumedItems:size() - 1 do
+        local mag = consumedItems:get(i)
+        local ammoType = mag:getAmmoType()
+        if not ammoType then
+            print("[ScrapAmmo] item[" .. i .. "] " .. tostring(mag:getType()) .. " has no ammoType, skipping")
+        else
+            local ammoKey = ammoType:getItemKey()
+            local ammoCount = mag:getCurrentAmmoCount()
+            print(string.format("[ScrapAmmo] item[%d] mag=%s ammoKey=%s ammoCount=%d", i, mag:getType(), tostring(ammoKey), ammoCount or 0))
+            if ammoCount and ammoCount > 0 and ammoKey then
+                for _ = 1, ammoCount do
+                    local bullet = instanceItem(ammoKey)
+                    if bullet then
+                        inventory:AddItem(bullet)
+                        sendAddItemToContainer(inventory, bullet)
+                    end
+                end
+                print(string.format("[ScrapAmmo] returned %d x %s", ammoCount, ammoKey))
+            else
+                print("[ScrapAmmo] magazine is empty, nothing to return")
+            end
+        end
+    end
+
+    print("[ScrapAmmo] done")
+end
