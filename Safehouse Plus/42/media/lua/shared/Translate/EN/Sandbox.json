@@ -1,14 +1,50 @@
 {
     "Sandbox_Safehouse": "Safehouse Plus",
+
     "Sandbox_SafehousePlus_EnableSafehouseCreateKey": "Enable Safehouse Create Key",
     "Sandbox_SafehousePlus_EnableSafehouseCreateKey_tooltip": "Add the option to create a house key in the player safehouses",
+
     "Sandbox_SafehousePlus_EnableRespawnMechanic": "Enable Respawn",
+
     "Sandbox_SafehousePlus_RespawnCooldown": "Respawn Cooldown",
     "Sandbox_SafehousePlus_RespawnCooldown_tooltip": "When you die you need to wait this seconds before respawn",
+
     "Sandbox_SafehousePlus_HealthOnRespawn": "Respawn Health",
     "Sandbox_SafehousePlus_HealthOnRespawn_tooltip": "Health that player will respawn",
+
     "Sandbox_SafehousePlus_KeepInventory": "Respawn Keep Inventory",
     "Sandbox_SafehousePlus_KeepInventory_tooltip": "When the player dies the item on the ground is removed and spawned on the player in respawn",
+
     "Sandbox_SafehousePlus_KeepStats": "Respawn Keep Stats",
-    "Sandbox_SafehousePlus_KeepStats_tooltip": "When the player dies stats like panic, boredom, fatigue, etc, is saved"
+    "Sandbox_SafehousePlus_KeepStats_tooltip": "When the player dies stats like panic, boredom, fatigue, etc, is saved",
+
+    "Sandbox_SafehousePlus_EnableSetHome": "Enable /sethome Command",
+    "Sandbox_SafehousePlus_EnableSetHome_tooltip": "Allow players to use /sethome to mark their current position as home",
+
+    "Sandbox_SafehousePlus_SetHomeCost": "/sethome Cost",
+    "Sandbox_SafehousePlus_SetHomeCost_tooltip": "Currency cost to use /sethome. Set to 0 for free. Requires Factions Economy",
+
+    "Sandbox_SafehousePlus_EnableHome": "Enable /home Command",
+    "Sandbox_SafehousePlus_EnableHome_tooltip": "Allow players to use /home to teleport to their saved home point",
+
+    "Sandbox_SafehousePlus_HomeCooldown": "/home Cooldown",
+    "Sandbox_SafehousePlus_HomeCooldown_tooltip": "Seconds players must wait between /home uses. Set to 0 to disable cooldown",
+
+    "Sandbox_SafehousePlus_HomeCost": "/home Cost",
+    "Sandbox_SafehousePlus_HomeCost_tooltip": "Currency cost to use /home. Set to 0 for free. Requires Factions Economy",
+
+    "Sandbox_SafehousePlus_EnableBuyHome": "Enable /buyhome Command",
+    "Sandbox_SafehousePlus_EnableBuyHome_tooltip": "Allow players to use /buyhome to claim the safehouse they are standing in as their home",
+
+    "Sandbox_SafehousePlus_BuyHomeCost": "/buyhome Cost",
+    "Sandbox_SafehousePlus_BuyHomeCost_tooltip": "Currency cost to use /buyhome. Set to 0 for free. Requires Factions Economy",
+
+    "Sandbox_SafehousePlus_EnableTpa": "Enable /tpa and /tpaaccept Commands",
+    "Sandbox_SafehousePlus_EnableTpa_tooltip": "Allow players to send and accept teleport requests with /tpa and /tpaaccept",
+
+    "Sandbox_SafehousePlus_TpaCost": "/tpa Cost",
+    "Sandbox_SafehousePlus_TpaCost_tooltip": "Currency cost for the player who sends a /tpa request. Set to 0 for free. Requires Factions Economy",
+
+    "Sandbox_SafehousePlus_TpaAcceptCost": "/tpaaccept Cost",
+    "Sandbox_SafehousePlus_TpaAcceptCost_tooltip": "Currency cost for the player who accepts a /tpaaccept request. Set to 0 for free. Requires Factions Economy"
 }

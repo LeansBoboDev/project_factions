@@ -2,8 +2,31 @@
     "IGUI_Door_Create_Key": "Fazer Chave",
     "IGUI_Door_Key_Created": "Chave Criada",
     "IGUI_Door_Lock": "Fechadura",
-    "IGUI_Door_Key_Not_Created": "Não posso fazer isso",
+    "IGUI_Door_Key_Not_Created": "NÃ£o posso fazer isso",
     "IGUI_Door_Key_No_Currency": "Moeda insuficiente para criar uma chave",
     "IGUI_Respawn_DeathUI_Respawn": "RENASCER",
-    "IGUI_Respawn_CCC_Respawn": "RENASCER"
+    "IGUI_Respawn_CCC_Respawn": "RENASCER",
+
+    "IGUI_SafehousePlus_Disabled": "This command is disabled on this server.",
+
+    "IGUI_SafehousePlus_HomeSet": "Home point set!",
+    "IGUI_SafehousePlus_NoHome": "No home point set. Use /sethome first.",
+    "IGUI_SafehousePlus_HomeCooldown": "Home on cooldown. %1 seconds remaining.",
+    "IGUI_SafehousePlus_TeleportedHome": "Teleported home.",
+
+    "IGUI_SafehousePlus_BuyHomeSuccess": "Safehouse claimed as home!",
+    "IGUI_SafehousePlus_NoFunds": "Not enough currency. This action costs %1.",
+    "IGUI_SafehousePlus_BuyHomeNoFunds": "Not enough currency.",
+    "IGUI_SafehousePlus_BuyHomeNoCurrency": "BuyHome requires Factions Economy to be active.",
+    "IGUI_SafehousePlus_BuyHomeNoSafehouse": "No safehouse found at your location.",
+
+    "IGUI_SafehousePlus_TpaUsage": "Usage: /tpa <player>",
+    "IGUI_SafehousePlus_TpaSent": "Teleport request sent to %1.",
+    "IGUI_SafehousePlus_TpaReceived": "%1 wants to teleport to you. Type /tpaaccept to allow.",
+    "IGUI_SafehousePlus_TpaAccepted": "Teleport request accepted.",
+    "IGUI_SafehousePlus_TpaNoPending": "No pending teleport request.",
+    "IGUI_SafehousePlus_TpaExpired": "Teleport request expired.",
+    "IGUI_SafehousePlus_TpaTargetNotFound": "Player not found or offline.",
+    "IGUI_SafehousePlus_TpaSelf": "You cannot send a teleport request to yourself.",
+    "IGUI_SafehousePlus_TpaTeleported": "Teleporting to %1."
 }

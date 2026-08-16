@@ -51,3 +51,95 @@ option SafehousePlus.KeepStats
 	page = Safehouse,
 	translation = SafehousePlus_KeepStats,
 }
+
+option SafehousePlus.EnableSetHome
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableSetHome,
+}
+
+option SafehousePlus.SetHomeCost
+{
+	type = integer,
+	default = 5,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_SetHomeCost,
+}
+
+option SafehousePlus.EnableHome
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableHome,
+}
+
+option SafehousePlus.HomeCooldown
+{
+	type = integer,
+	default = 300,
+	min = 0,
+	max = 86400,
+	page = Safehouse,
+	translation = SafehousePlus_HomeCooldown,
+}
+
+option SafehousePlus.HomeCost
+{
+	type = integer,
+	default = 5,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_HomeCost,
+}
+
+option SafehousePlus.EnableBuyHome
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableBuyHome,
+}
+
+option SafehousePlus.BuyHomeCost
+{
+	type = integer,
+	default = 5,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_BuyHomeCost,
+}
+
+option SafehousePlus.EnableTpa
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableTpa,
+}
+
+option SafehousePlus.TpaCost
+{
+	type = integer,
+	default = 5,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_TpaCost,
+}
+
+option SafehousePlus.TpaAcceptCost
+{
+	type = integer,
+	default = 5,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_TpaAcceptCost,
+}
