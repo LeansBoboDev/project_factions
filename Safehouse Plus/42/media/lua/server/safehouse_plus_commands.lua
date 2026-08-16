@@ -39,21 +39,33 @@ local function teleportPlayer(player, x, y, z, key, p1, cost, onConfirm)
     end
 end
 
--- Returns the cost deducted (0 if free/disabled), or false if insufficient funds.
-local function tryDeductCurrency(player, costOption)
+-- Check-only: returns cost (0 if free/disabled) or false if insufficient. Does NOT deduct.
+local function checkCurrency(player, costOption)
     local cost = getSandboxInt(costOption, 0)
     if cost <= 0 or not FactionsEconomyCompatibility then return 0 end
-
     local username = player:getUsername()
     local balance  = FactionsEconomyCurrencyData and FactionsEconomyCurrencyData[username] or 0
     if balance < cost then
         msgPlayer(player, "IGUI_SafehousePlus_NoFunds", tostring(cost))
         return false
     end
+    return cost
+end
 
-    FactionsEconomyCurrencyData[username] = balance - cost
+-- Actually deduct a previously checked amount.
+local function deductCurrency(player, cost)
+    if cost <= 0 or not FactionsEconomyCompatibility then return end
+    local username = player:getUsername()
+    FactionsEconomyCurrencyData[username] = (FactionsEconomyCurrencyData[username] or 0) - cost
     DebugPrintSafehousePlus("[Commands] deducted " .. cost .. " from " .. username ..
         " (new balance: " .. FactionsEconomyCurrencyData[username] .. ")")
+end
+
+-- Check + deduct in one call (for commands that don't involve delayed teleport).
+local function tryDeductCurrency(player, costOption)
+    local cost = checkCurrency(player, costOption)
+    if cost == false then return false end
+    deductCurrency(player, cost)
     return cost
 end
 
@@ -161,13 +173,14 @@ local function goHome(player, args)
         end
     end
 
-    local cost = tryDeductCurrency(player, "SafehousePlus.HomeCost")
+    local cost = checkCurrency(player, "SafehousePlus.HomeCost")
     if cost == false then return end
 
     local username = player:getUsername()
-    local onConfirm = cooldown > 0 and function()
-        homeCooldowns[username] = os.time()
-    end or nil
+    local onConfirm = function()
+        deductCurrency(player, cost)
+        if cooldown > 0 then homeCooldowns[username] = os.time() end
+    end
 
     teleportPlayer(player, home.x, home.y, home.z, "IGUI_SafehousePlus_TeleportedHome", home.name, cost, onConfirm)
     DebugPrintSafehousePlus("[Commands] goHome: " .. player:getUsername() .. " -> '" .. home.name .. "'")
@@ -344,14 +357,16 @@ local function tpaAccept(player)
         return
     end
 
-    local cost = tryDeductCurrency(player, "SafehousePlus.TpaAcceptCost")
+    local cost = checkCurrency(player, "SafehousePlus.TpaAcceptCost")
     if cost == false then return end
 
     pendingTPA[username] = nil
 
+    local accepter = player
     teleportPlayer(senderPlayer,
         player:getX(), player:getY(), player:getZ(),
-        "IGUI_SafehousePlus_TpaTeleported", username)
+        "IGUI_SafehousePlus_TpaTeleported", username, nil,
+        function() deductCurrency(accepter, cost) end)
     msgPlayer(player, "IGUI_SafehousePlus_TpaAccepted", nil, nil, cost)
     DebugPrintSafehousePlus("[Commands] tpaAccept: " .. request.from .. " teleported to " .. username)
 end
