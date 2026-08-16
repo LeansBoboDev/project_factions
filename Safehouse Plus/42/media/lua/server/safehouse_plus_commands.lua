@@ -21,10 +21,15 @@ local function msgPlayer(player, key, p1, p2, cost)
 end
 
 local function teleportPlayer(player, x, y, z, key, p1, cost)
-    player:setX(x)
-    player:setY(y)
-    player:setZ(z)
-    sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
+    local delay = getSandboxInt("SafehousePlus.TeleportDelay", 3)
+    if delay <= 0 then
+        player:setX(x)
+        player:setY(y)
+        player:setZ(z)
+        sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
+    else
+        sendServerCommand(player, "SafehousePlus", "teleportPending", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost, delay = delay })
+    end
 end
 
 -- Returns the cost deducted (0 if free/disabled), or false if insufficient funds.

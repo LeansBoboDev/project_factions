@@ -52,6 +52,16 @@ option SafehousePlus.KeepStats
 	translation = SafehousePlus_KeepStats,
 }
 
+option SafehousePlus.TeleportDelay
+{
+	type = integer,
+	default = 3,
+	min = 0,
+	max = 60,
+	page = Safehouse,
+	translation = SafehousePlus_TeleportDelay,
+}
+
 option SafehousePlus.EnableSetHome
 {
 	type = boolean,

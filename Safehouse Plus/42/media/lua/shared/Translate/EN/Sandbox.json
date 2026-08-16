@@ -18,6 +18,9 @@
     "Sandbox_SafehousePlus_KeepStats": "Respawn Keep Stats",
     "Sandbox_SafehousePlus_KeepStats_tooltip": "When the player dies stats like panic, boredom, fatigue, etc, is saved",
 
+    "Sandbox_SafehousePlus_TeleportDelay": "Teleport Delay (seconds)",
+    "Sandbox_SafehousePlus_TeleportDelay_tooltip": "Seconds to wait before teleporting with /home or /tpa. During this time the player cannot move or take damage. Set to 0 to teleport instantly.",
+
     "Sandbox_SafehousePlus_EnableSetHome": "Enable /sethome Command",
     "Sandbox_SafehousePlus_EnableSetHome_tooltip": "Allow players to use /sethome to mark their current position as home",
 

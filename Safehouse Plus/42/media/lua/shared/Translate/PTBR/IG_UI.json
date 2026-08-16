@@ -11,6 +11,9 @@
     "IGUI_SafehousePlus_NoFunds": "Not enough currency. This action costs %1.",
     "IGUI_SafehousePlus_CostSuffix": " (Cost: %1)",
 
+    "IGUI_SafehousePlus_TeleportPending": "Teleporting in %1 seconds. Do not move.",
+    "IGUI_SafehousePlus_TeleportingIn": "Teleporting in %1...",
+
     "IGUI_SafehousePlus_HomeSet": "Home '%1' set!",
     "IGUI_SafehousePlus_HomeDuplicateName": "A home named '%1' already exists.",
     "IGUI_SafehousePlus_HomeNotFound": "No home named '%1' found.",

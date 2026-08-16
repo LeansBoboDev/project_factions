@@ -18,6 +18,62 @@ local function resolveKey(key, p1, p2)
     return getText(key)
 end
 
+-- ── Delayed teleport timed action ─────────────────────────────
+
+local ISPendingTeleport = ISBaseTimedAction:derive("ISPendingTeleport")
+
+function ISPendingTeleport:new(player, dest)
+    local o      = ISBaseTimedAction.new(self, player)
+    o.dest       = dest
+    o.maxTime    = dest.delay * 60
+    o.startTime  = os.time()
+    o.lastShown  = dest.delay + 1
+    return o
+end
+
+function ISPendingTeleport:isValid()
+    return true
+end
+
+function ISPendingTeleport:start()
+    self.character:setInvincible(true)
+    chatMsg(getText("IGUI_SafehousePlus_TeleportPending", tostring(self.dest.delay)))
+end
+
+function ISPendingTeleport:update()
+    self.character:stopMoving()
+
+    local elapsed    = os.time() - self.startTime
+    local remaining  = self.dest.delay - elapsed
+    local displaySec = math.max(0, math.ceil(remaining))
+    if displaySec > 0 and displaySec < self.lastShown then
+        self.lastShown = displaySec
+        chatMsg(getText("IGUI_SafehousePlus_TeleportingIn", tostring(displaySec)))
+    end
+
+    ISBaseTimedAction.update(self)
+end
+
+function ISPendingTeleport:perform()
+    self.character:setInvincible(false)
+    local p = self.character
+    p:setX(self.dest.x)
+    p:setY(self.dest.y)
+    p:setZ(self.dest.z or 0)
+    local text = resolveKey(self.dest.key, self.dest.p1)
+    if self.dest.cost and self.dest.cost > 0 then
+        text = text .. getText("IGUI_SafehousePlus_CostSuffix", tostring(self.dest.cost))
+    end
+    chatMsg(text)
+    ISBaseTimedAction.perform(self)
+end
+
+function ISPendingTeleport:stop()
+    self.character:setInvincible(false)
+end
+
+-- ── Chat command intercept ────────────────────────────────────
+
 local _originalOnCommandEntered = ISChat.onCommandEntered
 
 ISChat.onCommandEntered = function(self)
@@ -133,6 +189,8 @@ ISChat.onCommandEntered = function(self)
     _originalOnCommandEntered(self)
 end
 
+-- ── Server command handler ────────────────────────────────────
+
 Events.OnServerCommand.Add(function(module, command, args)
     if module ~= "SafehousePlus" then return end
 
@@ -156,6 +214,12 @@ Events.OnServerCommand.Add(function(module, command, args)
                 text = text .. getText("IGUI_SafehousePlus_CostSuffix", tostring(args.cost))
             end
             chatMsg(text)
+        end
+
+    elseif command == "teleportPending" then
+        local player = getPlayer()
+        if player then
+            ISTimedActionQueue.add(ISPendingTeleport:new(player, args))
         end
 
     elseif command == "homeList" then
