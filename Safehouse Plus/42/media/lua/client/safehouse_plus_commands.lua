@@ -11,11 +11,17 @@ local function chatMsg(text)
     ISChat.addLineInChat(mock, 0)
 end
 
+-- Resolves a translation key sent from the server with getText()
+local function resolveKey(key, p1, p2)
+    if p2 ~= nil then return getText(key, p1, p2) end
+    if p1 ~= nil then return getText(key, p1) end
+    return getText(key)
+end
+
 local _originalOnCommandEntered = ISChat.onCommandEntered
 
 ISChat.onCommandEntered = function(self)
     local input = ISChat.instance.textEntry:getText()
-    print("[SafehousePlus-DBG] onCommandEntered fired. input=" .. tostring(input))
 
     if input and luautils.stringStarts(input, "/") then
         local parts = {}
@@ -23,7 +29,6 @@ ISChat.onCommandEntered = function(self)
             table.insert(parts, word)
         end
         local cmd = parts[1] and parts[1]:lower()
-        print("[SafehousePlus-DBG] cmd=" .. tostring(cmd))
 
         if cmd == "sethome" then
             if not getSandboxBool("SafehousePlus.EnableSetHome") then
@@ -101,7 +106,7 @@ Events.OnServerCommand.Add(function(module, command, args)
     if module ~= "SafehousePlus" then return end
 
     if command == "message" then
-        chatMsg(args.text or "")
+        chatMsg(resolveKey(args.key, args.p1, args.p2))
 
     elseif command == "teleport" then
         local player = getPlayer()
@@ -110,8 +115,8 @@ Events.OnServerCommand.Add(function(module, command, args)
             player:setY(args.y)
             player:setZ(args.z or 0)
         end
-        if args.text and args.text ~= "" then
-            chatMsg(args.text)
+        if args.key then
+            chatMsg(resolveKey(args.key, args.p1))
         end
     end
 end)

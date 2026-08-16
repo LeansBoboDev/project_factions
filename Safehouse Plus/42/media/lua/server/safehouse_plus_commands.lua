@@ -1,9 +1,9 @@
 if isClient() and not SafehousePlusIsSinglePlayer then return end
 
-local TPA_EXPIRY = 60  -- seconds a TPA request stays valid
+local TPA_EXPIRY = 60
 
-local pendingTPA    = {}  -- [targetUsername] = { from = string, time = number }
-local homeCooldowns = {}  -- [username] = os.time() of last /home use
+local pendingTPA    = {}
+local homeCooldowns = {}
 
 local function getSandboxBool(name)
     local opt = getSandboxOptions():getOptionByName(name)
@@ -15,19 +15,18 @@ local function getSandboxInt(name, fallback)
     return opt and opt:getValue() or fallback
 end
 
-local function msgPlayer(player, text)
-    sendServerCommand(player, "SafehousePlus", "message", { text = text })
+-- Sends a translation key + optional params to the client to resolve with getText()
+local function msgPlayer(player, key, p1, p2)
+    sendServerCommand(player, "SafehousePlus", "message", { key = key, p1 = p1, p2 = p2 })
 end
 
-local function teleportPlayer(player, x, y, z, text)
+local function teleportPlayer(player, x, y, z, key, p1)
     player:setX(x)
     player:setY(y)
     player:setZ(z)
-    sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, text = text or "" })
+    sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1 })
 end
 
--- Returns true and deducts cost. Returns false and notifies player if funds are insufficient.
--- If Economy is not active the cost is silently skipped and returns true.
 local function tryDeductCurrency(player, costOption)
     local cost = getSandboxInt(costOption, 0)
     if cost <= 0 or not FactionsEconomyCompatibility then return true end
@@ -35,7 +34,7 @@ local function tryDeductCurrency(player, costOption)
     local username = player:getUsername()
     local balance  = FactionsEconomyCurrencyData and FactionsEconomyCurrencyData[username] or 0
     if balance < cost then
-        msgPlayer(player, getText("IGUI_SafehousePlus_NoFunds", tostring(cost)))
+        msgPlayer(player, "IGUI_SafehousePlus_NoFunds", tostring(cost))
         return false
     end
 
@@ -49,7 +48,7 @@ end
 
 local function setHome(player)
     if not getSandboxBool("SafehousePlus.EnableSetHome") then
-        msgPlayer(player, getText("IGUI_SafehousePlus_Disabled"))
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
     if not tryDeductCurrency(player, "SafehousePlus.SetHomeCost") then return end
@@ -58,7 +57,7 @@ local function setHome(player)
     md.SafehousePlusHomeX = player:getX()
     md.SafehousePlusHomeY = player:getY()
     md.SafehousePlusHomeZ = player:getZ()
-    msgPlayer(player, getText("IGUI_SafehousePlus_HomeSet"))
+    msgPlayer(player, "IGUI_SafehousePlus_HomeSet")
     DebugPrintSafehousePlus("[Commands] setHome: " .. player:getUsername() ..
         " at " .. md.SafehousePlusHomeX .. "," .. md.SafehousePlusHomeY)
 end
@@ -67,13 +66,13 @@ end
 
 local function goHome(player)
     if not getSandboxBool("SafehousePlus.EnableHome") then
-        msgPlayer(player, getText("IGUI_SafehousePlus_Disabled"))
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
 
     local md = player:getModData()
     if not md.SafehousePlusHomeX then
-        msgPlayer(player, getText("IGUI_SafehousePlus_NoHome"))
+        msgPlayer(player, "IGUI_SafehousePlus_NoHome")
         return
     end
 
@@ -83,7 +82,7 @@ local function goHome(player)
         local lastUse   = homeCooldowns[username] or 0
         local remaining = cooldown - (os.time() - lastUse)
         if remaining > 0 then
-            msgPlayer(player, getText("IGUI_SafehousePlus_HomeCooldown", tostring(remaining)))
+            msgPlayer(player, "IGUI_SafehousePlus_HomeCooldown", tostring(remaining))
             return
         end
     end
@@ -98,7 +97,7 @@ local function goHome(player)
         md.SafehousePlusHomeX,
         md.SafehousePlusHomeY,
         md.SafehousePlusHomeZ or 0,
-        getText("IGUI_SafehousePlus_TeleportedHome"))
+        "IGUI_SafehousePlus_TeleportedHome")
     DebugPrintSafehousePlus("[Commands] goHome: " .. player:getUsername())
 end
 
@@ -106,14 +105,14 @@ end
 
 local function buyHome(player)
     if not getSandboxBool("SafehousePlus.EnableBuyHome") then
-        msgPlayer(player, getText("IGUI_SafehousePlus_Disabled"))
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
 
     local sq        = player:getSquare()
     local safehouse = sq and SafeHouse.getSafeHouse(sq)
     if not safehouse then
-        msgPlayer(player, getText("IGUI_SafehousePlus_BuyHomeNoSafehouse"))
+        msgPlayer(player, "IGUI_SafehousePlus_BuyHomeNoSafehouse")
         return
     end
 
@@ -135,7 +134,7 @@ local function buyHome(player)
     md.SafehousePlusHomeY = player:getY()
     md.SafehousePlusHomeZ = player:getZ()
 
-    msgPlayer(player, getText("IGUI_SafehousePlus_BuyHomeSuccess"))
+    msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess")
     DebugPrintSafehousePlus("[Commands] buyHome: " .. username .. " claimed safehouse")
 end
 
@@ -143,7 +142,7 @@ end
 
 local function tpa(player, args)
     if not getSandboxBool("SafehousePlus.EnableTpa") then
-        msgPlayer(player, getText("IGUI_SafehousePlus_Disabled"))
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
 
@@ -161,12 +160,12 @@ local function tpa(player, args)
     end
 
     if not targetPlayer then
-        msgPlayer(player, getText("IGUI_SafehousePlus_TpaTargetNotFound"))
+        msgPlayer(player, "IGUI_SafehousePlus_TpaTargetNotFound")
         return
     end
 
     if targetPlayer:getUsername() == senderName then
-        msgPlayer(player, getText("IGUI_SafehousePlus_TpaSelf"))
+        msgPlayer(player, "IGUI_SafehousePlus_TpaSelf")
         return
     end
 
@@ -174,8 +173,8 @@ local function tpa(player, args)
 
     pendingTPA[targetPlayer:getUsername()] = { from = senderName, time = os.time() }
 
-    msgPlayer(player, getText("IGUI_SafehousePlus_TpaSent", targetPlayer:getUsername()))
-    msgPlayer(targetPlayer, getText("IGUI_SafehousePlus_TpaReceived", senderName))
+    msgPlayer(player, "IGUI_SafehousePlus_TpaSent", targetPlayer:getUsername())
+    msgPlayer(targetPlayer, "IGUI_SafehousePlus_TpaReceived", senderName)
     DebugPrintSafehousePlus("[Commands] tpa: " .. senderName .. " -> " .. targetPlayer:getUsername())
 end
 
@@ -183,7 +182,7 @@ end
 
 local function tpaAccept(player)
     if not getSandboxBool("SafehousePlus.EnableTpa") then
-        msgPlayer(player, getText("IGUI_SafehousePlus_Disabled"))
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
 
@@ -191,13 +190,13 @@ local function tpaAccept(player)
     local request  = pendingTPA[username]
 
     if not request then
-        msgPlayer(player, getText("IGUI_SafehousePlus_TpaNoPending"))
+        msgPlayer(player, "IGUI_SafehousePlus_TpaNoPending")
         return
     end
 
     if os.time() - request.time > TPA_EXPIRY then
         pendingTPA[username] = nil
-        msgPlayer(player, getText("IGUI_SafehousePlus_TpaExpired"))
+        msgPlayer(player, "IGUI_SafehousePlus_TpaExpired")
         return
     end
 
@@ -213,7 +212,7 @@ local function tpaAccept(player)
 
     if not senderPlayer then
         pendingTPA[username] = nil
-        msgPlayer(player, getText("IGUI_SafehousePlus_TpaTargetNotFound"))
+        msgPlayer(player, "IGUI_SafehousePlus_TpaTargetNotFound")
         return
     end
 
@@ -223,8 +222,8 @@ local function tpaAccept(player)
 
     teleportPlayer(senderPlayer,
         player:getX(), player:getY(), player:getZ(),
-        getText("IGUI_SafehousePlus_TpaTeleported", username))
-    msgPlayer(player, getText("IGUI_SafehousePlus_TpaAccepted"))
+        "IGUI_SafehousePlus_TpaTeleported", username)
+    msgPlayer(player, "IGUI_SafehousePlus_TpaAccepted")
     DebugPrintSafehousePlus("[Commands] tpaAccept: " .. request.from .. " teleported to " .. username)
 end
 
