@@ -72,6 +72,7 @@ end
 -- Returns the homes table from ModData, migrating legacy fields if present
 local function getHomes(player)
     local md = player:getModData()
+    DebugPrintSafehousePlus("[getHomes] md=" .. tostring(md) .. " homes=" .. tostring(md.SafehousePlusHomes) .. " count=" .. tostring(md.SafehousePlusHomes and #md.SafehousePlusHomes or "nil"))
     if not md.SafehousePlusHomes then
         md.SafehousePlusHomes = {}
         if md.SafehousePlusHomeX then
@@ -129,6 +130,7 @@ local function setHome(player, args)
     if cost == false then return end
 
     table.insert(homes, { x = player:getX(), y = player:getY(), z = player:getZ(), name = name })
+    player:save()
     msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
     DebugPrintSafehousePlus("[Commands] setHome: " .. player:getUsername() ..
         " '" .. name .. "' at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
@@ -215,6 +217,7 @@ local function buyHome(player)
     end
 
     md.SafehousePlusBoughtHomes = bought + 1
+    player:save()
 
     local newMax = getEffectiveMaxHomes(player)
     msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax), nil, cost)
@@ -269,6 +272,7 @@ local function delHome(player, args)
     for i, h in ipairs(homes) do
         if h.name == name then
             table.remove(homes, i)
+            player:save()
             msgPlayer(player, "IGUI_SafehousePlus_HomeDeleted", name)
             DebugPrintSafehousePlus("[Commands] delHome: " .. player:getUsername() .. " deleted '" .. name .. "'")
             return
