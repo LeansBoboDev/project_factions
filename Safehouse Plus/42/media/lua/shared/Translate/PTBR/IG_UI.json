@@ -9,14 +9,21 @@
 
     "IGUI_SafehousePlus_Disabled": "This command is disabled on this server.",
     "IGUI_SafehousePlus_NoFunds": "Not enough currency. This action costs %1.",
+    "IGUI_SafehousePlus_CostSuffix": " (Cost: %1)",
 
-    "IGUI_SafehousePlus_HomeSet": "Home point set!",
+    "IGUI_SafehousePlus_HomeSet": "Home '%1' set!",
+    "IGUI_SafehousePlus_HomeDuplicateName": "A home named '%1' already exists.",
+    "IGUI_SafehousePlus_HomeNotFound": "No home named '%1' found.",
     "IGUI_SafehousePlus_MaxHomesReached": "You have reached the maximum of %1 home slots. Use /buyhome to unlock more.",
     "IGUI_SafehousePlus_NoHome": "No home point set. Use /sethome first.",
     "IGUI_SafehousePlus_HomeCooldown": "Home on cooldown. %1 seconds remaining.",
-    "IGUI_SafehousePlus_TeleportedHome": "Teleported home.",
+    "IGUI_SafehousePlus_TeleportedHome": "Teleported to '%1'.",
 
     "IGUI_SafehousePlus_BuyHomeSuccess": "Home slot purchased! You now have %1 home slots.",
+
+    "IGUI_SafehousePlus_HomeList": "Your homes (%1): %2",
+    "IGUI_SafehousePlus_HomeDeleted": "Home '%1' deleted.",
+    "IGUI_SafehousePlus_DelHomeUsage": "Usage: /delhome <name>",
 
     "IGUI_SafehousePlus_TpaUsage": "Usage: /tpa <player>",
     "IGUI_SafehousePlus_TpaSent": "Teleport request sent to %1.",

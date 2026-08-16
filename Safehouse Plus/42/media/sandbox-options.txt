@@ -136,6 +136,22 @@ option SafehousePlus.BuyHomeCostIncrement
 	translation = SafehousePlus_BuyHomeCostIncrement,
 }
 
+option SafehousePlus.EnableListHomes
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableListHomes,
+}
+
+option SafehousePlus.EnableDelHome
+{
+	type = boolean,
+	default = true,
+	page = Safehouse,
+	translation = SafehousePlus_EnableDelHome,
+}
+
 option SafehousePlus.EnableTpa
 {
 	type = boolean,

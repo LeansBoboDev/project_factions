@@ -37,7 +37,7 @@ ISChat.onCommandEntered = function(self)
                 ISChat.instance:unfocus()
                 return
             end
-            sendClientCommand("SafehousePlus", "setHome", {})
+            sendClientCommand("SafehousePlus", "setHome", { name = parts[2] })
             ISChat.instance.textEntry:setText("")
             ISChat.instance:unfocus()
             return
@@ -49,7 +49,38 @@ ISChat.onCommandEntered = function(self)
                 ISChat.instance:unfocus()
                 return
             end
-            sendClientCommand("SafehousePlus", "goHome", {})
+            sendClientCommand("SafehousePlus", "goHome", { name = parts[2] })
+            ISChat.instance.textEntry:setText("")
+            ISChat.instance:unfocus()
+            return
+
+        elseif cmd == "homes" then
+            if not getSandboxBool("SafehousePlus.EnableListHomes") then
+                chatMsg(getText("IGUI_SafehousePlus_Disabled"))
+                ISChat.instance.textEntry:setText("")
+                ISChat.instance:unfocus()
+                return
+            end
+            sendClientCommand("SafehousePlus", "listHomes", {})
+            ISChat.instance.textEntry:setText("")
+            ISChat.instance:unfocus()
+            return
+
+        elseif cmd == "delhome" then
+            if not getSandboxBool("SafehousePlus.EnableDelHome") then
+                chatMsg(getText("IGUI_SafehousePlus_Disabled"))
+                ISChat.instance.textEntry:setText("")
+                ISChat.instance:unfocus()
+                return
+            end
+            local name = parts[2]
+            if not name then
+                chatMsg(getText("IGUI_SafehousePlus_DelHomeUsage"))
+                ISChat.instance.textEntry:setText("")
+                ISChat.instance:unfocus()
+                return
+            end
+            sendClientCommand("SafehousePlus", "delHome", { name = name })
             ISChat.instance.textEntry:setText("")
             ISChat.instance:unfocus()
             return
@@ -106,7 +137,11 @@ Events.OnServerCommand.Add(function(module, command, args)
     if module ~= "SafehousePlus" then return end
 
     if command == "message" then
-        chatMsg(resolveKey(args.key, args.p1, args.p2))
+        local text = resolveKey(args.key, args.p1, args.p2)
+        if args.cost and args.cost > 0 then
+            text = text .. getText("IGUI_SafehousePlus_CostSuffix", tostring(args.cost))
+        end
+        chatMsg(text)
 
     elseif command == "teleport" then
         local player = getPlayer()
@@ -116,7 +151,22 @@ Events.OnServerCommand.Add(function(module, command, args)
             player:setZ(args.z or 0)
         end
         if args.key then
-            chatMsg(resolveKey(args.key, args.p1))
+            local text = resolveKey(args.key, args.p1)
+            if args.cost and args.cost > 0 then
+                text = text .. getText("IGUI_SafehousePlus_CostSuffix", tostring(args.cost))
+            end
+            chatMsg(text)
+        end
+
+    elseif command == "homeList" then
+        if args.count == 0 then
+            chatMsg(getText("IGUI_SafehousePlus_NoHome"))
+        else
+            local names = {}
+            for i = 1, args.count do
+                table.insert(names, args.homes[i])
+            end
+            chatMsg(getText("IGUI_SafehousePlus_HomeList", tostring(args.count), table.concat(names, ", ")))
         end
     end
 end)

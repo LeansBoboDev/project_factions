@@ -15,21 +15,22 @@ local function getSandboxInt(name, fallback)
     return opt and opt:getValue() or fallback
 end
 
--- Sends a translation key + optional params to the client to resolve with getText()
-local function msgPlayer(player, key, p1, p2)
-    sendServerCommand(player, "SafehousePlus", "message", { key = key, p1 = p1, p2 = p2 })
+-- cost > 0: appended as " (Cost: N)" by the client
+local function msgPlayer(player, key, p1, p2, cost)
+    sendServerCommand(player, "SafehousePlus", "message", { key = key, p1 = p1, p2 = p2, cost = cost })
 end
 
-local function teleportPlayer(player, x, y, z, key, p1)
+local function teleportPlayer(player, x, y, z, key, p1, cost)
     player:setX(x)
     player:setY(y)
     player:setZ(z)
-    sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1 })
+    sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
 end
 
+-- Returns the cost deducted (0 if free/disabled), or false if insufficient funds.
 local function tryDeductCurrency(player, costOption)
     local cost = getSandboxInt(costOption, 0)
-    if cost <= 0 or not FactionsEconomyCompatibility then return true end
+    if cost <= 0 or not FactionsEconomyCompatibility then return 0 end
 
     local username = player:getUsername()
     local balance  = FactionsEconomyCurrencyData and FactionsEconomyCurrencyData[username] or 0
@@ -41,24 +42,29 @@ local function tryDeductCurrency(player, costOption)
     FactionsEconomyCurrencyData[username] = balance - cost
     DebugPrintSafehousePlus("[Commands] deducted " .. cost .. " from " .. username ..
         " (new balance: " .. FactionsEconomyCurrencyData[username] .. ")")
-    return true
+    return cost
 end
 
--- Returns the homes table from ModData, migrating the old single-home fields if present
+-- Returns the homes table from ModData, migrating legacy fields if present
 local function getHomes(player)
     local md = player:getModData()
     if not md.SafehousePlusHomes then
         md.SafehousePlusHomes = {}
         if md.SafehousePlusHomeX then
             table.insert(md.SafehousePlusHomes, {
-                x = md.SafehousePlusHomeX,
-                y = md.SafehousePlusHomeY,
-                z = md.SafehousePlusHomeZ or 0,
+                x    = md.SafehousePlusHomeX,
+                y    = md.SafehousePlusHomeY,
+                z    = md.SafehousePlusHomeZ or 0,
+                name = "home1",
             })
             md.SafehousePlusHomeX = nil
             md.SafehousePlusHomeY = nil
             md.SafehousePlusHomeZ = nil
         end
+    end
+    -- Assign names to any entries that predate named-home support
+    for i, h in ipairs(md.SafehousePlusHomes) do
+        if not h.name then h.name = "home" .. i end
     end
     return md.SafehousePlusHomes
 end
@@ -70,9 +76,9 @@ local function getEffectiveMaxHomes(player)
     return base + bought
 end
 
--- ── /sethome ─────────────────────────────────────────────────
+-- ── /sethome [name] ───────────────────────────────────────────
 
-local function setHome(player)
+local function setHome(player, args)
     if not getSandboxBool("SafehousePlus.EnableSetHome") then
         msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
@@ -86,26 +92,50 @@ local function setHome(player)
         return
     end
 
-    if not tryDeductCurrency(player, "SafehousePlus.SetHomeCost") then return end
+    local name = (args and args.name) or ("home" .. tostring(#homes + 1))
 
-    table.insert(homes, { x = player:getX(), y = player:getY(), z = player:getZ() })
-    msgPlayer(player, "IGUI_SafehousePlus_HomeSet")
+    for _, h in ipairs(homes) do
+        if h.name == name then
+            msgPlayer(player, "IGUI_SafehousePlus_HomeDuplicateName", name)
+            return
+        end
+    end
+
+    local cost = tryDeductCurrency(player, "SafehousePlus.SetHomeCost")
+    if cost == false then return end
+
+    table.insert(homes, { x = player:getX(), y = player:getY(), z = player:getZ(), name = name })
+    msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
     DebugPrintSafehousePlus("[Commands] setHome: " .. player:getUsername() ..
-        " at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
+        " '" .. name .. "' at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
 end
 
--- ── /home ─────────────────────────────────────────────────────
+-- ── /home [name] ─────────────────────────────────────────────
 
-local function goHome(player)
+local function goHome(player, args)
     if not getSandboxBool("SafehousePlus.EnableHome") then
         msgPlayer(player, "IGUI_SafehousePlus_Disabled")
         return
     end
 
-    local homes    = getHomes(player)
+    local homes = getHomes(player)
     if #homes == 0 then
         msgPlayer(player, "IGUI_SafehousePlus_NoHome")
         return
+    end
+
+    local home
+    local name = args and args.name
+    if name then
+        for _, h in ipairs(homes) do
+            if h.name == name then home = h; break end
+        end
+        if not home then
+            msgPlayer(player, "IGUI_SafehousePlus_HomeNotFound", name)
+            return
+        end
+    else
+        home = homes[1]
     end
 
     local cooldown = getSandboxInt("SafehousePlus.HomeCooldown", 300)
@@ -119,15 +149,15 @@ local function goHome(player)
         end
     end
 
-    if not tryDeductCurrency(player, "SafehousePlus.HomeCost") then return end
+    local cost = tryDeductCurrency(player, "SafehousePlus.HomeCost")
+    if cost == false then return end
 
     if cooldown > 0 then
         homeCooldowns[player:getUsername()] = os.time()
     end
 
-    local home = homes[1]
-    teleportPlayer(player, home.x, home.y, home.z, "IGUI_SafehousePlus_TeleportedHome")
-    DebugPrintSafehousePlus("[Commands] goHome: " .. player:getUsername())
+    teleportPlayer(player, home.x, home.y, home.z, "IGUI_SafehousePlus_TeleportedHome", home.name, cost)
+    DebugPrintSafehousePlus("[Commands] goHome: " .. player:getUsername() .. " -> '" .. home.name .. "'")
 end
 
 -- ── /buyhome ──────────────────────────────────────────────────
@@ -154,14 +184,60 @@ local function buyHome(player)
         FactionsEconomyCurrencyData[username] = balance - cost
         DebugPrintSafehousePlus("[Commands] buyHome: deducted " .. cost .. " from " .. username ..
             " (new balance: " .. FactionsEconomyCurrencyData[username] .. ")")
+    else
+        cost = 0
     end
 
     md.SafehousePlusBoughtHomes = bought + 1
 
     local newMax = getEffectiveMaxHomes(player)
-    msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax))
+    msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax), nil, cost)
     DebugPrintSafehousePlus("[Commands] buyHome: " .. player:getUsername() ..
         " bought a slot (cost=" .. cost .. "), total max=" .. newMax)
+end
+
+-- ── /homes ────────────────────────────────────────────────────
+
+local function listHomes(player)
+    if not getSandboxBool("SafehousePlus.EnableListHomes") then
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
+        return
+    end
+
+    local homes = getHomes(player)
+    local names = {}
+    for _, h in ipairs(homes) do
+        table.insert(names, h.name)
+    end
+    sendServerCommand(player, "SafehousePlus", "homeList", { count = #homes, homes = names })
+    DebugPrintSafehousePlus("[Commands] listHomes: " .. player:getUsername() .. " has " .. #homes .. " homes")
+end
+
+-- ── /delhome <name> ───────────────────────────────────────────
+
+local function delHome(player, args)
+    if not getSandboxBool("SafehousePlus.EnableDelHome") then
+        msgPlayer(player, "IGUI_SafehousePlus_Disabled")
+        return
+    end
+
+    local name = args and args.name
+    if not name then
+        msgPlayer(player, "IGUI_SafehousePlus_DelHomeUsage")
+        return
+    end
+
+    local homes = getHomes(player)
+    for i, h in ipairs(homes) do
+        if h.name == name then
+            table.remove(homes, i)
+            msgPlayer(player, "IGUI_SafehousePlus_HomeDeleted", name)
+            DebugPrintSafehousePlus("[Commands] delHome: " .. player:getUsername() .. " deleted '" .. name .. "'")
+            return
+        end
+    end
+
+    msgPlayer(player, "IGUI_SafehousePlus_HomeNotFound", name)
 end
 
 -- ── /tpa <target> ─────────────────────────────────────────────
@@ -195,11 +271,12 @@ local function tpa(player, args)
         return
     end
 
-    if not tryDeductCurrency(player, "SafehousePlus.TpaCost") then return end
+    local cost = tryDeductCurrency(player, "SafehousePlus.TpaCost")
+    if cost == false then return end
 
     pendingTPA[targetPlayer:getUsername()] = { from = senderName, time = os.time() }
 
-    msgPlayer(player, "IGUI_SafehousePlus_TpaSent", targetPlayer:getUsername())
+    msgPlayer(player, "IGUI_SafehousePlus_TpaSent", targetPlayer:getUsername(), nil, cost)
     msgPlayer(targetPlayer, "IGUI_SafehousePlus_TpaReceived", senderName)
     DebugPrintSafehousePlus("[Commands] tpa: " .. senderName .. " -> " .. targetPlayer:getUsername())
 end
@@ -242,14 +319,15 @@ local function tpaAccept(player)
         return
     end
 
-    if not tryDeductCurrency(player, "SafehousePlus.TpaAcceptCost") then return end
+    local cost = tryDeductCurrency(player, "SafehousePlus.TpaAcceptCost")
+    if cost == false then return end
 
     pendingTPA[username] = nil
 
     teleportPlayer(senderPlayer,
         player:getX(), player:getY(), player:getZ(),
         "IGUI_SafehousePlus_TpaTeleported", username)
-    msgPlayer(player, "IGUI_SafehousePlus_TpaAccepted")
+    msgPlayer(player, "IGUI_SafehousePlus_TpaAccepted", nil, nil, cost)
     DebugPrintSafehousePlus("[Commands] tpaAccept: " .. request.from .. " teleported to " .. username)
 end
 
@@ -259,11 +337,15 @@ Events.OnClientCommand.Add(function(module, command, player, args)
     if module ~= "SafehousePlus" then return end
 
     if command == "setHome" then
-        setHome(player)
+        setHome(player, args)
     elseif command == "goHome" then
-        goHome(player)
+        goHome(player, args)
     elseif command == "buyHome" then
         buyHome(player)
+    elseif command == "listHomes" then
+        listHomes(player)
+    elseif command == "delHome" then
+        delHome(player, args)
     elseif command == "tpa" then
         tpa(player, args)
     elseif command == "tpaAccept" then

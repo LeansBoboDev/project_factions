@@ -45,6 +45,12 @@
     "Sandbox_SafehousePlus_BuyHomeCostIncrement": "/buyhome Cost Increment",
     "Sandbox_SafehousePlus_BuyHomeCostIncrement_tooltip": "Extra cost added per slot already purchased. E.g. base=5, increment=2: 1st slot costs 5, 2nd costs 7, 3rd costs 9. Set to 0 for flat cost. Requires Factions Economy",
 
+    "Sandbox_SafehousePlus_EnableListHomes": "Enable /homes Command",
+    "Sandbox_SafehousePlus_EnableListHomes_tooltip": "Allow players to list their saved home points with /homes",
+
+    "Sandbox_SafehousePlus_EnableDelHome": "Enable /delhome Command",
+    "Sandbox_SafehousePlus_EnableDelHome_tooltip": "Allow players to delete a saved home point with /delhome <name>",
+
     "Sandbox_SafehousePlus_EnableTpa": "Enable /tpa and /tpaaccept Commands",
     "Sandbox_SafehousePlus_EnableTpa_tooltip": "Allow players to send and accept teleport requests with /tpa and /tpaaccept",
 
