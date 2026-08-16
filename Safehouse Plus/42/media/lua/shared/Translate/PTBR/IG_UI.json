@@ -13,6 +13,7 @@
 
     "IGUI_SafehousePlus_TeleportPending": "Teleporting in %1 seconds. Do not move.",
     "IGUI_SafehousePlus_TeleportingIn": "Teleporting in %1...",
+    "IGUI_SafehousePlus_TeleportCancelled": "Teleport cancelled.",
 
     "IGUI_SafehousePlus_HomeSet": "Home '%1' set!",
     "IGUI_SafehousePlus_HomeDuplicateName": "A home named '%1' already exists.",

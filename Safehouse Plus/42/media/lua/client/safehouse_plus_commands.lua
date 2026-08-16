@@ -23,26 +23,37 @@ end
 local ISPendingTeleport = ISBaseTimedAction:derive("ISPendingTeleport")
 
 function ISPendingTeleport:new(player, dest)
-    local o      = ISBaseTimedAction.new(self, player)
-    o.dest       = dest
-    o.maxTime    = dest.delay * 60
-    o.startTime  = os.time()
-    o.lastShown  = dest.delay + 1
+    local o         = ISBaseTimedAction.new(self, player)
+    o.dest          = dest
+    o.maxTime       = dest.delay * 60
+    o.startTime     = os.time()
+    o.lastShown     = dest.delay + 1
+    o.stopOnWalk    = false
+    o.stopOnRun     = false
+    o.stopOnAim     = false
     return o
 end
 
+-- Cancel if the player moved or took damage
 function ISPendingTeleport:isValid()
+    if not self.lockX then return true end
+    local dx = math.abs(self.character:getX() - self.lockX)
+    local dy = math.abs(self.character:getY() - self.lockY)
+    if dx > 1.0 or dy > 1.0 then return false end
+    local health = self.character:getBodyDamage():getOverallBodyHealth()
+    if health < self.startHealth then return false end
     return true
 end
 
 function ISPendingTeleport:start()
-    self.character:setInvincible(true)
+    self.lockX       = self.character:getX()
+    self.lockY       = self.character:getY()
+    self.lockZ       = self.character:getZ()
+    self.startHealth = self.character:getBodyDamage():getOverallBodyHealth()
     chatMsg(getText("IGUI_SafehousePlus_TeleportPending", tostring(self.dest.delay)))
 end
 
 function ISPendingTeleport:update()
-    self.character:stopMoving()
-
     local elapsed    = os.time() - self.startTime
     local remaining  = self.dest.delay - elapsed
     local displaySec = math.max(0, math.ceil(remaining))
@@ -50,12 +61,9 @@ function ISPendingTeleport:update()
         self.lastShown = displaySec
         chatMsg(getText("IGUI_SafehousePlus_TeleportingIn", tostring(displaySec)))
     end
-
-    ISBaseTimedAction.update(self)
 end
 
 function ISPendingTeleport:perform()
-    self.character:setInvincible(false)
     local p = self.character
     p:setX(self.dest.x)
     p:setY(self.dest.y)
@@ -69,7 +77,7 @@ function ISPendingTeleport:perform()
 end
 
 function ISPendingTeleport:stop()
-    self.character:setInvincible(false)
+    chatMsg(getText("IGUI_SafehousePlus_TeleportCancelled"))
 end
 
 -- ── Chat command intercept ────────────────────────────────────
