@@ -40,8 +40,8 @@ function ISPendingTeleport:isValid()
     local dx = math.abs(self.character:getX() - self.lockX)
     local dy = math.abs(self.character:getY() - self.lockY)
     if dx > 1.0 or dy > 1.0 then return false end
-    local health = self.character:getBodyDamage():getOverallBodyHealth()
-    if health < self.startHealth then return false end
+    local bd = self.character:getBodyDamage()
+    if bd and self.startHealth and bd:getHealth() < self.startHealth then return false end
     return true
 end
 
@@ -49,7 +49,8 @@ function ISPendingTeleport:start()
     self.lockX       = self.character:getX()
     self.lockY       = self.character:getY()
     self.lockZ       = self.character:getZ()
-    self.startHealth = self.character:getBodyDamage():getOverallBodyHealth()
+    local bd = self.character:getBodyDamage()
+    self.startHealth = bd and bd:getHealth() or nil
     chatMsg(getText("IGUI_SafehousePlus_TeleportPending", tostring(self.dest.delay)))
 end
 
@@ -64,6 +65,7 @@ function ISPendingTeleport:update()
 end
 
 function ISPendingTeleport:perform()
+    sendClientCommand("SafehousePlus", "confirmTeleport", {})
     local p = self.character
     p:setX(self.dest.x)
     p:setY(self.dest.y)

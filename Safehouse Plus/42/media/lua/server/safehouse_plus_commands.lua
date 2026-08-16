@@ -2,8 +2,9 @@ if isClient() and not SafehousePlusIsSinglePlayer then return end
 
 local TPA_EXPIRY = 60
 
-local pendingTPA    = {}
-local homeCooldowns = {}
+local pendingTPA     = {}
+local homeCooldowns  = {}
+local pendingConfirm = {}  -- username -> callback applied only when client confirms teleport
 
 local function getSandboxBool(name)
     local opt = getSandboxOptions():getOptionByName(name)
@@ -20,14 +21,20 @@ local function msgPlayer(player, key, p1, p2, cost)
     sendServerCommand(player, "SafehousePlus", "message", { key = key, p1 = p1, p2 = p2, cost = cost })
 end
 
-local function teleportPlayer(player, x, y, z, key, p1, cost)
+-- onConfirm: optional function called only when the teleport actually completes.
+-- For immediate teleport it runs now; for delayed it runs when the client sends confirmTeleport.
+local function teleportPlayer(player, x, y, z, key, p1, cost, onConfirm)
     local delay = getSandboxInt("SafehousePlus.TeleportDelay", 3)
     if delay <= 0 then
+        if onConfirm then onConfirm() end
         player:setX(x)
         player:setY(y)
         player:setZ(z)
         sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
     else
+        if onConfirm then
+            pendingConfirm[player:getUsername()] = onConfirm
+        end
         sendServerCommand(player, "SafehousePlus", "teleportPending", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost, delay = delay })
     end
 end
@@ -157,11 +164,12 @@ local function goHome(player, args)
     local cost = tryDeductCurrency(player, "SafehousePlus.HomeCost")
     if cost == false then return end
 
-    if cooldown > 0 then
-        homeCooldowns[player:getUsername()] = os.time()
-    end
+    local username = player:getUsername()
+    local onConfirm = cooldown > 0 and function()
+        homeCooldowns[username] = os.time()
+    end or nil
 
-    teleportPlayer(player, home.x, home.y, home.z, "IGUI_SafehousePlus_TeleportedHome", home.name, cost)
+    teleportPlayer(player, home.x, home.y, home.z, "IGUI_SafehousePlus_TeleportedHome", home.name, cost, onConfirm)
     DebugPrintSafehousePlus("[Commands] goHome: " .. player:getUsername() .. " -> '" .. home.name .. "'")
 end
 
@@ -199,6 +207,18 @@ local function buyHome(player)
     msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax), nil, cost)
     DebugPrintSafehousePlus("[Commands] buyHome: " .. player:getUsername() ..
         " bought a slot (cost=" .. cost .. "), total max=" .. newMax)
+end
+
+-- ── confirmTeleport (client → server after delayed teleport) ──
+
+local function confirmTeleport(player)
+    local username = player:getUsername()
+    local cb = pendingConfirm[username]
+    if cb then
+        cb()
+        pendingConfirm[username] = nil
+        DebugPrintSafehousePlus("[Commands] confirmTeleport: cooldown applied for " .. username)
+    end
 end
 
 -- ── /homes ────────────────────────────────────────────────────
@@ -341,7 +361,9 @@ end
 Events.OnClientCommand.Add(function(module, command, player, args)
     if module ~= "SafehousePlus" then return end
 
-    if command == "setHome" then
+    if command == "confirmTeleport" then
+        confirmTeleport(player)
+    elseif command == "setHome" then
         setHome(player, args)
     elseif command == "goHome" then
         goHome(player, args)
