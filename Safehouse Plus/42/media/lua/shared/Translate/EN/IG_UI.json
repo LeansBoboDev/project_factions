@@ -8,17 +8,15 @@
 	"IGUI_Respawn_CCC_Respawn": "RESPAWN",
 
 	"IGUI_SafehousePlus_Disabled": "This command is disabled on this server.",
+	"IGUI_SafehousePlus_NoFunds": "Not enough currency. This action costs %1.",
 
 	"IGUI_SafehousePlus_HomeSet": "Home point set!",
+	"IGUI_SafehousePlus_MaxHomesReached": "You have reached the maximum of %1 home slots. Use /buyhome to unlock more.",
 	"IGUI_SafehousePlus_NoHome": "No home point set. Use /sethome first.",
 	"IGUI_SafehousePlus_HomeCooldown": "Home on cooldown. %1 seconds remaining.",
 	"IGUI_SafehousePlus_TeleportedHome": "Teleported home.",
 
-	"IGUI_SafehousePlus_BuyHomeSuccess": "Safehouse claimed as home!",
-	"IGUI_SafehousePlus_NoFunds": "Not enough currency. This action costs %1.",
-	"IGUI_SafehousePlus_BuyHomeNoFunds": "Not enough currency.",
-	"IGUI_SafehousePlus_BuyHomeNoCurrency": "BuyHome requires Factions Economy to be active.",
-	"IGUI_SafehousePlus_BuyHomeNoSafehouse": "No safehouse found at your location.",
+	"IGUI_SafehousePlus_BuyHomeSuccess": "Home slot purchased! You now have %1 home slots.",
 
 	"IGUI_SafehousePlus_TpaUsage": "Usage: /tpa <player>",
 	"IGUI_SafehousePlus_TpaSent": "Teleport request sent to %1.",

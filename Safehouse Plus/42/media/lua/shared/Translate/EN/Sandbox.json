@@ -21,6 +21,9 @@
     "Sandbox_SafehousePlus_EnableSetHome": "Enable /sethome Command",
     "Sandbox_SafehousePlus_EnableSetHome_tooltip": "Allow players to use /sethome to mark their current position as home",
 
+    "Sandbox_SafehousePlus_MaxHomes": "Max Homes Per Player",
+    "Sandbox_SafehousePlus_MaxHomes_tooltip": "How many home points each player can register with /sethome",
+
     "Sandbox_SafehousePlus_SetHomeCost": "/sethome Cost",
     "Sandbox_SafehousePlus_SetHomeCost_tooltip": "Currency cost to use /sethome. Set to 0 for free. Requires Factions Economy",
 
@@ -34,10 +37,13 @@
     "Sandbox_SafehousePlus_HomeCost_tooltip": "Currency cost to use /home. Set to 0 for free. Requires Factions Economy",
 
     "Sandbox_SafehousePlus_EnableBuyHome": "Enable /buyhome Command",
-    "Sandbox_SafehousePlus_EnableBuyHome_tooltip": "Allow players to use /buyhome to claim the safehouse they are standing in as their home",
+    "Sandbox_SafehousePlus_EnableBuyHome_tooltip": "Allow players to purchase additional home slots with /buyhome",
 
-    "Sandbox_SafehousePlus_BuyHomeCost": "/buyhome Cost",
-    "Sandbox_SafehousePlus_BuyHomeCost_tooltip": "Currency cost to use /buyhome. Set to 0 for free. Requires Factions Economy",
+    "Sandbox_SafehousePlus_BuyHomeCost": "/buyhome Base Cost",
+    "Sandbox_SafehousePlus_BuyHomeCost_tooltip": "Base currency cost for the first /buyhome purchase. Set to 0 for free. Requires Factions Economy",
+
+    "Sandbox_SafehousePlus_BuyHomeCostIncrement": "/buyhome Cost Increment",
+    "Sandbox_SafehousePlus_BuyHomeCostIncrement_tooltip": "Extra cost added per slot already purchased. E.g. base=5, increment=2: 1st slot costs 5, 2nd costs 7, 3rd costs 9. Set to 0 for flat cost. Requires Factions Economy",
 
     "Sandbox_SafehousePlus_EnableTpa": "Enable /tpa and /tpaaccept Commands",
     "Sandbox_SafehousePlus_EnableTpa_tooltip": "Allow players to send and accept teleport requests with /tpa and /tpaaccept",

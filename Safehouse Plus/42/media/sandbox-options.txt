@@ -60,6 +60,16 @@ option SafehousePlus.EnableSetHome
 	translation = SafehousePlus_EnableSetHome,
 }
 
+option SafehousePlus.MaxHomes
+{
+	type = integer,
+	default = 1,
+	min = 1,
+	max = 100,
+	page = Safehouse,
+	translation = SafehousePlus_MaxHomes,
+}
+
 option SafehousePlus.SetHomeCost
 {
 	type = integer,
@@ -114,6 +124,16 @@ option SafehousePlus.BuyHomeCost
 	max = 2147483647,
 	page = Safehouse,
 	translation = SafehousePlus_BuyHomeCost,
+}
+
+option SafehousePlus.BuyHomeCostIncrement
+{
+	type = integer,
+	default = 0,
+	min = 0,
+	max = 2147483647,
+	page = Safehouse,
+	translation = SafehousePlus_BuyHomeCostIncrement,
 }
 
 option SafehousePlus.EnableTpa
