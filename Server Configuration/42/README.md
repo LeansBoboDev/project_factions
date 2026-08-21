@@ -12,7 +12,7 @@ own jar, so these overwrite the vanilla classes at runtime without touching
 `projectzomboid.jar` itself.
 
 The matching `.java` sources (with the exact diff already applied) sit next to
-each `.class` file, and `java/rebuild.ps1` recompiles them.
+each `.class` file, and `build.sh` (in this folder's root) recompiles them.
 
 ### When you need to redo this (game updates)
 
@@ -49,7 +49,7 @@ the safehouse limit silently comes back). When that happens:
      before the existing `INetworkPacket.sendToAll(PacketTypes.PacketType.SafehouseSync, safehouse);` line.
 3. Apply the same two edits to the freshly decompiled files, replace the
    `.java` files in this folder with them.
-4. Run `java\rebuild.ps1 -JarPath "<path to the new projectzomboid.jar>"` — it
+4. Run `./build.sh "<path to the new projectzomboid.jar>"` — it
    auto-detects the required `--release` version from the jar itself and
    recompiles both `.class` files in place.
 5. Copy this whole `Server Configuration/42` folder into the dedicated
