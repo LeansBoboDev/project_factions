@@ -108,8 +108,8 @@ function GetFactionUsedPoints(faction)
 	for i = 0, SafeHouse.getSafehouseList():size() - 1 do
 		local safehouse = SafeHouse.getSafehouseList():get(i);
 
-		if safehouse.getOwner() == owner then
-			pointsUsed = pointsUsed - GetSafehouseCost(safehouse)
+		if safehouse:getOwner() == owner then
+			pointsUsed = pointsUsed + GetSafehouseCost(safehouse)
 		end
 	end
 

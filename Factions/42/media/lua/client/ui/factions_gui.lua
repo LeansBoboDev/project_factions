@@ -5,8 +5,6 @@ local safehouseUI = nil;
 
 FactionsGUI = ISPanel:derive("FactionsGUI");
 FactionsGUI.minimized = true;
--- FactionsGUI.btnText = { getText("UI_Text_SafehouseClaim"), getText("UI_Text_SafehouseCapture"),
--- 	getText("UI_Text_SafehouseView") }
 
 -- Creating the panel the right side of GUI
 
@@ -86,29 +84,13 @@ function Badge:new(x, y) -- Instanciation the Badgez
 
 	-- Default Textures for Badge
 	o.freeTex = defaultBadge;
-	o.redTex = getTexture("media/ui/red/Capture100.png");
-	o.blueTex = getTexture("media/ui/blue/Capture100.png");
-
-	-- Default variables
-	o.timer = 0;
-	o.capture = false;
-	o.state = 0;
 	o.noBackground = true;
-	o.owner = nil;
 
 	-- Default Opacity
 	o.alpha = 1.0;
 	-- If is minimized changes the opacity to lower
 	if FactionsGUI.minimized then
 		o.alpha = 0.75;
-	end
-
-	-- Instanciate other textures for the capture system
-	o.texture_r = {}
-	o.texture_b = {}
-	for i = 0, 20 do
-		o.texture_r[i] = getTexture("media/ui/red/Capture" .. tostring(i * 5) .. ".png");
-		o.texture_b[i] = getTexture("media/ui/blue/Capture" .. tostring(i * 5) .. ".png");
 	end
 
 	return o
@@ -149,18 +131,11 @@ function FactionsGUI:update() -- UI every tick overwrite
 end
 
 function FactionsGUI:updateButtons() -- Update dynamically the buttons based in self parameters
-	-- If player is capturing disable the button
-	if self.badge.capture then
-		self.button:setEnable(false);
-		self.internal = "";
-		return;
-	end
-
 	local faction = Faction.getPlayerFaction(getPlayer())
 	if not faction then
 		self.button:setEnable(false);
 		self.button:setTooltip(getText("UI_Text_SafehouseWithoutFaction"))
-		self.internal = "Capture";
+		self.internal = "";
 		return;
 	end
 
@@ -171,8 +146,8 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 			self.button:setEnable(true);
 			return;
 		else
-			self.internal = "Capture";
-			self.button:setEnable(true);
+			self.button:setEnable(false);
+			self.internal = "";
 			return;
 		end
 	end
@@ -220,7 +195,6 @@ function FactionsGUI:createChildren() -- Overwrite the children creation method
 	-- Adding it to the Game GUI
 	self:addChild(badge);
 	self.badge = badge;
-	self.badge.team = self.team;
 
 	local offset = (badge:getX() * 2) + badge:getWidth();
 
@@ -308,9 +282,6 @@ function FactionsGUI.onButtonClick() -- On the button click
 			450, safehouse, getPlayer());
 		safehouseUI:initialise()
 		safehouseUI:addToUIManager()
-	elseif internal == "Capture" then -- Capture the enemy safehouse button
-		-- TODO
-		getPlayer():Say("TO DO")
 	elseif internal == "Capture_Empty" then -- Capture Residential button
 		-- IMPORTANT
 		-- You cannot do that on the server side FOR SOME ABNORMOUS REASON
@@ -377,7 +348,7 @@ function FactionsGUI:SaveLayout(name, layout) -- Overwrite Layout Save
 	ISLayoutManager.DefaultSaveWindow(self, layout)
 end
 
-function FactionsGUI:new(titleText, factionText, buttonText, faction, team) -- Instanciate the FactionsGUI
+function FactionsGUI:new(titleText, factionText, buttonText, faction) -- Instanciate the FactionsGUI
 	-- Creating the object to save the GUI
 	local o = {}
 
@@ -404,7 +375,6 @@ function FactionsGUI:new(titleText, factionText, buttonText, faction, team) -- I
 	local player = getPlayer()      -- Getting entity
 	o.player = player;              -- Adding the entity player
 	o.username = player:getUsername(); -- Player Username
-	o.team = team;                  -- If the GUI is on a team safehouse or enemy
 
 	-- Adding the player faction to the gui parameter
 	o.faction = faction;
@@ -428,23 +398,11 @@ function FactionsGUI:new(titleText, factionText, buttonText, faction, team) -- I
 	-- Setting the default variables
 	o.timer = FactionsGUI.updateTime;
 	o.buttonVisible = true;
-	o:setCapture(false);
 	o.timestamp = getTimeInMillis();
 	o.dragging = true;
 	o.internal = "";
 
 	return o
-end
-
-function FactionsGUI:startCapture() -- Start the capturing system
-	-- Disable button
-	self.button:setEnable(false);
-	-- Add the message to the disabled button
-	self.button:setTooltip(getTextOrNull("UI_Text_SafehouseProgress") or "Capture in progress");
-	-- Add the sound for the player
-	getSoundManager():PlaySound("baseCaptureStart", false, 1.0)
-
-	self.badge.capture = true;
 end
 
 local function OnServerCommand(module, command, arguments)

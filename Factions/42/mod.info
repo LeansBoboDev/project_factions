@@ -1,6 +1,6 @@
 name=Factions
 id=factions
-description=Provides a capturing safehouse system with UI
+description=Provides a faction safehouse claiming system with UI
 poster=Poster.png
 pzversion=42
 modversion=1.0.0

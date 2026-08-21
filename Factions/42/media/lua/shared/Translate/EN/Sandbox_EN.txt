@@ -1,20 +1,8 @@
 Sandbox_EN = {
     Sandbox_Factions = "Factions",
 
-    Sandbox_Factions_TimeToEnableCapture = "Capture Start Hour",
-    Sandbox_Factions_TimeToEnableCapture_tooltip = "Hour in the day to Capture be enabled",
-
-    Sandbox_Factions_TimeToDisableCapture = "Capture Finish Hour",
-    Sandbox_Factions_TimeToDisableCapture_tooltip = "Hour in the day to Capture be disabled",
-    
-    Sandbox_Factions_CaptureDaysOfWeek = "Capture Days",
-    Sandbox_Factions_CaptureDaysOfWeek_tooltip = "Days of weeks that capture will be enable, 0 = Sunday, 1 = Monday... example: 0/3/6, Sunday,Wednesday,Saturday capture will be enabled",
-
     Sandbox_Factions_Timezone = "Timezone",
     Sandbox_Factions_Timezone_tooltip = "Timezone from your current location, Sao Paulo: -3, New York: -5, Moscou: 3",
-
-    Sandbox_Factions_IncreaseConstructionLife = "Increase Construction Life",
-    Sandbox_Factions_IncreaseConstructionLife_tooltip = "While in capture mode the player construction life will be normal, in non capture time the construction life will be increased to maximum",
 
     Sandbox_Factions_PointsPerZombieKills = "Claim Points",
     Sandbox_Factions_PointsPerZombieKills_tooltip = "Every amount of kills will give you this amount of points, for example 100=1, this means with 100 kills you will have 1 point to claim, 100=1;200=2; this means 200 kills you will have 2 points for claim",

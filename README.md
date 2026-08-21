@@ -4,20 +4,15 @@ B42: currently
 # Factions (Reworking...) do not use it
 ## I don't know what indie stone is doing behind the scenes but i think there will be a native pvp factions, better not lose time reworking this until the native system
 
-Singleplayer Compatibility: No, theres is no reason to add a capture system in singleplayer
+Singleplayer Compatibility: No, factions are a multiplayer concept
 
-Forked from [SSR: Safehouse](https://steamcommunity.com/sharedfiles/filedetails/?id=1178772929&searchtext=Safehouse) to create a complete new system to safehouse claim and capture
+Forked from [SSR: Safehouse](https://steamcommunity.com/sharedfiles/filedetails/?id=1178772929&searchtext=Safehouse) to create a complete new system to safehouse claim
 
 - UI to show the safehouse informations
-- Capture safehouse system
-- Multiple Safehouses (Need server configuration)
-- Chat alert for actions (capturing, losing, captured, lost)
-- Configurable time to enable safehouse capture invasion, also timezone
+- Faction safehouse claim system, multiple safehouses per faction gated by points earned from zombie kills (requires the java class override below, since b42 hardcodes one safehouse per player)
 - Configurable zombie kills to earn points
-- Configurable player construction health while in capture mode
-- Players can only try to capture safehouse one time per game day
 
-Consider downloading the safehouse limit remover in the folder [Server Configuration](https://github.com/LeandroTheDev/project_factions/tree/main/Server%20Configuration) and place it in the main project zomboid dedicated server folder
+Requires the safehouse limit patch in the folder [Server Configuration](https://github.com/LeandroTheDev/project_factions/tree/main/Server%20Configuration/42) placed in the main project zomboid dedicated server folder, otherwise the vanilla one-safehouse-per-player limit still applies
 
 # Factions Economy
 Add a new shop system, forked from [Server Points](https://steamcommunity.com/sharedfiles/filedetails/?id=2823055977&searchtext=Server+Points), and a Global Trade system, includes Loot Boxes and farm economy system by exploring and local farming vegetables/fruits.

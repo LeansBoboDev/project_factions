@@ -65,10 +65,6 @@ local function update()
 				-- This is the faction of the player
 				local player_faction = GetPlayerFaction(player:getUsername());
 
-				-- If true this means the safehouse is from your team
-				-- false means its a enemy, nil means empty safehouse
-				local team = nil;
-
 				-- Add this building to the global variable building
 				building = building;
 
@@ -80,19 +76,15 @@ local function update()
 					if safehouse_faction then
 						-- Creates the text
 						factionText = getText("UI_Text_LabelFaction") .. tostring(safehouse_faction:getName())
-						-- Check if the player faction is them same from the safehouse faction
+						-- Check if the player faction is the same as the safehouse faction
 						if player_faction == safehouse_faction then
-							team = true;
-							buttonText = FactionsGUI.btnText[3]
-						else
-							team = false;
-							buttonText = FactionsGUI.btnText[2]
+							buttonText = getText("UI_Text_SafehouseView")
 						end
 					end
 				end
 
 				-- Instanciate the Button UI
-				GUI = FactionsGUI:new(safehouseText, factionText, buttonText, player_faction, team);
+				GUI = FactionsGUI:new(safehouseText, factionText, buttonText, player_faction);
 				GUI:initialise();
 				GUI:addToUIManager();
 				ISLayoutManager.RegisterWindow('FactionsUI', FactionsGUI, GUI);
