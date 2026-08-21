@@ -187,7 +187,7 @@ option FactionsPlus.VehicleClaimCost
 {
     type = integer,
     min = 0,
-    max = 999999,
+    max = 2147483647,
     default = 0,
 
     page = FactionsPlus,

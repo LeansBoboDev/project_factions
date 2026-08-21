@@ -2,6 +2,24 @@ if isClient() and not FactionsEconomyIsSinglePlayer then return end;
 
 -- ── Helper ───────────────────────────────────────────────────
 
+-- Weapons that use a detachable magazine come back inserted and topped up;
+-- weapons without one (revolvers, break-actions, etc.) come back with their
+-- internal ammo capacity filled directly, mirroring HandWeapon.randomizeFirearmAsLoot.
+local function loadWeaponAmmo(item)
+    if not instanceof(item, "HandWeapon") or not item:isRanged() then return end
+
+    if item:usesExternalMagazine() then
+        item:setContainsClip(true)
+        item:setCurrentAmmoCount(item:getMaxAmmo())
+    elseif item:getAmmoType() then
+        item:setCurrentAmmoCount(item:getMaxAmmo())
+    end
+
+    if item:haveChamber() then
+        item:setRoundChambered(true)
+    end
+end
+
 local function giveItemToPlayer(player, itemFullName)
     local item = instanceItem(itemFullName)
     if not item then
@@ -11,6 +29,8 @@ local function giveItemToPlayer(player, itemFullName)
     if item:getType() == "CorpseAnimal" then
         item:createAndStoreDefaultDeadBody(nil)
     end
+
+    loadWeaponAmmo(item)
 
     player:getInventory():AddItem(item)
     sendAddItemToContainer(player:getInventory(), item);
