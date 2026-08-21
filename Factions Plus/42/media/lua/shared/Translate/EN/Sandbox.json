@@ -37,5 +37,11 @@
     "Sandbox_FactionsPlus_EnablePlayerLeaveMessages": "Enable Leave Messages",
     "Sandbox_FactionsPlus_EnablePlayerLeaveMessages_tooltip": "When a player leaves the server it will display a message with their username",
     "Sandbox_FactionsPlus_EnablePlayerDeathMessages": "Enable Death Messages",
-    "Sandbox_FactionsPlus_EnablePlayerDeathMessages_tooltip": "When a player dies in the server it will display a message with their username"
+    "Sandbox_FactionsPlus_EnablePlayerDeathMessages_tooltip": "When a player dies in the server it will display a message with their username",
+    "Sandbox_FactionsPlus_EnableVehicleClaim": "Enable Vehicle Claim",
+    "Sandbox_FactionsPlus_EnableVehicleClaim_tooltip": "Allows players to claim a vehicle with /vehicleclaim. Other players won't be able to open its trunk/glovebox to steal items, even if left unlocked",
+    "Sandbox_FactionsPlus_VehicleClaimCost": "Vehicle Claim Cost",
+    "Sandbox_FactionsPlus_VehicleClaimCost_tooltip": "Currency cost to claim a vehicle. Set to 0 for free. Requires Factions Economy",
+    "Sandbox_FactionsPlus_VehicleClaimMax": "Max Claimed Vehicles per Player",
+    "Sandbox_FactionsPlus_VehicleClaimMax_tooltip": "Maximum number of vehicles a single player can have claimed at the same time. Set to 0 for unlimited"
 }

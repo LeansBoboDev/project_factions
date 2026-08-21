@@ -174,3 +174,33 @@ option FactionsPlus.EnablePlayerDeathMessages
 	page = FactionsPlus,
 	translation = FactionsPlus_EnablePlayerDeathMessages,
 }
+
+option FactionsPlus.EnableVehicleClaim
+{
+	type = boolean,
+	default = true,
+	page = FactionsPlus,
+	translation = FactionsPlus_EnableVehicleClaim,
+}
+
+option FactionsPlus.VehicleClaimCost
+{
+    type = integer,
+    min = 0,
+    max = 999999,
+    default = 0,
+
+    page = FactionsPlus,
+    translation = FactionsPlus_VehicleClaimCost,
+}
+
+option FactionsPlus.VehicleClaimMax
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 1,
+
+    page = FactionsPlus,
+    translation = FactionsPlus_VehicleClaimMax,
+}

@@ -1,5 +1,22 @@
 {
 	"IGUI_Player_Connected": "conectou",
 	"IGUI_Player_Disconnected": "desconectou",
-	"IGUI_Player_Dead": "morreu"
+	"IGUI_Player_Dead": "morreu",
+
+	"IGUI_FactionsPlus_Vehicle_Disabled": "O sistema de claim de veiculo esta desabilitado neste servidor",
+	"IGUI_FactionsPlus_Vehicle_Claimed": "Voce reivindicou este veiculo. Use /vehicleaddmember <nome> para dar acesso a alguem",
+	"IGUI_FactionsPlus_Vehicle_AlreadyClaimed": "Este veiculo ja esta reivindicado",
+	"IGUI_FactionsPlus_Vehicle_NotClaimed": "Este veiculo nao esta reivindicado",
+	"IGUI_FactionsPlus_Vehicle_NotOwner": "Somente o dono do veiculo pode fazer isso",
+	"IGUI_FactionsPlus_Vehicle_Unclaimed": "Voce removeu a reivindicacao deste veiculo",
+	"IGUI_FactionsPlus_Vehicle_NoVehicle": "Voce precisa estar dentro do veiculo para fazer isso",
+	"IGUI_FactionsPlus_Vehicle_NoFunds": "Voce precisa de %1 de moeda para reivindicar este veiculo",
+	"IGUI_FactionsPlus_Vehicle_MaxClaims": "Voce ja atingiu o limite de %1 veiculos reivindicados",
+	"IGUI_FactionsPlus_Vehicle_MemberAdded": "%1 recebeu acesso a este veiculo",
+	"IGUI_FactionsPlus_Vehicle_MemberRemoved": "O acesso de %1 a este veiculo foi removido",
+	"IGUI_FactionsPlus_Vehicle_AlreadyMember": "%1 ja tem acesso a este veiculo",
+	"IGUI_FactionsPlus_Vehicle_NotMember": "%1 nao tem acesso a este veiculo",
+	"IGUI_FactionsPlus_Vehicle_ClaimOption": "Reivindicar Veiculo",
+	"IGUI_FactionsPlus_Vehicle_UnclaimOption": "Remover Reivindicacao",
+	"IGUI_FactionsPlus_Vehicle_AccessDenied": "Este veiculo pertence a outra pessoa"
 }

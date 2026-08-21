@@ -1,5 +1,22 @@
 {
 	"IGUI_Player_Connected": "connected",
 	"IGUI_Player_Disconnected": "disconnected",
-	"IGUI_Player_Dead": "died"
+	"IGUI_Player_Dead": "died",
+
+	"IGUI_FactionsPlus_Vehicle_Disabled": "Vehicle claiming is disabled on this server",
+	"IGUI_FactionsPlus_Vehicle_Claimed": "You claimed this vehicle. Use /vehicleaddmember <name> to give someone access",
+	"IGUI_FactionsPlus_Vehicle_AlreadyClaimed": "This vehicle is already claimed",
+	"IGUI_FactionsPlus_Vehicle_NotClaimed": "This vehicle isn't claimed",
+	"IGUI_FactionsPlus_Vehicle_NotOwner": "Only the vehicle's owner can do that",
+	"IGUI_FactionsPlus_Vehicle_Unclaimed": "You unclaimed this vehicle",
+	"IGUI_FactionsPlus_Vehicle_NoVehicle": "You must be inside the vehicle to do that",
+	"IGUI_FactionsPlus_Vehicle_NoFunds": "You need %1 currency to claim this vehicle",
+	"IGUI_FactionsPlus_Vehicle_MaxClaims": "You already have the maximum of %1 claimed vehicles",
+	"IGUI_FactionsPlus_Vehicle_MemberAdded": "%1 was given access to this vehicle",
+	"IGUI_FactionsPlus_Vehicle_MemberRemoved": "%1's access to this vehicle was removed",
+	"IGUI_FactionsPlus_Vehicle_AlreadyMember": "%1 already has access to this vehicle",
+	"IGUI_FactionsPlus_Vehicle_NotMember": "%1 doesn't have access to this vehicle",
+	"IGUI_FactionsPlus_Vehicle_ClaimOption": "Claim Vehicle",
+	"IGUI_FactionsPlus_Vehicle_UnclaimOption": "Unclaim Vehicle",
+	"IGUI_FactionsPlus_Vehicle_AccessDenied": "This vehicle belongs to someone else"
 }

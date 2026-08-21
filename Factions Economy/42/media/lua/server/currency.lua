@@ -7,8 +7,12 @@ if isClient() and not FactionsEconomyIsSinglePlayer then return end
 -- { ["playerUsername"] = 150 }
 FactionsEconomyCurrencyData          = {}
 
+-- Keyed by safehouse:getOnlineID() (a stable id derived from the safehouse's x,y —
+-- NOT by owner username), so a player owning more than one safehouse gets one
+-- independent entry per safehouse instead of them colliding into a single record.
 -- {
---   ["playerUsername"] = {
+--   [123456] = {
+--     Id              = 123456,
 --     Title           = "My Safehouse",
 --     Owner           = "playerUsername",
 --     Players         = { "playerUsername", "friendUsername" },
@@ -39,9 +43,23 @@ local function getSafehousePlayers(safehouse)
 end
 
 local function AddSafehouseToData(safehouse)
+    local id = safehouse:getOnlineID()
     local owner = safehouse:getOwner()
-    local existing = FactionsEconomySafehouseCurrencyData[owner]
-    FactionsEconomySafehouseCurrencyData[owner] = {
+    local existing = FactionsEconomySafehouseCurrencyData[id]
+
+    if not existing then
+        -- Migrate pre-multi-safehouse data that used to be keyed by owner username.
+        local legacy = FactionsEconomySafehouseCurrencyData[owner]
+        if type(legacy) == "table" and legacy.Owner == owner then
+            existing = legacy
+            FactionsEconomySafehouseCurrencyData[owner] = nil
+            DebugPrintFactionsEconomy(string.format("[SafehouseMigration] Migrated legacy data for %s to id %d", owner,
+                id))
+        end
+    end
+
+    FactionsEconomySafehouseCurrencyData[id] = {
+        Id              = id,
         Title           = safehouse:getTitle(),
         Owner           = owner,
         Players         = getSafehousePlayers(safehouse),
@@ -72,6 +90,14 @@ end
 
 -- ── Tick ─────────────────────────────────────────────────────
 
+-- Forward declaration: the vanilla Events.OnSafehousesChanged is only ever
+-- triggered client-side by the game engine (zombie.iso.areas.SafeHouse.addSafeHouse/
+-- removeSafeHouse gate the trigger behind `if (GameClient.client)`, which is never
+-- true on a dedicated server process). So on dedicated servers this event never
+-- fires and safehouses never get registered into FactionsEconomySafehouseCurrencyData.
+-- We call this function manually below instead of relying solely on the event.
+local OnSafehousesChanged
+
 local currencyPerTick = getSandboxOption("FactionsEconomy.CurrencyPerTick")
 local safehouseCurrencyPerTick = getSandboxOption("FactionsEconomy.SafehouseCurrencyPerTick")
 
@@ -88,12 +114,14 @@ local function giveCurrencyToPlayers()
 end
 
 local function giveSafehouseCurrency()
-    for owner, data in pairs(FactionsEconomySafehouseCurrencyData) do
+    OnSafehousesChanged()
+    for id, data in pairs(FactionsEconomySafehouseCurrencyData) do
         data.Currency = data.Currency +
             math.floor(safehouseCurrencyPerTick *
                 (data.Tier * getSandboxOption("FactionsEconomy.SafehouseCurrencyAdditionalPerTier")))
 
-        DebugPrintFactionsEconomy(string.format("[SafehouseCurrency] %s currency: %d", owner, data.Currency))
+        DebugPrintFactionsEconomy(string.format("[SafehouseCurrency] %s (id %s) currency: %d", data.Owner, id,
+            data.Currency))
     end
 end
 
@@ -155,7 +183,7 @@ FactionsEconomyCurrencyRecipe.UpgradeSafehouse = function(craftRecipeData, playe
         return
     end
 
-    local data = FactionsEconomySafehouseCurrencyData[username]
+    local data = FactionsEconomySafehouseCurrencyData[safehouse:getOnlineID()]
     if not data then
         DebugPrintFactionsEconomy(string.format("[UpgradeSafehouse] no data found for %s", username))
         return
@@ -224,7 +252,7 @@ local function redeemSafehouseCurrency(player)
         safehouse:getTitle()))
 
     local owner = safehouse:getOwner()
-    local safeData = FactionsEconomySafehouseCurrencyData[owner]
+    local safeData = FactionsEconomySafehouseCurrencyData[safehouse:getOnlineID()]
     if not safeData then
         DebugPrintFactionsEconomy(string.format("[RedeemSafehouse] No tracking data for safehouse owner: %s", owner))
         AddSafehouseToData(safehouse)
@@ -243,42 +271,45 @@ LuaEventManager.AddEvent("OnFactionsEconomySafehouseClaimed")
 LuaEventManager.AddEvent("OnFactionsEconomySafehouseUpdated")
 LuaEventManager.AddEvent("OnFactionsEconomySafehouseUnclaimed")
 
-local function OnSafehousesChanged()
+OnSafehousesChanged = function()
     local list = SafeHouse.getSafehouseList()
     local currentIds = {}
 
     for i = 0, list:size() - 1 do
         local safehouse = list:get(i)
+        local id = safehouse:getOnlineID()
         local owner = safehouse:getOwner()
-        currentIds[owner] = true
+        currentIds[id] = true
 
-        if not FactionsEconomySafehouseCurrencyData[owner] then
+        if not FactionsEconomySafehouseCurrencyData[id] then
             DebugPrintFactionsEconomy(string.format(
-                "[SafehouseTracking] New safehouse claimed: %s (owner: %s, created: %s)",
-                safehouse:getTitle(), owner, safehouse:getDatetimeCreatedStr()))
+                "[SafehouseTracking] New safehouse claimed: %s (owner: %s, id: %d, created: %s)",
+                safehouse:getTitle(), owner, id, safehouse:getDatetimeCreatedStr()))
 
             AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseClaimed", safehouse)
         else
-            DebugPrintFactionsEconomy(string.format("[SafehouseTracking] Safehouse updated: %s (owner: %s, created: %s)",
-                safehouse:getTitle(), owner, safehouse:getDatetimeCreatedStr()))
+            DebugPrintFactionsEconomy(string.format(
+                "[SafehouseTracking] Safehouse updated: %s (owner: %s, id: %d, created: %s)",
+                safehouse:getTitle(), owner, id, safehouse:getDatetimeCreatedStr()))
 
             AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseUpdated", safehouse)
         end
     end
 
-    for owner, _ in pairs(FactionsEconomySafehouseCurrencyData) do
-        if not currentIds[owner] then
-            DebugPrintFactionsEconomy(string.format("[SafehouseTracking] Safehouse removed: %s", owner))
-            FactionsEconomySafehouseCurrencyData[owner] = nil
+    for id, data in pairs(FactionsEconomySafehouseCurrencyData) do
+        if not currentIds[id] then
+            DebugPrintFactionsEconomy(string.format("[SafehouseTracking] Safehouse removed: %s (id: %s)", data.Owner,
+                id))
+            FactionsEconomySafehouseCurrencyData[id] = nil
 
-            triggerEvent("OnFactionsEconomySafehouseUnclaimed", owner)
+            triggerEvent("OnFactionsEconomySafehouseUnclaimed", data.Owner)
         end
     end
 end
 
-Events.OnSafehousesChanged.Add(OnSafehousesChanged)
+Events.EveryTenMinutes.Add(OnSafehousesChanged)
 
 -- ── Client Requests ──────────────────────────────────────────
 
