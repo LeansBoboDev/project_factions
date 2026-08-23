@@ -98,10 +98,15 @@ local function claimVehicle(player, args)
     local cost = checkCurrency(player)
     if cost == false then return end
 
+    local vehicleName = "Vehicle #" .. tostring(keyId)
+    local ok, name = pcall(function() return vehicle:getScript():getFullName() end)
+    if ok and name and name ~= "" then vehicleName = name end
+
     FactionsPlusVehicleClaimData[keyId] = {
-        KeyId   = keyId,
-        Owner   = username,
-        Members = {},
+        KeyId        = keyId,
+        Owner        = username,
+        Members      = {},
+        VehicleName  = vehicleName,
     }
 
     deductCurrency(player, cost)
@@ -185,6 +190,42 @@ Events.OnInitGlobalModData.Add(function(isNewGame)
     FactionsPlusVehicleClaimData = ModData.getOrCreate("FactionsPlusVehicleClaim")
 end)
 
+local function sendMyVehicles(player)
+    local username = player:getUsername()
+    local list = {}
+    for keyId, claim in pairs(FactionsPlusVehicleClaimData) do
+        if claim.Owner == username then
+            table.insert(list, {
+                keyId   = keyId,
+                name    = claim.VehicleName or ("Vehicle #" .. tostring(keyId)),
+                members = claim.Members or {},
+            })
+        end
+    end
+    sendServerCommand(player, "FactionsPlusVehicle", "myVehiclesList", { vehicles = list })
+end
+
+local function unclaimByKeyId(player, args)
+    local username = player:getUsername()
+    local keyId = args and args.keyId
+    if not keyId then return end
+
+    local claim = FactionsPlusVehicleClaimData[keyId]
+    if not claim then
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotClaimed")
+        return
+    end
+    if claim.Owner ~= username then
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotOwner")
+        return
+    end
+
+    FactionsPlusVehicleClaimData[keyId] = nil
+    DebugPrintFactionsPlus(string.format("[VehicleClaim] %s unclaimed vehicle (keyId %d) via panel", username, keyId))
+    notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Unclaimed")
+    sendMyVehicles(player)
+end
+
 Events.OnClientCommand.Add(function(module, command, player, args)
     if module ~= "FactionsPlusVehicle" then return end
 
@@ -196,5 +237,9 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         setMember(player, args.username, true, args)
     elseif command == "removeMember" then
         setMember(player, args.username, false, args)
+    elseif command == "getMyVehicles" then
+        sendMyVehicles(player)
+    elseif command == "unclaimByKeyId" then
+        unclaimByKeyId(player, args)
     end
 end)

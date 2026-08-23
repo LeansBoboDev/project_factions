@@ -19,5 +19,9 @@
 	"IGUI_FactionsPlus_Vehicle_ClaimOption": "Claim Vehicle",
 	"IGUI_FactionsPlus_Vehicle_UnclaimOption": "Unclaim Vehicle",
 	"IGUI_FactionsPlus_Vehicle_AccessDenied": "This vehicle belongs to someone else",
-	"IGUI_FactionsPlus_Vehicle_NoKey": "You must have the vehicle key to claim it"
+	"IGUI_FactionsPlus_Vehicle_NoKey": "You must have the vehicle key to claim it",
+
+	"IGUI_FactionsPlus_Vehicle_ButtonLabel": "Vehicles",
+	"IGUI_FactionsPlus_Vehicle_ListTitle": "My Vehicles",
+	"IGUI_FactionsPlus_Vehicle_Members": "members"
 }
