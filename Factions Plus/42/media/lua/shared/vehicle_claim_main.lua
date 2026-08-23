@@ -132,10 +132,19 @@ end)
 -- broadcastClaimSync only reaches players online at the moment of a claim, so
 -- a player who connects after a claim was made would have a stale (empty) local
 -- table and isAllowed() would incorrectly allow part uninstalls/etc.
-Events.OnGameStart.Add(function()
-    if isClient() and not FactionsPlusIsSinglePlayer then
-        sendClientCommand("FactionsPlusVehicle", "getAllClaims", {})
+-- OnGameStart fires before the character is ready in multiplayer, so we wait
+-- via OnTick until getSpecificPlayer(0) returns a valid object.
+local _allClaimsRequested = false
+Events.OnTick.Add(function()
+    if _allClaimsRequested then return end
+    if not isClient() or FactionsPlusIsSinglePlayer then
+        _allClaimsRequested = true
+        return
     end
+    local player = getSpecificPlayer(0)
+    if not player then return end
+    sendClientCommand(player, "FactionsPlusVehicle", "getAllClaims", {})
+    _allClaimsRequested = true
 end)
 
 Events.OnServerCommand.Add(function(module, command, args)

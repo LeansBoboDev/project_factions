@@ -285,11 +285,14 @@ Events.OnClientCommand.Add(function(module, command, player, args)
     elseif command == "unclaimByKeyId" then
         unclaimByKeyId(player, args)
     elseif command == "getAllClaims" then
+        local count = 0
         for keyId, claim in pairs(FactionsPlusVehicleClaimData) do
             sendServerCommand(player, "FactionsPlusVehicle", "claimSync", {
                 keyId = keyId,
                 claim = { Owner = claim.Owner, Members = claim.Members, VehicleName = claim.VehicleName },
             })
+            count = count + 1
         end
+        DebugPrintFactionsPlus(string.format("[VehicleClaim] getAllClaims for %s: sent %d claims", player:getUsername(), count))
     end
 end)
