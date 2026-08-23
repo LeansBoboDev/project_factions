@@ -81,28 +81,56 @@ end
 -- Vehicle Claim — Radial Menu ("hold V" while driving)
 -- ============================================================
 
-local function onClaimVehicle(playerObj)
-    sendClientCommand(playerObj, "FactionsPlusVehicle", "claim", {})
+local function onClaimVehicle(playerObj, vehicle)
+    local keyId = vehicle and vehicle:getKeyId() or nil
+    sendClientCommand(playerObj, "FactionsPlusVehicle", "claim", { keyId = keyId })
 end
 
-local function onUnclaimVehicle(playerObj)
-    sendClientCommand(playerObj, "FactionsPlusVehicle", "unclaim", {})
+local function onUnclaimVehicle(playerObj, vehicle)
+    local keyId = vehicle and vehicle:getKeyId() or nil
+    sendClientCommand(playerObj, "FactionsPlusVehicle", "unclaim", { keyId = keyId })
 end
 
+-- Inside vehicle: radial menu while seated/driving
 local _originalShowRadialMenu = ISVehicleMenu.showRadialMenu
 
 ISVehicleMenu.showRadialMenu = function(playerObj)
+    local menu = getPlayerRadialMenu(playerObj:getPlayerNum())
+    local wasVisible = menu:isReallyVisible()
+
     _originalShowRadialMenu(playerObj)
 
-    if not playerObj:getVehicle() then return end
+    if wasVisible then return end
 
-    local menu = getPlayerRadialMenu(playerObj:getPlayerNum())
-    if not menu:isReallyVisible() then return end
+    local vehicle = playerObj:getVehicle()
+    if not vehicle then return end
 
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onClaimVehicle, playerObj)
+        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onClaimVehicle, playerObj, vehicle)
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onUnclaimVehicle, playerObj)
+        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onUnclaimVehicle, playerObj, vehicle)
+end
+
+-- Outside vehicle: radial menu while standing near it (pressing V outside)
+local _originalShowRadialMenuOutside = ISVehicleMenu.showRadialMenuOutside
+
+ISVehicleMenu.showRadialMenuOutside = function(playerObj)
+    local menu = getPlayerRadialMenu(playerObj:getPlayerNum())
+    local wasVisible = menu:isReallyVisible()
+
+    _originalShowRadialMenuOutside(playerObj)
+
+    if wasVisible then return end
+
+    local vehicle = ISVehicleMenu.getVehicleToInteractWith(playerObj)
+    if not vehicle then return end
+
+    if menu:isEmpty() then return end
+
+    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
+        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onClaimVehicle, playerObj, vehicle)
+    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
+        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onUnclaimVehicle, playerObj, vehicle)
 end
 
 -- ============================================================
@@ -112,6 +140,7 @@ end
 -- door/hotwire/siphon/uninstall checks in the shared script, these are
 -- optimistic (client-authoritative), same trust level as vanilla's own
 -- entering/towing rules.
+
 
 local Original_ISEnterVehicle_isValid = ISEnterVehicle.isValid
 function ISEnterVehicle:isValid()

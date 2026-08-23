@@ -42,20 +42,48 @@ local function deductCurrency(player, cost)
         FactionsEconomyCurrencyData[username]))
 end
 
-local function claimVehicle(player)
+-- Returns the vehicle the player is in, or a nearby vehicle matching keyId (for outside claiming).
+local function findVehicle(player, args)
+    local v = player:getVehicle()
+    if v then return v end
+    local keyId = args and args.keyId
+    if not keyId then return nil end
+    local px = math.floor(player:getX())
+    local py = math.floor(player:getY())
+    local pz = math.floor(player:getZ())
+    for dx = -4, 4 do
+        for dy = -4, 4 do
+            local sq = getCell():getGridSquare(px + dx, py + dy, pz)
+            if sq then
+                local candidate = sq:getVehicleContainer()
+                if candidate and candidate:getKeyId() == keyId then
+                    return candidate
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function claimVehicle(player, args)
     if not getSandboxOption("FactionsPlus.EnableVehicleClaim") then
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Disabled")
         return
     end
 
     local username = player:getUsername()
-    local vehicle = player:getVehicle()
+    local vehicle = findVehicle(player, args)
     if not vehicle then
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoVehicle")
         return
     end
 
     local keyId = vehicle:getKeyId()
+    if not player:getInventory():haveThisKeyId(keyId) then
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoKey")
+        return
+    end
+
     if FactionsPlusVehicleClaimData[keyId] then
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_AlreadyClaimed")
         return
@@ -77,16 +105,15 @@ local function claimVehicle(player)
     }
 
     deductCurrency(player, cost)
-    vehicle:setLocked(true)
 
     DebugPrintFactionsPlus(string.format("[VehicleClaim] %s claimed vehicle (keyId %d)", username, keyId))
     notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Claimed")
     triggerEvent("OnFactionsPlusVehicleClaimed", vehicle, player)
 end
 
-local function unclaimVehicle(player)
+local function unclaimVehicle(player, args)
     local username = player:getUsername()
-    local vehicle = player:getVehicle()
+    local vehicle = findVehicle(player, args)
     if not vehicle then
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoVehicle")
         return
@@ -109,9 +136,9 @@ local function unclaimVehicle(player)
     triggerEvent("OnFactionsPlusVehicleUnclaimed", vehicle, username)
 end
 
-local function setMember(player, targetUsername, add)
+local function setMember(player, targetUsername, add, args)
     local username = player:getUsername()
-    local vehicle = player:getVehicle()
+    local vehicle = findVehicle(player, args)
     if not vehicle then
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoVehicle")
         return
@@ -162,12 +189,12 @@ Events.OnClientCommand.Add(function(module, command, player, args)
     if module ~= "FactionsPlusVehicle" then return end
 
     if command == "claim" then
-        claimVehicle(player)
+        claimVehicle(player, args)
     elseif command == "unclaim" then
-        unclaimVehicle(player)
+        unclaimVehicle(player, args)
     elseif command == "addMember" then
-        setMember(player, args.username, true)
+        setMember(player, args.username, true, args)
     elseif command == "removeMember" then
-        setMember(player, args.username, false)
+        setMember(player, args.username, false, args)
     end
 end)

@@ -81,9 +81,17 @@ Events.EveryOneMinute.Add(protectClaimedVehicles)
 
 local function findVehicleByKeyId(keyId)
     local vehicles = getCell():getVehicles()
-    for i = 0, vehicles:size() - 1 do
-        local vehicle = vehicles:get(i)
-        if vehicle:getKeyId() == keyId then return vehicle end
+    if not vehicles then return nil end
+    -- getVehicles() returns a Java ArrayList server-side: size()/get(i) with 0-based index
+    if vehicles.size and vehicles:size then
+        for i = 0, vehicles:size() - 1 do
+            local v = vehicles:get(i)
+            if v and v:getKeyId() == keyId then return v end
+        end
+    else
+        for _, v in pairs(vehicles) do
+            if v and v:getKeyId() == keyId then return v end
+        end
     end
     return nil
 end

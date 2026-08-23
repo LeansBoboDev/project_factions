@@ -18,5 +18,6 @@
 	"IGUI_FactionsPlus_Vehicle_NotMember": "%1 nao tem acesso a este veiculo",
 	"IGUI_FactionsPlus_Vehicle_ClaimOption": "Reivindicar Veiculo",
 	"IGUI_FactionsPlus_Vehicle_UnclaimOption": "Remover Reivindicacao",
-	"IGUI_FactionsPlus_Vehicle_AccessDenied": "Este veiculo pertence a outra pessoa"
+	"IGUI_FactionsPlus_Vehicle_AccessDenied": "Este veiculo pertence a outra pessoa",
+	"IGUI_FactionsPlus_Vehicle_NoKey": "Voce precisa ter a chave do veiculo para reivindicá-lo"
 }
