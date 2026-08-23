@@ -2,6 +2,8 @@
 -- Chat Command Listener + Server Message Listener
 -- ============================================================
 
+print("[FE-DEBUG] commands.lua loading...")
+
 -- ── Client Command Hook ──────────────────────────────────────
 
 local oldOnCommandEntered = ISChat.onCommandEntered
@@ -17,6 +19,7 @@ end
 -- ── Server Message Listener (client side) ────────────────────
 
 Events.OnServerCommand.Add(function(module, command, args)
+    print("[FE-DEBUG] OnServerCommand: module=" .. tostring(module) .. " command=" .. tostring(command))
     if module ~= "FactionsEconomyCurrency" then return end
 
     if command == "showSay" then
@@ -31,5 +34,8 @@ Events.OnServerCommand.Add(function(module, command, args)
         end
 
         HaloTextHelper.addGoodText(player, message)
+    elseif command == "safehouseCurrencyInfo" then
+        DebugPrintFactionsEconomy(string.format("[SafehouseCurrencyInfo] received amount=%s", tostring(args.amount)))
+        FactionsEconomySetSafehousePendingCurrency(args.amount)
     end
 end)

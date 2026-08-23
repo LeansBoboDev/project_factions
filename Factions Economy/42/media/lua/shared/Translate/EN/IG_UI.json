@@ -29,5 +29,7 @@
 	"IGUI_Shop_Return": "Returned",
 	"IGUI_Shop_Sell": "Sold",
 	"IGUI_Safehouse_Redeem": "Redeemed",
-	"IGUI_Safehouse_Upgraded": "Upgraded"
+	"IGUI_Safehouse_Upgraded": "Upgraded",
+	"IGUI_Safehouse_Redeem_Tooltip": "Collect %1 points",
+	"IGUI_Safehouse_Redeem_Tooltip_Empty": "No points available"
 }

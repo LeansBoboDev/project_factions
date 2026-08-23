@@ -6,10 +6,10 @@
 	"IGUI_Shop_Available": " Disponivel",
 	"IGUI_Shop_lootbox": "Loot Box",
 	"IGUI_Shop_books": "Livros",
-	"IGUI_Shop_survival": "Matériais",
+	"IGUI_Shop_survival": "Matï¿½riais",
 	"IGUI_Shop_farm": "Fazenda",
-	"IGUI_Shop_faction": "Facção",
-	"IGUI_Shop_vehicle": "Veículos",
+	"IGUI_Shop_faction": "Facï¿½ï¿½o",
+	"IGUI_Shop_vehicle": "Veï¿½culos",
 	"IGUI_Shop_missing": "Sem Itens",
 	"IGUI_Add_Trade_Items": "Adicionar Itens",
 	"IGUI_Trade_No_Items": "Sem Itens",
@@ -20,7 +20,7 @@
 	"IGUI_Trade_Clothing": "Roupa",
 	"IGUI_Trade_WeaponPart": "Parte de Arma",
 	"IGUI_Trade_Literature": "Literatura",
-	"IGUI_Container_Convert": "Converter em Estação de Troca",
+	"IGUI_Container_Convert": "Converter em Estaï¿½ï¿½o de Troca",
 	"IGUI_Trade_Send": "ENVIAR",
 	"IGUI_Trade_Items": "Itens no container",
 	"IGUI_ItemCat_Special": "Loot Box Especial",
@@ -29,5 +29,7 @@
 	"IGUI_Shop_Return": "Retornado",
 	"IGUI_Shop_Sell": "Vendido",
 	"IGUI_Safehouse_Redeem": "Resgatado",
-	"IGUI_Safehouse_Upgraded": "Melhorado"
+	"IGUI_Safehouse_Upgraded": "Melhorado",
+	"IGUI_Safehouse_Redeem_Tooltip": "Coletar %1 pontos",
+	"IGUI_Safehouse_Redeem_Tooltip_Empty": "Nenhum ponto disponÃ­vel"
 }

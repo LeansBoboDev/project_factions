@@ -322,6 +322,28 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         })
     elseif command == "redeemSafehouseCurrency" then
         redeemSafehouseCurrency(player)
+    elseif command == "getSafehouseCurrency" then
+        local safehouseId = args.safehouseId
+        DebugPrintFactionsEconomy(string.format("[GetSafehouseCurrency] %s requested id=%s", player:getUsername(), tostring(safehouseId)))
+        if not safehouseId then return end
+        local safeData = FactionsEconomySafehouseCurrencyData[safehouseId]
+        if not safeData then
+            DebugPrintFactionsEconomy(string.format("[GetSafehouseCurrency] no safeData for id=%s", tostring(safehouseId)))
+            sendServerCommand(player, "FactionsEconomyCurrency", "safehouseCurrencyInfo", { amount = 0 })
+            return
+        end
+        local username = player:getUsername()
+        local allowed = safeData.Owner == username
+        if not allowed then
+            for _, name in ipairs(safeData.Players) do
+                if name == username then allowed = true; break end
+            end
+        end
+        DebugPrintFactionsEconomy(string.format("[GetSafehouseCurrency] %s allowed=%s currency=%d", username, tostring(allowed), safeData.Currency))
+        if not allowed then return end
+        sendServerCommand(player, "FactionsEconomyCurrency", "safehouseCurrencyInfo", {
+            amount = safeData.Currency
+        })
     elseif command == "requestCreateKey" then
         local username = player:getUsername()
         local cost     = getSandboxOption("FactionsEconomy.CreateKeyCost")
