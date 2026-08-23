@@ -284,5 +284,12 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         sendMyVehicles(player)
     elseif command == "unclaimByKeyId" then
         unclaimByKeyId(player, args)
+    elseif command == "getAllClaims" then
+        for keyId, claim in pairs(FactionsPlusVehicleClaimData) do
+            sendServerCommand(player, "FactionsPlusVehicle", "claimSync", {
+                keyId = keyId,
+                claim = { Owner = claim.Owner, Members = claim.Members, VehicleName = claim.VehicleName },
+            })
+        end
     end
 end)

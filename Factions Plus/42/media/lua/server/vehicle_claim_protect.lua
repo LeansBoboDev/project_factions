@@ -35,7 +35,9 @@ local function captureConditions(vehicle)
     local snapshot = {}
     for i = 0, vehicle:getPartCount() - 1 do
         local part = vehicle:getPartByIndex(i)
-        if part:getInventoryItem() or part:getWindow() then
+        -- getWindow() is always non-nil for window-type parts even when the glass is gone,
+        -- so use getInventoryItem() as the real presence check for both windows and other parts.
+        if part:getInventoryItem() then
             snapshot[i] = part:getCondition()
         end
     end
@@ -156,16 +158,10 @@ end)
 local function findVehicleByKeyId(keyId)
     local vehicles = getCell():getVehicles()
     if not vehicles then return nil end
-    -- getVehicles() returns a Java ArrayList server-side: size()/get(i) with 0-based index
-    if vehicles.size then
-        for i = 0, vehicles:size() - 1 do
-            local v = vehicles:get(i)
-            if v and v:getKeyId() == keyId then return v end
-        end
-    else
-        for _, v in pairs(vehicles) do
-            if v and v:getKeyId() == keyId then return v end
-        end
+    local iter = vehicles:iterator()
+    while iter:hasNext() do
+        local v = iter:next()
+        if v and v:getKeyId() == keyId then return v end
     end
     return nil
 end

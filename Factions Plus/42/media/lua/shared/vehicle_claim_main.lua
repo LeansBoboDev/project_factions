@@ -128,6 +128,16 @@ Events.OnInitGlobalModData.Add(function()
     end
 end)
 
+-- When the player is in the world, request all existing claims from the server.
+-- broadcastClaimSync only reaches players online at the moment of a claim, so
+-- a player who connects after a claim was made would have a stale (empty) local
+-- table and isAllowed() would incorrectly allow part uninstalls/etc.
+Events.OnGameStart.Add(function()
+    if isClient() and not FactionsPlusIsSinglePlayer then
+        sendClientCommand("FactionsPlusVehicle", "getAllClaims", {})
+    end
+end)
+
 Events.OnServerCommand.Add(function(module, command, args)
     if module ~= "FactionsPlusVehicle" then return end
     if command == "claimSync" then
