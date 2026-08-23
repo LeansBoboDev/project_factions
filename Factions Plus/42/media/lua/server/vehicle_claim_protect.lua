@@ -35,7 +35,7 @@ local function captureConditions(vehicle)
     local snapshot = {}
     for i = 0, vehicle:getPartCount() - 1 do
         local part = vehicle:getPartByIndex(i)
-        if part:getInventoryItem() then
+        if part:getInventoryItem() or part:getWindow() then
             snapshot[i] = part:getCondition()
         end
     end
@@ -45,12 +45,16 @@ end
 local function restoreConditions(vehicle, snapshot)
     for i = 0, vehicle:getPartCount() - 1 do
         local part = vehicle:getPartByIndex(i)
-        local item = part:getInventoryItem()
         local savedCondition = snapshot[i]
-        if item and savedCondition and part:getCondition() < savedCondition then
+        if savedCondition and part:getCondition() < savedCondition then
             part:setCondition(savedCondition)
-            part:doInventoryItemStats(item, 0)
-            vehicle:transmitPartCondition(part)
+            local item = part:getInventoryItem()
+            if item then
+                part:doInventoryItemStats(item, 0)
+                vehicle:transmitPartCondition(part)
+            elseif part:getWindow() then
+                vehicle:transmitPartWindow(part)
+            end
         end
     end
 end

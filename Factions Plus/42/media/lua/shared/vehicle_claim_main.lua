@@ -98,3 +98,15 @@ function ISSmashWindow:isValid()
     end
     return Original_ISSmashWindow_isValid(self)
 end
+
+-- Server-side block: direct weapon attacks bypass isValid() entirely (Java combat path),
+-- so we also intercept complete() on the server to prevent the actual window hit.
+local Original_ISSmashWindow_complete = ISSmashWindow.complete
+function ISSmashWindow:complete()
+    if isServer() and self.vehiclePart then
+        if not FactionsPlusVehicleClaim.isAllowed(self.vehiclePart:getVehicle(), self.character) then
+            return true
+        end
+    end
+    return Original_ISSmashWindow_complete(self)
+end
