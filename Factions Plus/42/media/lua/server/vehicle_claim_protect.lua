@@ -133,7 +133,15 @@ local function protectClaimedVehicles()
     DebugPrintFactionsPlus(string.format("[VehicleProtect] poll done: %d vehicles checked, %d claimed", count, claimed))
 end
 
-Events.EveryOneMinute.Add(protectClaimedVehicles)
+local _protectTick = 0
+Events.OnTick.Add(function()
+    _protectTick = _protectTick + 1
+    local interval = getSandboxOptions():getOptionByName("FactionsPlus.VehicleProtectTickInterval"):getValue()
+    if _protectTick >= interval then
+        _protectTick = 0
+        protectClaimedVehicles()
+    end
+end)
 
 Events.OnFactionsPlusVehicleClaimed.Add(function(vehicle, player)
     local claim = FactionsPlusVehicleClaim.getClaim(vehicle)

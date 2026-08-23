@@ -204,3 +204,14 @@ option FactionsPlus.VehicleClaimMax
     page = FactionsPlus,
     translation = FactionsPlus_VehicleClaimMax,
 }
+
+option FactionsPlus.VehicleProtectTickInterval
+{
+    type = integer,
+    min = 1,
+    max = 10000,
+    default = 200,
+
+    page = FactionsPlus,
+    translation = FactionsPlus_VehicleProtectTickInterval,
+}

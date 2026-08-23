@@ -43,5 +43,7 @@
     "Sandbox_FactionsPlus_VehicleClaimCost": "Vehicle Claim Cost",
     "Sandbox_FactionsPlus_VehicleClaimCost_tooltip": "Currency cost to claim a vehicle. Set to 0 for free. Requires Factions Economy",
     "Sandbox_FactionsPlus_VehicleClaimMax": "Max Claimed Vehicles per Player",
-    "Sandbox_FactionsPlus_VehicleClaimMax_tooltip": "Maximum number of vehicles a single player can have claimed at the same time. Set to 0 for unlimited"
+    "Sandbox_FactionsPlus_VehicleClaimMax_tooltip": "Maximum number of vehicles a single player can have claimed at the same time. Set to 0 for unlimited",
+    "Sandbox_FactionsPlus_VehicleProtectTickInterval": "Vehicle Protect Tick Interval",
+    "Sandbox_FactionsPlus_VehicleProtectTickInterval_tooltip": "How many server ticks between each vehicle condition check and restore. Lower = more responsive but more CPU. At 15 FPS, 15 = ~1 second, 150 = ~10 seconds"
 }
