@@ -59,9 +59,9 @@ local function protectClaimedVehicles()
     if not FactionsPlusVehicleClaimData then return end
     if not getSandboxOptions():getOptionByName("FactionsPlus.EnableVehicleClaim"):getValue() then return end
 
-    local vehicles = getCell():getVehicles()
-    for i = 0, vehicles:size() - 1 do
-        local vehicle = vehicles:get(i)
+    local iter = getCell():getVehicles():iterator()
+    while iter:hasNext() do
+        local vehicle = iter:next()
         local claim = FactionsPlusVehicleClaim.getClaim(vehicle)
         if claim then
             if isVehicleOccupied(vehicle) then

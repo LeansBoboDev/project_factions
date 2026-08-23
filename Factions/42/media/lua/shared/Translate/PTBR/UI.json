@@ -1,0 +1,12 @@
+{
+    "UI_Text_LabelFaction": "Faccao: ",
+    "UI_Text_SafehouseClaim": "Conquistar",
+    "UI_Text_SafehouseView": "Ver",
+    "UI_Text_SafehouseEmpty": "Safehouse Vazia",
+    "UI_Text_SafehouseNotALeader": "Voce nao e o lider da faccao",
+    "UI_Text_SafehousePointsAvailable": "Conquistar custara %1 ponto (Disponivel: %2)",
+    "UI_Text_SafehouseNotEnoughPoints": "Precisa de mais pontos para conquistar (Disponivel: %1 / %2)",
+    "UI_Text_SafehouseNameTooLongShort": "Titulo da Safehouse precisa ter 3-30 caracteres.",
+    "UI_Text_SafehouseNoPoints": "Pontos insuficientes...",
+    "UI_Text_SafehouseWithoutFaction": "Voce nao esta em uma faccao"
+}

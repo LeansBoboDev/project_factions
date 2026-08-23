@@ -1,0 +1,7 @@
+{
+    "Sandbox_Factions": "Factions",
+    "Sandbox_Factions_Timezone": "Fuso Horario",
+    "Sandbox_Factions_Timezone_tooltip": "Fuso horario da sua localizacao atual, Sao Paulo: -3, New York: -5, Moscou: 3",
+    "Sandbox_Factions_PointsPerZombieKills": "Pontos de Conquista",
+    "Sandbox_Factions_PointsPerZombieKills_tooltip": "A cada quantidade de kills voce ganhara esta quantidade de pontos, por exemplo 100=1, isso significa que com 100 kills voce tera 1 ponto para conquistar, 100=1;200=2; isso significa que com 200 kills voce tera 2 pontos para conquistar"
+}
