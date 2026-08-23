@@ -5,6 +5,8 @@ local safehouseUI = nil;
 
 FactionsGUI = ISPanel:derive("FactionsGUI");
 FactionsGUI.minimized = true;
+FactionsGUI.points = 0;
+FactionsGUI.internal = "";
 
 -- Creating the panel the right side of GUI
 
@@ -34,6 +36,12 @@ function Badge:update() -- Updates every ticks
 end
 
 function Badge:prerender() -- Before updating the screen render
+end
+
+function Badge:render() -- Draw the badge flag texture
+	if self.freeTex then
+		self:drawTextureScaled(self.freeTex, 0, 0, self.width, self.height, self.alpha)
+	end
 end
 
 function Badge:onMouseMove(dx, dy) -- Overwrite moving
@@ -132,22 +140,36 @@ end
 
 function FactionsGUI:updateButtons() -- Update dynamically the buttons based in self parameters
 	local faction = Faction.getPlayerFaction(getPlayer())
-	if not faction then
-		self.button:setEnable(false);
-		self.button:setTooltip(getText("UI_Text_SafehouseWithoutFaction"))
-		self.internal = "";
-		return;
+
+	-- Reload the entire GUI if faction status changed (e.g. player just created/left a faction)
+	if faction ~= self.faction then
+		UnloadUI()
+		return
 	end
 
 	local safehouse = SafeHouse.getSafeHouse(self.player:getSquare());
+
+	-- Reload if safehouse presence changed (e.g. just claimed or someone else claimed)
+	if safehouse ~= self.safehouse then
+		UnloadUI()
+		return
+	end
+
+	if not faction then
+		self.button:setEnable(false);
+		self.button:setTooltip(getText("UI_Text_SafehouseWithoutFaction"))
+		FactionsGUI.internal = "";
+		return;
+	end
+
 	if safehouse then
 		if safehouse:playerAllowed(self.player) then
-			self.internal = "View";
+			FactionsGUI.internal = "View";
 			self.button:setEnable(true);
 			return;
 		else
 			self.button:setEnable(false);
-			self.internal = "";
+			FactionsGUI.internal = "";
 			return;
 		end
 	end
@@ -156,33 +178,31 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 	if safehouseUnavailableReason ~= "" then
 		self.button:setEnable(false);
 		self.button:setTooltip(safehouseUnavailableReason);
-		self.internal = "Capture_Spawn";
+		FactionsGUI.internal = "Capture_Spawn";
 		return;
 	end
 
-	-- Update the self someone inside
 	self.someoneInside = IsSomeoneInside(self.player:getSquare(), self.faction, self.floors);
 
-	-- Get available points
-	local available = FactionsGUI.points -
-		GetFactionUsedPoints(GetPlayerFaction(self.player:getUsername()));
+	local playerFaction = GetPlayerFaction(self.player:getUsername())
+	local usedPoints = playerFaction and GetFactionUsedPoints(playerFaction) or 0
+	local available = FactionsGUI.points - usedPoints
 	local pointsEnough = tonumber(available) >= tonumber(self.price);
-	-- Check if someone is inside and is enabled
+
 	if self.someoneInside then
-		-- Set to false, because someone is inside and you cannot capture a safehouse with someone inside... dummy
 		self.button:setEnable(false);
 		self.button:setTooltip(getText("IGUI_Safehouse_SomeoneInside"));
-		self.internal = "";
+		FactionsGUI.internal = "";
 		return;
-	elseif pointsEnough then -- Check if have points enough for capturing
+	elseif pointsEnough then
 		self.button:setEnable(true);
 		self.button:setTooltip(getText("UI_Text_SafehousePointsAvailable", self.price, available));
-		self.internal = "Capture_Empty";
+		FactionsGUI.internal = "Capture_Empty";
 		return;
-	else -- Not enough points
+	else
 		self.button:setEnable(false);
 		self.button:setTooltip(getText("UI_Text_SafehouseNotEnoughPoints", available, self.price))
-		self.internal = "";
+		FactionsGUI.internal = "";
 		return;
 	end
 end
@@ -249,7 +269,8 @@ function FactionsGUI:createChildren() -- Overwrite the children creation method
 	self.button:setVisible(self.buttonVisible);
 
 	-- Getting the price of the house the player is standing
-	self.price = GetSafehouseCost(self.player:getBuilding());
+	local playerBuilding = self.player:getBuilding()
+	self.price = GetSafehouseCost(playerBuilding);
 
 	-- If the price is lower than one, set to one
 	if self.price < 1 then
