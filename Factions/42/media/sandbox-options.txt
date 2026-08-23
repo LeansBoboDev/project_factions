@@ -1,14 +1,5 @@
 VERSION = 1,
 
-option Factions.Timezone
-{
-    type = string,
-    default = -3,
-
-    page = Factions,
-    translation = Factions_Timezone,
-}
-
 option Factions.PointsPerZombieKills
 {
     type = string,

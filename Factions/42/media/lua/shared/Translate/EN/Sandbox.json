@@ -1,7 +1,5 @@
 {
     "Sandbox_Factions": "Factions",
-    "Sandbox_Factions_Timezone": "Timezone",
-    "Sandbox_Factions_Timezone_tooltip": "Timezone from your current location, Sao Paulo: -3, New York: -5, Moscou: 3",
     "Sandbox_Factions_PointsPerZombieKills": "Claim Points",
     "Sandbox_Factions_PointsPerZombieKills_tooltip": "Every amount of kills will give you this amount of points, for example 100=1, this means with 100 kills you will have 1 point to claim, 100=1;200=2; this means 200 kills you will have 2 points for claim"
 }
