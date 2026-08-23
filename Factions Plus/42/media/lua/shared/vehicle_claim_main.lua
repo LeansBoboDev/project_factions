@@ -110,3 +110,32 @@ function ISSmashWindow:complete()
     end
     return Original_ISSmashWindow_complete(self)
 end
+
+-- ============================================================
+-- Client-side claim data sync
+-- ============================================================
+-- vehicle_claim.lua (server-only) sets FactionsPlusVehicleClaimData via ModData, but
+-- that global is never initialized on the client. Without it, getClaim() always returns
+-- nil on the client, so isAllowed() always returns true and isValid() never fires,
+-- letting smashCarWindow() run in ISSmashWindow.start() before the server can block it.
+--
+-- Fix: initialize the client's copy from ModData on login, then keep it current via
+-- targeted broadcasts sent whenever a claim is created or removed.
+
+Events.OnInitGlobalModData.Add(function()
+    if isClient() and not FactionsPlusIsSinglePlayer then
+        FactionsPlusVehicleClaimData = ModData.getOrCreate("FactionsPlusVehicleClaim")
+    end
+end)
+
+Events.OnServerCommand.Add(function(module, command, args)
+    if module ~= "FactionsPlusVehicle" then return end
+    if command == "claimSync" then
+        if not FactionsPlusVehicleClaimData then FactionsPlusVehicleClaimData = {} end
+        FactionsPlusVehicleClaimData[args.keyId] = args.claim
+    elseif command == "unclaimSync" then
+        if FactionsPlusVehicleClaimData then
+            FactionsPlusVehicleClaimData[args.keyId] = nil
+        end
+    end
+end)

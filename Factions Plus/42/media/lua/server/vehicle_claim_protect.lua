@@ -46,48 +46,85 @@ local function restoreConditions(vehicle, snapshot)
     for i = 0, vehicle:getPartCount() - 1 do
         local part = vehicle:getPartByIndex(i)
         local savedCondition = snapshot[i]
-        if savedCondition and part:getCondition() < savedCondition then
-            part:setCondition(savedCondition)
-            local item = part:getInventoryItem()
-            if item then
-                part:doInventoryItemStats(item, 0)
-                vehicle:transmitPartCondition(part)
-            elseif part:getWindow() then
-                vehicle:transmitPartWindow(part)
+        if savedCondition then
+            -- Part was present in snapshot but is now missing (e.g. window destroyed by melee) — reinstall it.
+            local wasReinstalled = false
+            if part:getWindow() and not part:getInventoryItem() then
+                DebugPrintFactionsPlus(string.format("[VehicleProtect] part %d window missing — reinstalling", i))
+                VehicleUtils.createPartInventoryItem(part)
+                wasReinstalled = true
+            end
+            if wasReinstalled or part:getCondition() < savedCondition then
+                DebugPrintFactionsPlus(string.format("[VehicleProtect] restoring part %d: %d -> %d", i, part:getCondition(), savedCondition))
+                part:setCondition(savedCondition)
+                local item = part:getInventoryItem()
+                if item then
+                    part:doInventoryItemStats(item, 0)
+                    vehicle:transmitPartCondition(part)
+                    vehicle:transmitPartItem(part)
+                end
+                if part:getWindow() then
+                    vehicle:transmitPartWindow(part)
+                end
+                if wasReinstalled then
+                    vehicle:doDamageOverlay()
+                end
             end
         end
     end
 end
 
 local function protectClaimedVehicles()
-    if not FactionsPlusVehicleClaimData then return end
-    if not getSandboxOptions():getOptionByName("FactionsPlus.EnableVehicleClaim"):getValue() then return end
+    if not FactionsPlusVehicleClaimData then
+        DebugPrintFactionsPlus("[VehicleProtect] skipped: FactionsPlusVehicleClaimData is nil")
+        return
+    end
+    if not getSandboxOptions():getOptionByName("FactionsPlus.EnableVehicleClaim"):getValue() then
+        DebugPrintFactionsPlus("[VehicleProtect] skipped: EnableVehicleClaim is off")
+        return
+    end
 
+    local count, claimed = 0, 0
     local iter = getCell():getVehicles():iterator()
     while iter:hasNext() do
         local vehicle = iter:next()
+        count = count + 1
         local claim = FactionsPlusVehicleClaim.getClaim(vehicle)
         if claim then
+            claimed = claimed + 1
+            local keyId = vehicle:getKeyId()
             if isVehicleOccupied(vehicle) then
                 claim.Condition = captureConditions(vehicle)
+                DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d occupied — snapshot updated", keyId))
             elseif claim.Condition then
                 restoreConditions(vehicle, claim.Condition)
+                DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d unoccupied — restore applied", keyId))
             else
-                -- First time we see this claimed vehicle (e.g. server just
-                -- started) - just establish a baseline, don't change anything.
                 claim.Condition = captureConditions(vehicle)
+                DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d unoccupied — baseline captured (first time)", keyId))
             end
         end
     end
+    DebugPrintFactionsPlus(string.format("[VehicleProtect] poll done: %d vehicles checked, %d claimed", count, claimed))
 end
 
 Events.EveryOneMinute.Add(protectClaimedVehicles)
+
+Events.OnFactionsPlusVehicleClaimed.Add(function(vehicle, player)
+    local claim = FactionsPlusVehicleClaim.getClaim(vehicle)
+    if claim then
+        claim.Condition = captureConditions(vehicle)
+        DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d claimed — initial snapshot captured", vehicle:getKeyId()))
+    else
+        DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d claimed but getClaim returned nil!", vehicle:getKeyId()))
+    end
+end)
 
 local function findVehicleByKeyId(keyId)
     local vehicles = getCell():getVehicles()
     if not vehicles then return nil end
     -- getVehicles() returns a Java ArrayList server-side: size()/get(i) with 0-based index
-    if vehicles.size and vehicles:size then
+    if vehicles.size then
         for i = 0, vehicles:size() - 1 do
             local v = vehicles:get(i)
             if v and v:getKeyId() == keyId then return v end

@@ -3,6 +3,8 @@ if isClient() and not FactionsPlusIsSinglePlayer then return end
 -- { [vehicle:getKeyId()] = { KeyId = 123, Owner = "playerUsername", Members = { "friendUsername" } } }
 FactionsPlusVehicleClaimData = {}
 
+local broadcastClaimSync
+
 local function getSandboxOption(name)
     return getSandboxOptions():getOptionByName(name):getValue()
 end
@@ -111,6 +113,7 @@ local function claimVehicle(player, args)
 
     deductCurrency(player, cost)
 
+    broadcastClaimSync(keyId, FactionsPlusVehicleClaimData[keyId])
     DebugPrintFactionsPlus(string.format("[VehicleClaim] %s claimed vehicle (keyId %d)", username, keyId))
     notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Claimed")
     triggerEvent("OnFactionsPlusVehicleClaimed", vehicle, player)
@@ -136,6 +139,7 @@ local function unclaimVehicle(player, args)
     end
 
     FactionsPlusVehicleClaimData[keyId] = nil
+    broadcastClaimSync(keyId, nil)
     DebugPrintFactionsPlus(string.format("[VehicleClaim] %s unclaimed vehicle (keyId %d)", username, keyId))
     notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Unclaimed")
     triggerEvent("OnFactionsPlusVehicleUnclaimed", vehicle, username)
@@ -169,6 +173,7 @@ local function setMember(player, targetUsername, add, args)
             end
         end
         table.insert(claim.Members, targetUsername)
+        broadcastClaimSync(keyId, claim)
         notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberAdded", targetUsername)
         DebugPrintFactionsPlus(string.format("[VehicleClaim] %s added %s to vehicle (keyId %d)", username,
             targetUsername, keyId))
@@ -176,6 +181,7 @@ local function setMember(player, targetUsername, add, args)
         for i, member in ipairs(claim.Members) do
             if member == targetUsername then
                 table.remove(claim.Members, i)
+                broadcastClaimSync(keyId, claim)
                 notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberRemoved", targetUsername)
                 DebugPrintFactionsPlus(string.format("[VehicleClaim] %s removed %s from vehicle (keyId %d)", username,
                     targetUsername, keyId))
@@ -186,8 +192,44 @@ local function setMember(player, targetUsername, add, args)
     end
 end
 
+-- Broadcasts a claim add or remove to every connected client so their local
+-- FactionsPlusVehicleClaimData stays current for client-side isValid() checks.
+broadcastClaimSync = function(keyId, claim)
+    local players = getOnlinePlayers()
+    for i = 0, players:size() - 1 do
+        if claim then
+            sendServerCommand(players:get(i), "FactionsPlusVehicle", "claimSync", {
+                keyId = keyId,
+                claim = { Owner = claim.Owner, Members = claim.Members, VehicleName = claim.VehicleName },
+            })
+        else
+            sendServerCommand(players:get(i), "FactionsPlusVehicle", "unclaimSync", { keyId = keyId })
+        end
+    end
+end
+
 Events.OnInitGlobalModData.Add(function(isNewGame)
     FactionsPlusVehicleClaimData = ModData.getOrCreate("FactionsPlusVehicleClaim")
+    -- Direct weapon attacks on vehicle windows go through VehicleCommands.damageWindow
+    -- (module='vehicle', command='damageWindow'), completely bypassing ISSmashWindow.
+    -- Wrap VehicleCommands.OnClientCommand here (after all scripts are loaded) to block
+    -- that path for claimed vehicles.
+    if VehicleCommands and VehicleCommands.OnClientCommand then
+        local _orig = VehicleCommands.OnClientCommand
+        Events.OnClientCommand.Remove(_orig)
+        VehicleCommands.OnClientCommand = function(module, command, player, args)
+            if module == "vehicle" and command == "damageWindow" and args then
+                local vehicle = getVehicleById(args.vehicle)
+                if vehicle and not FactionsPlusVehicleClaim.isAllowed(vehicle, player) then
+                    DebugPrintFactionsPlus(string.format("[VehicleClaim] blocked direct window attack on vehicle (keyId %d) by %s",
+                        vehicle:getKeyId(), player:getUsername()))
+                    return
+                end
+            end
+            _orig(module, command, player, args)
+        end
+        Events.OnClientCommand.Add(VehicleCommands.OnClientCommand)
+    end
 end)
 
 local function sendMyVehicles(player)
@@ -221,6 +263,7 @@ local function unclaimByKeyId(player, args)
     end
 
     FactionsPlusVehicleClaimData[keyId] = nil
+    broadcastClaimSync(keyId, nil)
     DebugPrintFactionsPlus(string.format("[VehicleClaim] %s unclaimed vehicle (keyId %d) via panel", username, keyId))
     notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Unclaimed")
     sendMyVehicles(player)
