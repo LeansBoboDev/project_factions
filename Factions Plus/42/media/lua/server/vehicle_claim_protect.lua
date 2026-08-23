@@ -42,6 +42,30 @@ local function captureConditions(vehicle)
     return snapshot
 end
 
+local function clearBrokenGlassNear(vehicle)
+    local vx = math.floor(vehicle:getX())
+    local vy = math.floor(vehicle:getY())
+    local vz = math.floor(vehicle:getZ())
+    for dx = -3, 3 do
+        for dy = -3, 3 do
+            local sq = getCell():getGridSquare(vx + dx, vy + dy, vz)
+            if sq then
+                local toRemove = {}
+                local objects = sq:getObjects()
+                for i = 0, objects:size() - 1 do
+                    local obj = objects:get(i)
+                    if instanceof(obj, "IsoBrokenGlass") then
+                        table.insert(toRemove, obj)
+                    end
+                end
+                for _, obj in ipairs(toRemove) do
+                    sq:transmitRemoveItemFromSquare(obj)
+                end
+            end
+        end
+    end
+end
+
 local function restoreConditions(vehicle, snapshot)
     for i = 0, vehicle:getPartCount() - 1 do
         local part = vehicle:getPartByIndex(i)
@@ -68,6 +92,7 @@ local function restoreConditions(vehicle, snapshot)
                 end
                 if wasReinstalled then
                     vehicle:doDamageOverlay()
+                    clearBrokenGlassNear(vehicle)
                 end
             end
         end
