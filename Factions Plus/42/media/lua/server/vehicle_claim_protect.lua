@@ -125,14 +125,12 @@ local function protectClaimedVehicles()
                 DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d occupied — snapshot updated", keyId))
             elseif claim.Condition then
                 restoreConditions(vehicle, claim.Condition)
-                DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d unoccupied — restore applied", keyId))
             else
                 claim.Condition = captureConditions(vehicle)
                 DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d unoccupied — baseline captured (first time)", keyId))
             end
         end
     end
-    DebugPrintFactionsPlus(string.format("[VehicleProtect] poll done: %d vehicles checked, %d claimed", count, claimed))
 end
 
 local _protectTick = 0

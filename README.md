@@ -1,6 +1,15 @@
 Legacy b41 version: access [Last commit from B41](https://github.com/LeandroTheDev/project_factions/tree/25b168e77add44a12f5f35f02ec0fd80618451be)
 
 B42: currently
+
+# Official Server
+The aionthera project have a official server running this project that you can test it:
+
+``IP``: projectzomboid.aionthera.org
+
+``Ports``: 16261
+
+``Country``: Brazil
 # Factions
 
 Singleplayer Compatibility: No, factions are a multiplayer concept
@@ -37,6 +46,7 @@ Add new features and adjustments for playing in any anarchy/infinite server.
 - Connections/Disconnections/Death player messages events (Multiplayer only)
 - Weekly turn off and on water and electric
 - Reset world start age making food and items (prevent respawning rotten foods or broken equipment)
+- Vehicle Claim system (compatible with factions economy)
 
 # Safehouse Plus
 Respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829), and create door key system

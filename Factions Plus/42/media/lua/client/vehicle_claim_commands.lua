@@ -106,9 +106,9 @@ ISVehicleMenu.showRadialMenu = function(playerObj)
     if not vehicle then return end
 
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onClaimVehicle, playerObj, vehicle)
+        getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onUnclaimVehicle, playerObj, vehicle)
+        getTexture("media/ui/vehicles/factions_vehicle_unclaim.png"), onUnclaimVehicle, playerObj, vehicle)
 end
 
 -- Outside vehicle: radial menu while standing near it (pressing V outside)
@@ -128,9 +128,9 @@ ISVehicleMenu.showRadialMenuOutside = function(playerObj)
     if menu:isEmpty() then return end
 
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onClaimVehicle, playerObj, vehicle)
+        getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
-        getTexture("media/ui/vehicles/vehicle_lockdoors.png"), onUnclaimVehicle, playerObj, vehicle)
+        getTexture("media/ui/vehicles/factions_vehicle_unclaim.png"), onUnclaimVehicle, playerObj, vehicle)
 end
 
 -- ============================================================

@@ -44,7 +44,19 @@ JAVA_RELEASE=$((MAJOR_VERSION - 44))  # class file major 52 == Java 8, ... 69 ==
 
 echo "Detected class file major version $MAJOR_VERSION -> javac --release $JAVA_RELEASE"
 
-javac --release "$JAVA_RELEASE" -encoding UTF-8 -cp "$JAR_PATH" -d "$ROOT" \
+# Find javac: use PATH first, then fall back to system JVM installations
+if command -v javac &>/dev/null; then
+    JAVAC="javac"
+else
+    JAVAC="$(find /usr/lib/jvm -name javac -type f 2>/dev/null | sort -V | tail -1)"
+    if [[ -z "$JAVAC" ]]; then
+        echo "javac not found. Install a JDK (e.g. sudo pacman -S jdk-openjdk)" >&2
+        exit 1
+    fi
+    echo "Using javac at: $JAVAC"
+fi
+
+"$JAVAC" --release "$JAVA_RELEASE" -encoding UTF-8 -cp "$JAR_PATH" -d "$ROOT" \
     "${SRC_FILES[@]/#/$ROOT/}"
 
 echo "OK: recompiled into $ROOT/zombie/..."
