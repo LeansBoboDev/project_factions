@@ -1,8 +1,7 @@
 Legacy b41 version: access [Last commit from B41](https://github.com/LeandroTheDev/project_factions/tree/25b168e77add44a12f5f35f02ec0fd80618451be)
 
 B42: currently
-# Factions (Reworking...) do not use it
-## I don't know what indie stone is doing behind the scenes but i think there will be a native pvp factions, better not lose time reworking this until the native system
+# Factions
 
 Singleplayer Compatibility: No, factions are a multiplayer concept
 

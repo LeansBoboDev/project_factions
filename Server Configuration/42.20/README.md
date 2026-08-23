@@ -2,9 +2,13 @@ Place this folder inside your project zomboid dedicated server and overwrite
 
 ## java/ class overrides
 
-`java/zombie/iso/areas/SafeHouse.class` and `java/zombie/network/packets/safehouse/SafehouseClaimPacket.class`
-are recompiled, patched replacements for the vanilla classes of the same name.
-They remove the vanilla "one safehouse per player" block and add a
+Three recompiled, patched replacements for vanilla server classes:
+
+- `java/zombie/iso/areas/SafeHouse.class`
+- `java/zombie/network/packets/safehouse/SafehouseClaimPacket.class`
+- `java/zombie/network/anticheats/AntiCheatSafeHouseNotMember.class` *(added in 42.20)*
+
+Together they remove the vanilla "one safehouse per player" block and add a
 server-side `OnSafehouseClaimed` Lua event so the Factions mod can enforce its
 own points-based limit instead (see `Factions/42/media/lua/server/safehouse.lua`).
 The dedicated server's classpath loads this `java/` folder before the game's
@@ -16,7 +20,7 @@ each `.class` file, and `build.sh` (in this folder's root) recompiles them.
 
 ### When you need to redo this (game updates)
 
-A PZ update can change these two classes and break the override (server fails
+A PZ update can change these three classes and break the override (server fails
 to start, throws `NoSuchMethodError`/`IncompatibleClassChangeError` on load, or
 the safehouse limit silently comes back). When that happens:
 
@@ -25,8 +29,9 @@ the safehouse limit silently comes back). When that happens:
    sources for:
    - `zombie/iso/areas/SafeHouse.java`
    - `zombie/network/packets/safehouse/SafehouseClaimPacket.java`
+   - `zombie/network/anticheats/AntiCheatSafeHouseNotMember.java`
 2. Diff those fresh vanilla files against the patched ones already in this
-   `java/` folder to see exactly what our patch changed (both files have a
+   `java/` folder to see exactly what our patch changed (each file has a
    comment block at the top listing the intent):
    - `SafeHouse.java`: in `canBeSafehouse(...)`, the `if` block that adds
      `IGUI_Safehouse_AlreadyHaveSafehouse` to `reason` when
@@ -47,6 +52,10 @@ the safehouse limit silently comes back). When that happens:
      }
      ```
      before the existing `INetworkPacket.sendToAll(PacketTypes.PacketType.SafehouseSync, safehouse);` line.
+   - `AntiCheatSafeHouseNotMember.java`: in `validate(...)`, the vanilla block
+     that returns `"player already has safehouse"` when
+     `SafeHouse.hasSafehouse(player) != null` is removed entirely. The method
+     should fall through to `return result;` without that check.
 3. Apply the same two edits to the freshly decompiled files, replace the
    `.java` files in this folder with them.
 4. Run `./build.sh "<path to the new projectzomboid.jar>"` — it
