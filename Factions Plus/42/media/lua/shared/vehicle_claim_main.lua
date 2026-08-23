@@ -54,12 +54,32 @@ function ISOpenVehicleDoor:complete()
     return Original_ISOpenVehicleDoor_complete(self)
 end
 
+-- Shows a red halo text and a chat message to the local player when a claimed
+-- vehicle action is blocked. Only runs client-side; no-ops on the server.
+local function notifyBlocked(character, textKey)
+    if isServer() then return end
+    HaloTextHelper.addBadText(character, getText("IGUI_FactionsPlus_Vehicle_AccessDenied"))
+    if not ISChat or not ISChat.instance or not ISChat.instance.chatText then return end
+    local text = getText(textKey)
+    local msg = {
+        getText           = function(_) return "<RGB:1,0.3,0.3>" .. text end,
+        getTextWithPrefix = function(_) return "<RGB:1,0.3,0.3>" .. text end,
+        isServerAlert     = function(_) return false end,
+        isShowAuthor      = function(_) return false end,
+        getAuthor         = function(_) return nil end,
+        setShouldAttractZombies = function(_) return false end,
+        setOverHeadSpeech       = function(_) return false end,
+    }
+    ISChat.addLineInChat(msg, 0)
+end
+
 -- Blocks non-members from hotwiring, starting the engine, siphoning fuel, or
 -- uninstalling parts (tires, engine parts...) on a claimed vehicle. Same
 -- shared/authoritative pattern as the door check above.
 local Original_ISHotwireVehicle_isValid = ISHotwireVehicle.isValid
 function ISHotwireVehicle:isValid()
     if not FactionsPlusVehicleClaim.isAllowed(self.character:getVehicle(), self.character) then
+        notifyBlocked(self.character, "IGUI_FactionsPlus_Vehicle_AccessDenied")
         return false
     end
     return Original_ISHotwireVehicle_isValid(self)
@@ -68,6 +88,7 @@ end
 local Original_ISStartVehicleEngine_isValid = ISStartVehicleEngine.isValid
 function ISStartVehicleEngine:isValid()
     if not FactionsPlusVehicleClaim.isAllowed(self.character:getVehicle(), self.character) then
+        notifyBlocked(self.character, "IGUI_FactionsPlus_Vehicle_AccessDenied")
         return false
     end
     return Original_ISStartVehicleEngine_isValid(self)
@@ -76,6 +97,7 @@ end
 local Original_ISTakeGasolineFromVehicle_isValid = ISTakeGasolineFromVehicle.isValid
 function ISTakeGasolineFromVehicle:isValid()
     if not FactionsPlusVehicleClaim.isAllowed(self.vehicle, self.character) then
+        notifyBlocked(self.character, "IGUI_FactionsPlus_Vehicle_AccessDenied")
         return false
     end
     return Original_ISTakeGasolineFromVehicle_isValid(self)
@@ -84,6 +106,9 @@ end
 local Original_ISUninstallVehiclePart_isValid = ISUninstallVehiclePart.isValid
 function ISUninstallVehiclePart:isValid()
     if not FactionsPlusVehicleClaim.isAllowed(self.vehicle, self.character) then
+        if not self.action then
+            notifyBlocked(self.character, "IGUI_FactionsPlus_Vehicle_PartBlocked")
+        end
         return false
     end
     return Original_ISUninstallVehiclePart_isValid(self)
@@ -94,6 +119,7 @@ end
 local Original_ISSmashWindow_isValid = ISSmashWindow.isValid
 function ISSmashWindow:isValid()
     if self.vehiclePart and not FactionsPlusVehicleClaim.isAllowed(self.vehiclePart:getVehicle(), self.character) then
+        notifyBlocked(self.character, "IGUI_FactionsPlus_Vehicle_AccessDenied")
         return false
     end
     return Original_ISSmashWindow_isValid(self)
