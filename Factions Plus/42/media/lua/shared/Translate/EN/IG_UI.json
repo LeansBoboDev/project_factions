@@ -4,7 +4,7 @@
 	"IGUI_Player_Dead": "died",
 
 	"IGUI_FactionsPlus_Vehicle_Disabled": "Vehicle claiming is disabled on this server",
-	"IGUI_FactionsPlus_Vehicle_Claimed": "You claimed this vehicle. Use /vehicleaddmember <name> to give someone access",
+	"IGUI_FactionsPlus_Vehicle_Claimed": "You claimed this vehicle. Open My Vehicles to manage members",
 	"IGUI_FactionsPlus_Vehicle_AlreadyClaimed": "This vehicle is already claimed",
 	"IGUI_FactionsPlus_Vehicle_NotClaimed": "This vehicle isn't claimed",
 	"IGUI_FactionsPlus_Vehicle_NotOwner": "Only the vehicle's owner can do that",
@@ -24,5 +24,13 @@
 
 	"IGUI_FactionsPlus_Vehicle_ButtonLabel": "Vehicles",
 	"IGUI_FactionsPlus_Vehicle_ListTitle": "My Vehicles",
-	"IGUI_FactionsPlus_Vehicle_Members": "members"
+	"IGUI_FactionsPlus_Vehicle_Members": "members",
+
+	"IGUI_FactionsPlus_Vehicle_Owner": "Owner: ",
+	"IGUI_FactionsPlus_Vehicle_MembersLabel": "Members:",
+	"IGUI_FactionsPlus_Vehicle_AddMember": "Add Member",
+	"IGUI_FactionsPlus_Vehicle_RemoveMember": "Remove Member",
+	"IGUI_FactionsPlus_Vehicle_AddMemberPrompt": "Enter the username to add:",
+	"IGUI_FactionsPlus_Vehicle_RemoveConfirm": "Remove %1's access to this vehicle?",
+	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Are you sure you want to unclaim this vehicle?"
 }

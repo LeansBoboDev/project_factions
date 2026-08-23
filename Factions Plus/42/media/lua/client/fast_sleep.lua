@@ -4,44 +4,31 @@
 
 if not getSandboxOptions():getOptionByName("FactionsPlus.EnableFastSleep"):getValue() then return end
 
-
 local player
 
-local accumulator = 0
 local function OnTick()
-	local delta = GameTime.getInstance():getRealworldSecondsSinceLastUpdate()
-	accumulator = accumulator + delta
+    if not player or not player:isAsleep() then
+        Events.OnTick.Remove(OnTick)
+        player = nil
+        return
+    end
 
-	if accumulator < 1.0 then return end
-	accumulator = 0
-
-	if player:isAsleep() then
-		sendClientCommand(player, "FastSleep", "tick", {})
-
-		local currentFatigue = player:getStats():get(CharacterStat.FATIGUE)
-		local currentEndurance = player:getStats():get(CharacterStat.ENDURANCE)
-
-		if currentFatigue <= 0 then
-			getSleepingEvent():wakeUp(player)
-		end
-
-		DebugPrintFactionsPlus(string.format(
-			"[FastSleep] fatigue=%.4f endurance=%.4f",
-			currentFatigue,
-			currentEndurance
-		))
-	else
-		Events.OnTick.Remove(OnTick)
-	end
+    if player:getStats():get(CharacterStat.FATIGUE) <= 0 then
+        getSleepingEvent():wakeUp(player)
+        sendClientCommand(player, "FastSleep", "stopSleep", {})
+        Events.OnTick.Remove(OnTick)
+        player = nil
+    end
 end
 
 local oldOnSleepWalkToComplete = ISWorldObjectContextMenu.onSleepWalkToComplete
 function ISWorldObjectContextMenu.onSleepWalkToComplete(playerId, bed)
-	oldOnSleepWalkToComplete(playerId, bed)
+    oldOnSleepWalkToComplete(playerId, bed)
 
-	local playerObj = getSpecificPlayer(playerId)
-	if not playerObj or not playerObj:isAsleep() then return end
+    local playerObj = getSpecificPlayer(playerId)
+    if not playerObj or not playerObj:isAsleep() then return end
 
-	player = playerObj
-	Events.OnTick.Add(OnTick)
+    player = playerObj
+    sendClientCommand(player, "FastSleep", "startSleep", {})
+    Events.OnTick.Add(OnTick)
 end

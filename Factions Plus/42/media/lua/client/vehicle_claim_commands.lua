@@ -56,21 +56,6 @@ ISChat.onCommandEntered = function(self)
             ISChat.instance.textEntry:setText("")
             ISChat.instance:unfocus()
             return
-        elseif cmd == "vehicleunclaim" then
-            sendClientCommand("FactionsPlusVehicle", "unclaim", {})
-            ISChat.instance.textEntry:setText("")
-            ISChat.instance:unfocus()
-            return
-        elseif cmd == "vehicleaddmember" then
-            sendClientCommand("FactionsPlusVehicle", "addMember", { username = parts[2] })
-            ISChat.instance.textEntry:setText("")
-            ISChat.instance:unfocus()
-            return
-        elseif cmd == "vehicleremovemember" then
-            sendClientCommand("FactionsPlusVehicle", "removeMember", { username = parts[2] })
-            ISChat.instance.textEntry:setText("")
-            ISChat.instance:unfocus()
-            return
         end
     end
 
@@ -84,11 +69,6 @@ end
 local function onClaimVehicle(playerObj, vehicle)
     local keyId = vehicle and vehicle:getKeyId() or nil
     sendClientCommand(playerObj, "FactionsPlusVehicle", "claim", { keyId = keyId })
-end
-
-local function onUnclaimVehicle(playerObj, vehicle)
-    local keyId = vehicle and vehicle:getKeyId() or nil
-    sendClientCommand(playerObj, "FactionsPlusVehicle", "unclaim", { keyId = keyId })
 end
 
 -- Inside vehicle: radial menu while seated/driving
@@ -107,8 +87,6 @@ ISVehicleMenu.showRadialMenu = function(playerObj)
 
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
         getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
-    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
-        getTexture("media/ui/vehicles/factions_vehicle_unclaim.png"), onUnclaimVehicle, playerObj, vehicle)
 end
 
 -- Outside vehicle: radial menu while standing near it (pressing V outside)
@@ -129,8 +107,6 @@ ISVehicleMenu.showRadialMenuOutside = function(playerObj)
 
     menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
         getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
-    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
-        getTexture("media/ui/vehicles/factions_vehicle_unclaim.png"), onUnclaimVehicle, playerObj, vehicle)
 end
 
 -- ============================================================

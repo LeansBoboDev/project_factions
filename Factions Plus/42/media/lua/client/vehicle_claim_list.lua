@@ -6,6 +6,14 @@ local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local UI_BORDER_SPACING = 10
 local BUTTON_HGT = FONT_HGT_SMALL + 6
 
+-- Resolves the human-readable vehicle name from a stored model key or legacy full name.
+-- Stored value may be "CarModelKey", "Base.CarModelKey" (legacy), or "Vehicle #N".
+local function vehicleDisplayName(storedName)
+    if not storedName then return "Vehicle" end
+    local key = storedName:match("%.(.+)$") or storedName
+    return getTextOrNull("IGUI_VehicleName" .. key) or key
+end
+
 -- ============================================================
 -- FactionsPlusVehicleList panel
 -- ============================================================
@@ -26,16 +34,16 @@ function FactionsPlusVehicleList:initialise()
     self.closeBtn:enableCancelColor()
     self:addChild(self.closeBtn)
 
-    self.unclaimBtn = ISButton:new(self:getWidth() - btnWid - UI_BORDER_SPACING - 1, self.closeBtn.y,
-        btnWid, BUTTON_HGT, getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"), self, FactionsPlusVehicleList.onClick)
-    self.unclaimBtn.internal = "UNCLAIM"
-    self.unclaimBtn.anchorTop = false
-    self.unclaimBtn.anchorBottom = true
-    self.unclaimBtn:initialise()
-    self.unclaimBtn:instantiate()
-    self.unclaimBtn.borderColor = {r=1, g=1, b=1, a=0.1}
-    self.unclaimBtn.enable = false
-    self:addChild(self.unclaimBtn)
+    self.viewBtn = ISButton:new(self:getWidth() - btnWid - UI_BORDER_SPACING - 1, self.closeBtn.y,
+        btnWid, BUTTON_HGT, getText("IGUI_PlayerStats_View"), self, FactionsPlusVehicleList.onClick)
+    self.viewBtn.internal = "VIEW"
+    self.viewBtn.anchorTop = false
+    self.viewBtn.anchorBottom = true
+    self.viewBtn:initialise()
+    self.viewBtn:instantiate()
+    self.viewBtn.borderColor = {r=1, g=1, b=1, a=0.1}
+    self.viewBtn.enable = false
+    self:addChild(self.viewBtn)
 
     local listY = UI_BORDER_SPACING * 2 + FONT_HGT_MEDIUM + 1
     self.list = ISScrollingListBox:new(UI_BORDER_SPACING + 1, listY,
@@ -56,12 +64,11 @@ end
 
 function FactionsPlusVehicleList:populateList(vehicleList)
     self.list:clear()
-    self.unclaimBtn.enable = false
+    self.viewBtn.enable = false
     self.selectedVehicle = nil
     if vehicleList then
         for _, v in ipairs(vehicleList) do
-            local displayName = v.name:match("%.(.+)$") or v.name
-            self.list:addItem(displayName, v)
+            self.list:addItem(vehicleDisplayName(v.name), v)
         end
     end
 end
@@ -72,12 +79,11 @@ function FactionsPlusVehicleList:drawItem(y, item, alt)
         self.borderColor.r, self.borderColor.g, self.borderColor.b)
     if self.selected == item.index then
         self:drawRect(0, y, self:getWidth(), self.itemheight - 1, 0.3, 0.7, 0.35, 0.15)
-        self.parent.unclaimBtn.enable = true
+        self.parent.viewBtn.enable = true
         self.parent.selectedVehicle = item.item
     end
     local memberCount = item.item.members and #item.item.members or 0
-    local displayName = item.item.name:match("%.(.+)$") or item.item.name
-    local label = displayName
+    local label = vehicleDisplayName(item.item.name)
     if memberCount > 0 then
         label = label .. "  (" .. memberCount .. " " .. getText("IGUI_FactionsPlus_Vehicle_Members") .. ")"
     end
@@ -99,10 +105,17 @@ end
 function FactionsPlusVehicleList:onClick(button)
     if button.internal == "CLOSE" then
         self:close()
-    elseif button.internal == "UNCLAIM" and self.selectedVehicle then
-        sendClientCommand("FactionsPlusVehicle", "unclaimByKeyId", { keyId = self.selectedVehicle.keyId })
-        self.selectedVehicle = nil
-        self.unclaimBtn.enable = false
+    elseif button.internal == "VIEW" and self.selectedVehicle then
+        if FactionsPlusVehicleUI and FactionsPlusVehicleUI.instance then
+            FactionsPlusVehicleUI.instance:close()
+        end
+        local width = 500 + getCore():getOptionFontSizeReal() * 30
+        local ui = FactionsPlusVehicleUI:new(
+            (getCore():getScreenWidth() - width) / 2,
+            getCore():getScreenHeight() / 2 - 200,
+            width, 450, self.selectedVehicle, self.player)
+        ui:initialise()
+        ui:addToUIManager()
     end
 end
 

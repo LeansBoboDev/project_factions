@@ -20,7 +20,7 @@ Forked from [SSR: Safehouse](https://steamcommunity.com/sharedfiles/filedetails/
 - Faction safehouse claim system, multiple safehouses per faction gated by points earned from zombie kills (requires the java class override below, since b42 hardcodes one safehouse per player)
 - Configurable zombie kills to earn points
 
-Requires the safehouse limit patch in the folder [Server Configuration](https://github.com/LeandroTheDev/project_factions/tree/main/Server%20Configuration/42) placed in the main project zomboid dedicated server folder, otherwise the vanilla one-safehouse-per-player limit still applies
+Requires the safehouse limit patch in the folder [Server Configuration](https://github.com/LeandroTheDev/project_factions/tree/main/Server%20Configuration) placed in the main project zomboid dedicated server folder, otherwise the vanilla one-safehouse-per-player limit still applies
 
 # Factions Economy
 Add a new shop system, forked from [Server Points](https://steamcommunity.com/sharedfiles/filedetails/?id=2823055977&searchtext=Server+Points), and a Global Trade system, includes Loot Boxes and farm economy system by exploring and local farming vegetables/fruits.

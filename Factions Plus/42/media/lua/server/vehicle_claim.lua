@@ -101,8 +101,10 @@ local function claimVehicle(player, args)
     if cost == false then return end
 
     local vehicleName = "Vehicle #" .. tostring(keyId)
-    local ok, name = pcall(function() return vehicle:getScript():getFullName() end)
-    if ok and name and name ~= "" then vehicleName = name end
+    local ok, modelKey = pcall(function()
+        return vehicle:getScript():getCarModelName() or vehicle:getScript():getName()
+    end)
+    if ok and modelKey and modelKey ~= "" then vehicleName = modelKey end
 
     FactionsPlusVehicleClaimData[keyId] = {
         KeyId        = keyId,
@@ -117,79 +119,6 @@ local function claimVehicle(player, args)
     DebugPrintFactionsPlus(string.format("[VehicleClaim] %s claimed vehicle (keyId %d)", username, keyId))
     notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Claimed")
     triggerEvent("OnFactionsPlusVehicleClaimed", vehicle, player)
-end
-
-local function unclaimVehicle(player, args)
-    local username = player:getUsername()
-    local vehicle = findVehicle(player, args)
-    if not vehicle then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoVehicle")
-        return
-    end
-
-    local keyId = vehicle:getKeyId()
-    local claim = FactionsPlusVehicleClaimData[keyId]
-    if not claim then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotClaimed")
-        return
-    end
-    if claim.Owner ~= username then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotOwner")
-        return
-    end
-
-    FactionsPlusVehicleClaimData[keyId] = nil
-    broadcastClaimSync(keyId, nil)
-    DebugPrintFactionsPlus(string.format("[VehicleClaim] %s unclaimed vehicle (keyId %d)", username, keyId))
-    notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_Unclaimed")
-    triggerEvent("OnFactionsPlusVehicleUnclaimed", vehicle, username)
-end
-
-local function setMember(player, targetUsername, add, args)
-    local username = player:getUsername()
-    local vehicle = findVehicle(player, args)
-    if not vehicle then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NoVehicle")
-        return
-    end
-    if not targetUsername or targetUsername == "" then return end
-
-    local keyId = vehicle:getKeyId()
-    local claim = FactionsPlusVehicleClaimData[keyId]
-    if not claim then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotClaimed")
-        return
-    end
-    if claim.Owner ~= username then
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotOwner")
-        return
-    end
-
-    if add then
-        for _, member in ipairs(claim.Members) do
-            if member == targetUsername then
-                notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_AlreadyMember", targetUsername)
-                return
-            end
-        end
-        table.insert(claim.Members, targetUsername)
-        broadcastClaimSync(keyId, claim)
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberAdded", targetUsername)
-        DebugPrintFactionsPlus(string.format("[VehicleClaim] %s added %s to vehicle (keyId %d)", username,
-            targetUsername, keyId))
-    else
-        for i, member in ipairs(claim.Members) do
-            if member == targetUsername then
-                table.remove(claim.Members, i)
-                broadcastClaimSync(keyId, claim)
-                notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberRemoved", targetUsername)
-                DebugPrintFactionsPlus(string.format("[VehicleClaim] %s removed %s from vehicle (keyId %d)", username,
-                    targetUsername, keyId))
-                return
-            end
-        end
-        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotMember", targetUsername)
-    end
 end
 
 -- Broadcasts a claim add or remove to every connected client so their local
@@ -241,10 +170,53 @@ local function sendMyVehicles(player)
                 keyId   = keyId,
                 name    = claim.VehicleName or ("Vehicle #" .. tostring(keyId)),
                 members = claim.Members or {},
+                owner   = claim.Owner,
             })
         end
     end
     sendServerCommand(player, "FactionsPlusVehicle", "myVehiclesList", { vehicles = list })
+end
+
+local function setMemberByKeyId(player, targetUsername, add, keyId)
+    local username = player:getUsername()
+    if not keyId then return end
+    if not targetUsername or targetUsername == "" then return end
+
+    local claim = FactionsPlusVehicleClaimData[keyId]
+    if not claim then
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotClaimed")
+        return
+    end
+    if claim.Owner ~= username then
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotOwner")
+        return
+    end
+
+    if add then
+        for _, member in ipairs(claim.Members) do
+            if member == targetUsername then
+                notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_AlreadyMember", targetUsername)
+                return
+            end
+        end
+        table.insert(claim.Members, targetUsername)
+        broadcastClaimSync(keyId, claim)
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberAdded", targetUsername)
+        DebugPrintFactionsPlus(string.format("[VehicleClaim] %s added %s to vehicle (keyId %d) via panel", username, targetUsername, keyId))
+        sendMyVehicles(player)
+    else
+        for i, member in ipairs(claim.Members) do
+            if member == targetUsername then
+                table.remove(claim.Members, i)
+                broadcastClaimSync(keyId, claim)
+                notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_MemberRemoved", targetUsername)
+                DebugPrintFactionsPlus(string.format("[VehicleClaim] %s removed %s from vehicle (keyId %d) via panel", username, targetUsername, keyId))
+                sendMyVehicles(player)
+                return
+            end
+        end
+        notifyPlayer(player, "IGUI_FactionsPlus_Vehicle_NotMember", targetUsername)
+    end
 end
 
 local function unclaimByKeyId(player, args)
@@ -274,16 +246,14 @@ Events.OnClientCommand.Add(function(module, command, player, args)
 
     if command == "claim" then
         claimVehicle(player, args)
-    elseif command == "unclaim" then
-        unclaimVehicle(player, args)
-    elseif command == "addMember" then
-        setMember(player, args.username, true, args)
-    elseif command == "removeMember" then
-        setMember(player, args.username, false, args)
     elseif command == "getMyVehicles" then
         sendMyVehicles(player)
     elseif command == "unclaimByKeyId" then
         unclaimByKeyId(player, args)
+    elseif command == "addMemberByKeyId" then
+        setMemberByKeyId(player, args.username, true, args.keyId)
+    elseif command == "removeMemberByKeyId" then
+        setMemberByKeyId(player, args.username, false, args.keyId)
     elseif command == "getAllClaims" then
         local count = 0
         for keyId, claim in pairs(FactionsPlusVehicleClaimData) do

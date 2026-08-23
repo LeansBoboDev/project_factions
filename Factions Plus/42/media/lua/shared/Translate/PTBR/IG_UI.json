@@ -4,7 +4,7 @@
 	"IGUI_Player_Dead": "morreu",
 
 	"IGUI_FactionsPlus_Vehicle_Disabled": "O sistema de claim de veiculo esta desabilitado neste servidor",
-	"IGUI_FactionsPlus_Vehicle_Claimed": "Voce reivindicou este veiculo. Use /vehicleaddmember <nome> para dar acesso a alguem",
+	"IGUI_FactionsPlus_Vehicle_Claimed": "Voce reivindicou este veiculo. Abra Meus Veiculos para gerenciar membros",
 	"IGUI_FactionsPlus_Vehicle_AlreadyClaimed": "Este veiculo ja esta reivindicado",
 	"IGUI_FactionsPlus_Vehicle_NotClaimed": "Este veiculo nao esta reivindicado",
 	"IGUI_FactionsPlus_Vehicle_NotOwner": "Somente o dono do veiculo pode fazer isso",
@@ -24,5 +24,13 @@
 
 	"IGUI_FactionsPlus_Vehicle_ButtonLabel": "Veiculos",
 	"IGUI_FactionsPlus_Vehicle_ListTitle": "Meus Veiculos",
-	"IGUI_FactionsPlus_Vehicle_Members": "membros"
+	"IGUI_FactionsPlus_Vehicle_Members": "membros",
+
+	"IGUI_FactionsPlus_Vehicle_Owner": "Dono: ",
+	"IGUI_FactionsPlus_Vehicle_MembersLabel": "Membros:",
+	"IGUI_FactionsPlus_Vehicle_AddMember": "Adicionar Membro",
+	"IGUI_FactionsPlus_Vehicle_RemoveMember": "Remover Membro",
+	"IGUI_FactionsPlus_Vehicle_AddMemberPrompt": "Digite o nome do jogador para adicionar:",
+	"IGUI_FactionsPlus_Vehicle_RemoveConfirm": "Remover o acesso de %1 a este veiculo?",
+	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Tem certeza que deseja remover a reivindicacao deste veiculo?"
 }
