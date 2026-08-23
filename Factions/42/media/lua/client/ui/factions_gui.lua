@@ -187,10 +187,20 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 
 	local safehouseUnavailableReason = SafeHouse.canBeSafehouse(self.player:getSquare(), self.player);
 	if safehouseUnavailableReason ~= "" then
-		self.button:setEnable(false);
-		self.button:setTooltip(safehouseUnavailableReason);
-		FactionsGUI.internal = "Capture_Spawn";
-		return;
+		-- Faction members can claim multiple safehouses (server enforces points limit),
+		-- so strip the vanilla "already have a safehouse" line from the reason for them.
+		local faction = GetPlayerFaction(self.player:getUsername())
+		if faction then
+			local alreadyHave = getText("IGUI_Safehouse_AlreadyHaveSafehouse")
+			safehouseUnavailableReason = safehouseUnavailableReason:gsub(alreadyHave .. "\n", "")
+			safehouseUnavailableReason = safehouseUnavailableReason:gsub(alreadyHave, "")
+		end
+		if safehouseUnavailableReason:gsub("%s", "") ~= "" then
+			self.button:setEnable(false);
+			self.button:setTooltip(safehouseUnavailableReason);
+			FactionsGUI.internal = "Capture_Spawn";
+			return;
+		end
 	end
 
 	self.someoneInside = IsSomeoneInside(self.player:getSquare(), self.faction, self.floors);

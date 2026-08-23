@@ -26,6 +26,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/java" && pwd)"
 SRC_FILES=(
     "zombie/iso/areas/SafeHouse.java"
     "zombie/network/packets/safehouse/SafehouseClaimPacket.java"
+    "zombie/network/anticheats/AntiCheatSafeHouseNotMember.java"
 )
 
 # The game's own classes (zombie.*) are compiled with a specific --release
