@@ -38,9 +38,17 @@ end
 function Badge:prerender() -- Before updating the screen render
 end
 
-function Badge:render() -- Draw the badge flag texture
-	if self.freeTex then
-		self:drawTextureScaled(self.freeTex, 0, 0, self.width, self.height, self.alpha)
+function Badge:render() -- Draw the badge flag texture based on safehouse ownership
+	local tex
+	if self.team == nil then
+		tex = self.freeTex  -- empty safehouse
+	elseif self.team then
+		tex = self.blueTex  -- your faction
+	else
+		tex = self.redTex   -- enemy faction
+	end
+	if tex then
+		self:drawTextureScaled(tex, 0, 0, self.width, self.height, self.alpha)
 	end
 end
 
@@ -90,8 +98,11 @@ function Badge:new(x, y) -- Instanciation the Badgez
 	o.anchorTop = false;
 	o.anchorBottom = true;
 
-	-- Default Textures for Badge
+	-- Default Textures for Badge (free=empty, blue=friendly, red=enemy)
 	o.freeTex = defaultBadge;
+	o.blueTex = getTexture("media/ui/blue/fade4.png");
+	o.redTex  = getTexture("media/ui/red/fade4.png");
+	o.team    = nil; -- nil=empty, true=friendly, false=enemy
 	o.noBackground = true;
 
 	-- Default Opacity
@@ -215,6 +226,7 @@ function FactionsGUI:createChildren() -- Overwrite the children creation method
 	-- Adding it to the Game GUI
 	self:addChild(badge);
 	self.badge = badge;
+	self.badge.team = self.team;
 
 	local offset = (badge:getX() * 2) + badge:getWidth();
 
@@ -369,7 +381,7 @@ function FactionsGUI:SaveLayout(name, layout) -- Overwrite Layout Save
 	ISLayoutManager.DefaultSaveWindow(self, layout)
 end
 
-function FactionsGUI:new(titleText, factionText, buttonText, faction) -- Instanciate the FactionsGUI
+function FactionsGUI:new(titleText, factionText, buttonText, faction, team) -- Instanciate the FactionsGUI
 	-- Creating the object to save the GUI
 	local o = {}
 
@@ -399,6 +411,7 @@ function FactionsGUI:new(titleText, factionText, buttonText, faction) -- Instanc
 
 	-- Adding the player faction to the gui parameter
 	o.faction = faction;
+	o.team = team; -- nil=empty safehouse, true=friendly, false=enemy
 
 	-- Instanciate Variables
 	local square = player:getSquare();

@@ -56,6 +56,8 @@ local function update()
 		local buttonText = nil;
 
 		local player_faction = GetPlayerFaction(player:getUsername());
+		-- nil=empty, true=friendly, false=enemy
+		local team = nil;
 
 		if not player_faction then
 			factionText = getText("UI_Text_SafehouseWithoutFaction")
@@ -67,13 +69,16 @@ local function update()
 			if safehouse_faction then
 				factionText = getText("UI_Text_LabelFaction") .. tostring(safehouse_faction:getName())
 				if player_faction == safehouse_faction then
+					team = true;
 					buttonText = getText("UI_Text_SafehouseView")
+				else
+					team = false;
 				end
 			end
 		end
 
 		local ok, err = pcall(function()
-			GUI = FactionsGUI:new(safehouseText, factionText, buttonText, player_faction);
+			GUI = FactionsGUI:new(safehouseText, factionText, buttonText, player_faction, team);
 			GUI:initialise();
 			GUI:addToUIManager();
 			ISLayoutManager.RegisterWindow('FactionsUI', FactionsGUI, GUI);
