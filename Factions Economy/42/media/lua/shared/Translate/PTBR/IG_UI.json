@@ -31,5 +31,8 @@
 	"IGUI_Safehouse_Redeem": "Resgatado",
 	"IGUI_Safehouse_Upgraded": "Melhorado",
 	"IGUI_Safehouse_Redeem_Tooltip": "Coletar %1 pontos",
-	"IGUI_Safehouse_Redeem_Tooltip_Empty": "Nenhum ponto disponível"
+	"IGUI_Safehouse_Redeem_Tooltip_Empty": "Nenhum ponto disponível",
+	"IGUI_Economy_Scoreboard_Title": "Ranking de Pontos",
+	"IGUI_Economy_Scoreboard_Button": "Placar",
+	"IGUI_Economy_Scoreboard_Empty": "Sem dados disponíveis"
 }

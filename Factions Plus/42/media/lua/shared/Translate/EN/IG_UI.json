@@ -32,5 +32,8 @@
 	"IGUI_FactionsPlus_Vehicle_RemoveMember": "Remove Member",
 	"IGUI_FactionsPlus_Vehicle_AddMemberPrompt": "Enter the username to add:",
 	"IGUI_FactionsPlus_Vehicle_RemoveConfirm": "Remove %1's access to this vehicle?",
-	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Are you sure you want to unclaim this vehicle?"
+	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Are you sure you want to unclaim this vehicle?",
+
+	"IGUI_FactionsMOTD_Title": "Message of the Day",
+	"IGUI_FactionsMOTD_Close": "Close"
 }

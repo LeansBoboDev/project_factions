@@ -35,6 +35,7 @@ Add a new shop system, forked from [Server Points](https://steamcommunity.com/sh
 - [Random Hordes](https://github.com/LeandroTheDev/random_hordes) currency give on horde survival
 - Safehouse Passive Currency Give
 - Upgrade Safehouse
+- Scoreboard for the most rich players
 
 # Factions Plus
 Add new features and adjustments for playing in any anarchy/infinite server.
@@ -47,6 +48,7 @@ Add new features and adjustments for playing in any anarchy/infinite server.
 - Weekly turn off and on water and electric
 - Reset world start age making food and items (prevent respawning rotten foods or broken equipment)
 - Vehicle Claim system (compatible with factions economy)
+- MOTD command forked from [SSR: News](https://steamcommunity.com/sharedfiles/filedetails/?id=1178773471)
 
 # Safehouse Plus
 Respawn mechanics forked from [Keep Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2879960829), and create door key system

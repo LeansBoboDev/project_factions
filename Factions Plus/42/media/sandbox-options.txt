@@ -215,3 +215,11 @@ option FactionsPlus.VehicleProtectTickInterval
     page = FactionsPlus,
     translation = FactionsPlus_VehicleProtectTickInterval,
 }
+
+option FactionsPlus.EnableMOTD
+{
+    type = boolean,
+    default = true,
+    page = FactionsPlus,
+    translation = FactionsPlus_EnableMOTD,
+}

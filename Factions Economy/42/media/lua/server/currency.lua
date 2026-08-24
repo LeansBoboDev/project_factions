@@ -344,6 +344,17 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         sendServerCommand(player, "FactionsEconomyCurrency", "safehouseCurrencyInfo", {
             amount = safeData.Currency
         })
+    elseif command == "getScoreboard" then
+        local entries = {}
+        for username, balance in pairs(FactionsEconomyCurrencyData) do
+            table.insert(entries, { username = username, balance = balance })
+        end
+        table.sort(entries, function(a, b) return a.balance > b.balance end)
+        local top = {}
+        for i = 1, math.min(20, #entries) do
+            top[i] = entries[i]
+        end
+        sendServerCommand(player, "FactionsEconomyCurrency", "scoreboardData", { entries = top })
     elseif command == "requestCreateKey" then
         local username = player:getUsername()
         local cost     = getSandboxOption("FactionsEconomy.CreateKeyCost")

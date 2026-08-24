@@ -32,5 +32,8 @@
 	"IGUI_FactionsPlus_Vehicle_RemoveMember": "Remover Membro",
 	"IGUI_FactionsPlus_Vehicle_AddMemberPrompt": "Digite o nome do jogador para adicionar:",
 	"IGUI_FactionsPlus_Vehicle_RemoveConfirm": "Remover o acesso de %1 a este veiculo?",
-	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Tem certeza que deseja remover a reivindicacao deste veiculo?"
+	"IGUI_FactionsPlus_Vehicle_UnclaimConfirm": "Tem certeza que deseja remover a reivindicacao deste veiculo?",
+
+	"IGUI_FactionsMOTD_Title": "Mensagem do Dia",
+	"IGUI_FactionsMOTD_Close": "Fechar"
 }

@@ -39,29 +39,6 @@ Events.OnServerCommand.Add(function(module, command, args)
     end
 end)
 
-local _originalOnCommandEntered = ISChat.onCommandEntered
-
-ISChat.onCommandEntered = function(self)
-    local input = ISChat.instance.textEntry:getText()
-
-    if input and luautils.stringStarts(input, "/") then
-        local parts = {}
-        for word in input:sub(2):gmatch("%S+") do
-            table.insert(parts, word)
-        end
-        local cmd = parts[1] and parts[1]:lower()
-
-        if cmd == "vehicleclaim" then
-            sendClientCommand("FactionsPlusVehicle", "claim", {})
-            ISChat.instance.textEntry:setText("")
-            ISChat.instance:unfocus()
-            return
-        end
-    end
-
-    _originalOnCommandEntered(self)
-end
-
 -- ============================================================
 -- Vehicle Claim — Radial Menu ("hold V" while driving)
 -- ============================================================
