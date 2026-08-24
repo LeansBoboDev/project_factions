@@ -176,6 +176,7 @@ function IsSpawnPoint(square)
 end
 
 function GetFloorCount(building)
+	if not building then return 0 end
 	local def = building:getDef()
 	if def then
 		local level = 0;
