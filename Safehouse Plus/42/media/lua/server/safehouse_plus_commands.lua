@@ -72,7 +72,6 @@ end
 -- Returns the homes table from ModData, migrating legacy fields if present
 local function getHomes(player)
     local md = player:getModData()
-    DebugPrintSafehousePlus("[getHomes] md=" .. tostring(md) .. " homes=" .. tostring(md.SafehousePlusHomes) .. " count=" .. tostring(md.SafehousePlusHomes and #md.SafehousePlusHomes or "nil"))
     if not md.SafehousePlusHomes then
         md.SafehousePlusHomes = {}
         if md.SafehousePlusHomeX then
@@ -112,18 +111,24 @@ local function setHome(player, args)
     local maxHomes = getEffectiveMaxHomes(player)
     local homes    = getHomes(player)
 
-    if #homes >= maxHomes then
-        msgPlayer(player, "IGUI_SafehousePlus_MaxHomesReached", tostring(maxHomes))
-        return
-    end
-
     local name = (args and args.name) or ("home" .. tostring(#homes + 1))
 
     for _, h in ipairs(homes) do
         if h.name == name then
-            msgPlayer(player, "IGUI_SafehousePlus_HomeDuplicateName", name)
+            local cost = tryDeductCurrency(player, "SafehousePlus.SetHomeCost")
+            if cost == false then return end
+            h.x, h.y, h.z = player:getX(), player:getY(), player:getZ()
+            player:save()
+            msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
+            DebugPrintSafehousePlus("[Commands] setHome (overwrite): " .. player:getUsername() ..
+                " '" .. name .. "' at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
             return
         end
+    end
+
+    if #homes >= maxHomes then
+        msgPlayer(player, "IGUI_SafehousePlus_MaxHomesReached", tostring(maxHomes))
+        return
     end
 
     local cost = tryDeductCurrency(player, "SafehousePlus.SetHomeCost")
