@@ -48,6 +48,22 @@ local function onClaimVehicle(playerObj, vehicle)
     sendClientCommand(playerObj, "FactionsPlusVehicle", "claim", { keyId = keyId })
 end
 
+local function onUnclaimVehicle(playerObj, vehicle)
+    local keyId = vehicle and vehicle:getKeyId() or nil
+    if not keyId then return end
+    sendClientCommand(playerObj, "FactionsPlusVehicle", "unclaimByKeyId", { keyId = keyId })
+end
+
+local function addClaimSlice(menu, playerObj, vehicle)
+    if FactionsPlusVehicleClaim.getClaim(vehicle) then
+        menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_UnclaimOption"),
+            getTexture("media/ui/vehicles/factions_vehicle_unclaim.png"), onUnclaimVehicle, playerObj, vehicle)
+    else
+        menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
+            getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
+    end
+end
+
 -- Inside vehicle: radial menu while seated/driving
 local _originalShowRadialMenu = ISVehicleMenu.showRadialMenu
 
@@ -62,8 +78,7 @@ ISVehicleMenu.showRadialMenu = function(playerObj)
     local vehicle = playerObj:getVehicle()
     if not vehicle then return end
 
-    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
-        getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
+    addClaimSlice(menu, playerObj, vehicle)
 end
 
 -- Outside vehicle: radial menu while standing near it (pressing V outside)
@@ -82,8 +97,7 @@ ISVehicleMenu.showRadialMenuOutside = function(playerObj)
 
     if menu:isEmpty() then return end
 
-    menu:addSlice(getText("IGUI_FactionsPlus_Vehicle_ClaimOption"),
-        getTexture("media/ui/vehicles/factions_vehicle_claim.png"), onClaimVehicle, playerObj, vehicle)
+    addClaimSlice(menu, playerObj, vehicle)
 end
 
 -- ============================================================
