@@ -69,28 +69,75 @@ local function tryDeductCurrency(player, costOption)
     return cost
 end
 
--- Returns the homes table from ModData, migrating legacy fields if present
+-- Persists homes as flat primitive keys so PZ serializes them correctly on save.
+-- Keys: SafehousePlusHomeCount, SafehousePlusHome_N_x/y/z/name
+local function saveHomes(player, homes)
+    local md = player:getModData()
+    local oldCount = md.SafehousePlusHomeCount or 0
+    for i = 1, oldCount do
+        local p = "SafehousePlusHome_" .. i .. "_"
+        md[p .. "x"] = nil
+        md[p .. "y"] = nil
+        md[p .. "z"] = nil
+        md[p .. "name"] = nil
+    end
+    md.SafehousePlusHomeCount = #homes
+    for i, h in ipairs(homes) do
+        local p = "SafehousePlusHome_" .. i .. "_"
+        md[p .. "x"]    = h.x
+        md[p .. "y"]    = h.y
+        md[p .. "z"]    = h.z or 0
+        md[p .. "name"] = h.name
+    end
+end
+
+-- Returns homes as a plain Lua table, migrating legacy formats if needed.
+-- Callers that mutate the result MUST call saveHomes() then player:save().
 local function getHomes(player)
     local md = player:getModData()
-    if not md.SafehousePlusHomes then
-        md.SafehousePlusHomes = {}
-        if md.SafehousePlusHomeX then
-            table.insert(md.SafehousePlusHomes, {
-                x    = md.SafehousePlusHomeX,
-                y    = md.SafehousePlusHomeY,
-                z    = md.SafehousePlusHomeZ or 0,
-                name = "home1",
+
+    -- Migration: old nested-table format (didn't survive PZ serialization)
+    if md.SafehousePlusHomes ~= nil then
+        local legacy = md.SafehousePlusHomes
+        md.SafehousePlusHomes = nil
+        local migrated = {}
+        if type(legacy) == "table" then
+            for i, h in ipairs(legacy) do
+                table.insert(migrated, {
+                    x = h.x, y = h.y, z = h.z or 0,
+                    name = h.name or ("home" .. i),
+                })
+            end
+        end
+        saveHomes(player, migrated)
+        return migrated
+    end
+
+    -- Migration: single-home x/y/z primitives (pre-named-homes)
+    if md.SafehousePlusHomeX then
+        local migrated = {{ x = md.SafehousePlusHomeX, y = md.SafehousePlusHomeY, z = md.SafehousePlusHomeZ or 0, name = "home1" }}
+        md.SafehousePlusHomeX = nil
+        md.SafehousePlusHomeY = nil
+        md.SafehousePlusHomeZ = nil
+        saveHomes(player, migrated)
+        return migrated
+    end
+
+    -- Normal read from flat primitive keys
+    local count = md.SafehousePlusHomeCount or 0
+    local homes = {}
+    for i = 1, count do
+        local p = "SafehousePlusHome_" .. i .. "_"
+        local x = md[p .. "x"]
+        local y = md[p .. "y"]
+        if x and y then
+            table.insert(homes, {
+                x = x, y = y, z = md[p .. "z"] or 0,
+                name = md[p .. "name"] or ("home" .. i),
             })
-            md.SafehousePlusHomeX = nil
-            md.SafehousePlusHomeY = nil
-            md.SafehousePlusHomeZ = nil
         end
     end
-    -- Assign names to any entries that predate named-home support
-    for i, h in ipairs(md.SafehousePlusHomes) do
-        if not h.name then h.name = "home" .. i end
-    end
-    return md.SafehousePlusHomes
+    return homes
 end
 
 -- Base slots (sandbox) + slots purchased by the player with /buyhome
@@ -118,6 +165,7 @@ local function setHome(player, args)
             local cost = tryDeductCurrency(player, "SafehousePlus.SetHomeCost")
             if cost == false then return end
             h.x, h.y, h.z = player:getX(), player:getY(), player:getZ()
+            saveHomes(player, homes)
             player:save()
             msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
             DebugPrintSafehousePlus("[Commands] setHome (overwrite): " .. player:getUsername() ..
@@ -135,6 +183,7 @@ local function setHome(player, args)
     if cost == false then return end
 
     table.insert(homes, { x = player:getX(), y = player:getY(), z = player:getZ(), name = name })
+    saveHomes(player, homes)
     player:save()
     msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
     DebugPrintSafehousePlus("[Commands] setHome: " .. player:getUsername() ..
@@ -277,6 +326,7 @@ local function delHome(player, args)
     for i, h in ipairs(homes) do
         if h.name == name then
             table.remove(homes, i)
+            saveHomes(player, homes)
             player:save()
             msgPlayer(player, "IGUI_SafehousePlus_HomeDeleted", name)
             DebugPrintSafehousePlus("[Commands] delHome: " .. player:getUsername() .. " deleted '" .. name .. "'")
