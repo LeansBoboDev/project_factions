@@ -1,0 +1,99 @@
+<VERSION: 1.0>
+Bem-vindo à Aionthera
+<SIZE:large> <RGB:0.4,0.8,1> Aionthera <RGB:1,1,1>
+<SIZE:medium> <RGB:0.6,0.6,0.6> Factions  •  PVE  •  Economia  •  Comunidade <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Conexão <RGB:1,1,1>
+<SIZE:medium> IP <SPACE><SPACE><SPACE><SPACE><SPACE><SPACE> <RGB:0.4,1,0.5> projectzomboid.aionthera.org <RGB:1,1,1>
+<SIZE:medium> Porta <SPACE><SPACE><SPACE> <RGB:0.4,1,0.5> 16261 <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Sobre o Servidor <RGB:1,1,1>
+<SIZE:medium> Aionthera é um servidor Factions com foco em PVE — jogadores não podem se matar.
+<SIZE:medium> Una-se a outros jogadores, forme sua facção e sobrevivam juntos ao apocalipse.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Funcionalidades <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Factions — forme grupos, reivindique território e coopere
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Economia — compre e venda itens na loja (Menu de Pausa)
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> PVE — foco em sobrevivência, sem conflito entre jogadores
+
+<SIZE:medium> <RGB:1,0.8,0.2> Gostou do servidor? <RGB:1,1,1>
+<SIZE:medium> Não esqueça de nos adicionar aos <SPACE> <RGB:0.4,1,0.5> Favoritos <RGB:1,1,1> <SPACE> para nos encontrar facilmente na próxima vez!
+<PAGE>
+Safehouse e Veículos
+<SIZE:large> <RGB:0.4,0.8,1> Safehouse e Veículos <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Safehouses <RGB:1,1,1>
+<SIZE:medium> Neste servidor você pode ter múltiplas safehouses ao mesmo tempo.
+<SIZE:medium> No começo você tem <SPACE> <RGB:0.4,1,0.5> 1 ponto de captura <RGB:1,1,1> <SPACE> disponível.
+<SIZE:medium> Mate zumbis para ganhar mais pontos e expandir seu território.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Proteção de Veículo <RGB:1,1,1>
+<SIZE:medium> Você pode proteger seus veículos contra roubo.
+<SIZE:medium>  <RGB:0.4,1,0.5> 1. <RGB:1,1,1> <SPACE> Chegue perto de um veículo que você possua a chave
+<SIZE:medium>  <RGB:0.4,1,0.5> 2. <RGB:1,1,1> <SPACE> Pressione a tecla do menu radial <RGB:0.4,1,0.5> V <RGB:1,1,1> (padrão)
+<SIZE:medium>  <RGB:0.4,1,0.5> 3. <RGB:1,1,1> <SPACE> Selecione <SPACE> <RGB:0.4,1,0.5> Claim Vehicle <RGB:1,1,1> <SPACE> (custa <SPACE> <RGB:1,0.7,0.2> 10 Currency <RGB:1,1,1>)
+<SIZE:medium> Após reivindicado, outros jogadores não conseguem acessar o porta-malas ou porta-luvas.
+<SIZE:medium> Além disso, enquanto você estiver <SPACE> <RGB:1,0.4,0.4> fora do veículo <RGB:1,1,1>, ele fica <SPACE> <RGB:0.4,1,0.5> imune a danos <RGB:1,1,1> <SPACE> causados por outros jogadores,
+<SIZE:medium> preservando sua integridade.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Painel do Usuário <RGB:1,1,1>
+<SIZE:medium> Você pode ver e gerenciar suas safehouses e veículos reivindicados
+<SIZE:medium> pelo <SPACE> <RGB:0.4,1,0.5> botão de painel do usuário <RGB:1,1,1> <SPACE> no <SPACE> <RGB:0.4,1,0.5> botao cliente <RGB:1,1,1> <SPACE> da tela.
+<PAGE>
+Comandos
+<SIZE:large> <RGB:0.4,0.8,1> Comandos <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Geral <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /motd <RGB:1,1,1> — Abre este painel de informações
+
+<SIZE:medium> <RGB:1,0.8,0.2> Casa <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [nome] <RGB:1,1,1> — Salva sua localização atual como uma casa nomeada
+<SIZE:medium>  <RGB:0.4,1,0.5> /home [nome] <RGB:1,1,1> — Teleporta para uma casa salva
+<SIZE:medium>  <RGB:0.4,1,0.5> /homes <RGB:1,1,1> — Lista todas as suas casas salvas
+<SIZE:medium>  <RGB:0.4,1,0.5> /delhome (nome) <RGB:1,1,1> — Remove uma casa salva pelo nome
+<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Compra um slot extra de casa
+
+<SIZE:medium> <RGB:1,0.8,0.2> Teleporte <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (jogador) <RGB:1,1,1> — Envia um pedido de teleporte para outro jogador
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpaaccept <RGB:1,1,1> — Aceita um pedido de teleporte pendente
+<PAGE>
+Ciclo da Água e Luz
+<SIZE:large> <RGB:0.4,0.8,1> Ciclo da Água e Luz <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Horários <RGB:1,1,1>
+<SIZE:medium> Água e luz ficam <SPACE> <RGB:1,0.4,0.4> DESLIGADAS <RGB:1,1,1> <SPACE> nos dias:
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Segunda-feira
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Terça-feira
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Quinta-feira
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Sexta-feira
+
+<SIZE:medium> Água e luz ficam <SPACE> <RGB:0.4,1,0.5> LIGADAS <RGB:1,1,1> <SPACE> nos dias:
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Quarta-feira
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Sábado
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Domingo
+<PAGE>
+Gameplay
+<SIZE:large> <RGB:0.4,0.8,1> Gameplay <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Respawn <RGB:1,1,1>
+<SIZE:medium> Ao morrer, você pode renascer normalmente.
+<SIZE:medium> <RGB:1,0.4,0.4> Não saia do servidor <RGB:1,1,1> <SPACE> logo após morrer — uma limitação do jogo pode fazer você perder seu personagem.
+<SIZE:medium> Sempre <SPACE> <RGB:0.4,1,0.5> renasça primeiro <RGB:1,1,1> <SPACE> e só então saia do servidor.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Airdrops <RGB:1,1,1>
+<SIZE:medium> Airdrops podem nascer aleatoriamente em qualquer lugar do mapa.
+<SIZE:medium> Quando um airdrop nasce, um <SPACE> <RGB:0.4,1,0.5> ícone <RGB:1,1,1> <SPACE> é adicionado ao seu mapa
+<SIZE:medium> e uma mensagem aparece no <SPACE> <RGB:0.4,1,0.5> chat <RGB:1,1,1> <SPACE> avisando o local onde ele apareceu.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Smoke Flares <RGB:1,1,1>
+<SIZE:medium> Smoke flares podem ser compradas no Menu de Pausa, no botão <SPACE> <RGB:0.4,1,0.5> SHOP <RGB:1,1,1>.
+<SIZE:medium> Ao usar uma smoke flare, você solicita um <SPACE> <RGB:0.4,1,0.5> airdrop manual <RGB:1,1,1>.
+<SIZE:medium> Atenção: <SPACE> <RGB:1,0.4,0.4> uma horda de zumbis <RGB:1,1,1> <SPACE> irá nascer no local ao usá-la.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Currency <RGB:1,1,1>
+<SIZE:medium> Você recebe Currency passivamente apenas por jogar.
+<SIZE:medium> Todas as suas safehouses possuem uma <SPACE> <RGB:0.4,1,0.5> poupança <RGB:1,1,1> <SPACE> que acumula Currency com o tempo.
+<SIZE:medium> Acesse a safehouse para visualizar e <SPACE> <RGB:0.4,1,0.5> recolher <RGB:1,1,1> <SPACE> esse valor.
+<SIZE:medium> No Menu de Pausa, botão <SPACE> <RGB:0.4,1,0.5> SHOP <RGB:1,1,1>, você pode comprar um <SPACE> <RGB:0.4,1,0.5> upgrade de safehouse <RGB:1,1,1> <SPACE> para aumentar os ganhos da poupança daquela safehouse específica.
+<SIZE:medium> Você também pode ganhar Currency <SPACE> <RGB:0.4,1,0.5> vendendo colheitas <RGB:1,1,1> <SPACE> das suas plantações.
+

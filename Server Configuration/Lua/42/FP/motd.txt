@@ -1,0 +1,99 @@
+<VERSION: 1.0>
+Welcome to Aionthera
+<SIZE:large> <RGB:0.4,0.8,1> Aionthera <RGB:1,1,1>
+<SIZE:medium> <RGB:0.6,0.6,0.6> Factions  •  PVE  •  Economy  •  Community <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Connection <RGB:1,1,1>
+<SIZE:medium> IP <SPACE><SPACE><SPACE><SPACE><SPACE><SPACE> <RGB:0.4,1,0.5> projectzomboid.aionthera.org <RGB:1,1,1>
+<SIZE:medium> Port <SPACE><SPACE><SPACE><SPACE> <RGB:0.4,1,0.5> 16261 <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> About <RGB:1,1,1>
+<SIZE:medium> Aionthera is a Factions server with a PVE focus — players cannot kill each other.
+<SIZE:medium> Team up, build your faction, and thrive together in the apocalypse.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Features <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Factions — form groups, claim territory, and cooperate
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Economy — buy and sell items in the shop (Pause Menu)
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> PVE — focus on survival, not conflict
+
+<SIZE:medium> <RGB:1,0.8,0.2> Enjoying the server? <RGB:1,1,1>
+<SIZE:medium> Don't forget to add us to your <SPACE> <RGB:0.4,1,0.5> Favorites <RGB:1,1,1> <SPACE> so you can find us easily next time!
+<PAGE>
+Safehouse & Vehicles
+<SIZE:large> <RGB:0.4,0.8,1> Safehouse & Vehicles <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Safehouses <RGB:1,1,1>
+<SIZE:medium> On this server you can own multiple safehouses simultaneously.
+<SIZE:medium> At the start you have <SPACE> <RGB:0.4,1,0.5> 1 capture point <RGB:1,1,1> <SPACE> available.
+<SIZE:medium> Kill zombies to earn more points and expand your territory.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Vehicle Protection <RGB:1,1,1>
+<SIZE:medium> You can protect your vehicles from theft.
+<SIZE:medium>  <RGB:0.4,1,0.5> 1. <RGB:1,1,1> <SPACE> Get close to a vehicle you have the key for
+<SIZE:medium>  <RGB:0.4,1,0.5> 2. <RGB:1,1,1> <SPACE> Press the radial menu key <RGB:0.4,1,0.5> V <RGB:1,1,1> (default)
+<SIZE:medium>  <RGB:0.4,1,0.5> 3. <RGB:1,1,1> <SPACE> Select <SPACE> <RGB:0.4,1,0.5> Claim Vehicle <RGB:1,1,1> <SPACE> (costs <SPACE> <RGB:1,0.7,0.2> 10 Currency <RGB:1,1,1>)
+<SIZE:medium> Once claimed, other players cannot access the trunk or glovebox.
+<SIZE:medium> Additionally, while you are <SPACE> <RGB:1,0.4,0.4> outside the vehicle <RGB:1,1,1>, it is <SPACE> <RGB:0.4,1,0.5> immune to damage <RGB:1,1,1> <SPACE> from other players,
+<SIZE:medium> keeping its condition fully intact.
+
+<SIZE:medium> <RGB:1,0.8,0.2> User Panel <RGB:1,1,1>
+<SIZE:medium> You can view and manage your safehouses and claimed vehicles
+<SIZE:medium> through the <SPACE> <RGB:0.4,1,0.5> user panel button <RGB:1,1,1> <SPACE> in the <SPACE> <RGB:0.4,1,0.5> client button <RGB:1,1,1> <SPACE> of the screen.
+<PAGE>
+Commands
+<SIZE:large> <RGB:0.4,0.8,1> Commands <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> General <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /motd <RGB:1,1,1> — Opens this help panel
+
+<SIZE:medium> <RGB:1,0.8,0.2> Home <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [name] <RGB:1,1,1> — Save your current location as a named home
+<SIZE:medium>  <RGB:0.4,1,0.5> /home [name] <RGB:1,1,1> — Teleport to a saved home
+<SIZE:medium>  <RGB:0.4,1,0.5> /homes <RGB:1,1,1> — List all your saved homes
+<SIZE:medium>  <RGB:0.4,1,0.5> /delhome (name) <RGB:1,1,1> — Delete a saved home by name
+<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Purchase an extra home slot
+
+<SIZE:medium> <RGB:1,0.8,0.2> Teleport <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (player) <RGB:1,1,1> — Send a teleport request to another player
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpaaccept <RGB:1,1,1> — Accept a pending teleport request
+<PAGE>
+Water & Light Cycle
+<SIZE:large> <RGB:0.4,0.8,1> Water & Light Cycle <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Schedule <RGB:1,1,1>
+<SIZE:medium> Water and electricity are <SPACE> <RGB:1,0.4,0.4> OFF <RGB:1,1,1> <SPACE> on:
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Monday
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Tuesday
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Thursday
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Friday
+
+<SIZE:medium> Water and electricity are <SPACE> <RGB:0.4,1,0.5> ON <RGB:1,1,1> <SPACE> on:
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Wednesday
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Saturday
+<SIZE:medium>  <RGB:0.4,1,0.5> » <RGB:1,1,1><SPACE> Sunday
+<PAGE>
+Gameplay
+<SIZE:large> <RGB:0.4,0.8,1> Gameplay <RGB:1,1,1>
+
+<SIZE:medium> <RGB:1,0.8,0.2> Respawn <RGB:1,1,1>
+<SIZE:medium> When you die, you can respawn normally.
+<SIZE:medium> <RGB:1,0.4,0.4> Do not log out of the server <RGB:1,1,1> <SPACE> right after dying — a game limitation may cause you to lose your character.
+<SIZE:medium> Always <SPACE> <RGB:0.4,1,0.5> respawn first <RGB:1,1,1> <SPACE> and only then log out of the server.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Airdrops <RGB:1,1,1>
+<SIZE:medium> Airdrops can spawn randomly anywhere on the map.
+<SIZE:medium> When one spawns, an <SPACE> <RGB:0.4,1,0.5> icon <RGB:1,1,1> <SPACE> is added to your map
+<SIZE:medium> and a message appears in the <SPACE> <RGB:0.4,1,0.5> chat <RGB:1,1,1> <SPACE> announcing the location.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Smoke Flares <RGB:1,1,1>
+<SIZE:medium> Smoke flares can be purchased from the Pause Menu, under the <SPACE> <RGB:0.4,1,0.5> SHOP <RGB:1,1,1> <SPACE> button.
+<SIZE:medium> Using a smoke flare requests a <SPACE> <RGB:0.4,1,0.5> manual airdrop <RGB:1,1,1>.
+<SIZE:medium> Warning: <SPACE> <RGB:1,0.4,0.4> a zombie horde <RGB:1,1,1> <SPACE> will spawn at that location when you use it.
+
+<SIZE:medium> <RGB:1,0.8,0.2> Currency <RGB:1,1,1>
+<SIZE:medium> You earn Currency passively just by playing.
+<SIZE:medium> All of your safehouses have a <SPACE> <RGB:0.4,1,0.5> savings <RGB:1,1,1> <SPACE> that accumulates Currency over time.
+<SIZE:medium> Visit the safehouse to view and <SPACE> <RGB:0.4,1,0.5> collect <RGB:1,1,1> <SPACE> that amount.
+<SIZE:medium> In the Pause Menu, under the <SPACE> <RGB:0.4,1,0.5> SHOP <RGB:1,1,1> <SPACE> button, you can buy a <SPACE> <RGB:0.4,1,0.5> safehouse upgrade <RGB:1,1,1> <SPACE> to increase the savings earnings of that specific safehouse.
+<SIZE:medium> You can also earn Currency by <SPACE> <RGB:0.4,1,0.5> selling crops <RGB:1,1,1> <SPACE> from your plantations.
+
