@@ -18,6 +18,7 @@ Welcome to Aionthera
 
 <SIZE:medium> <RGB:1,0.8,0.2> Enjoying the server? <RGB:1,1,1>
 <SIZE:medium> Don't forget to add us to your <SPACE> <RGB:0.4,1,0.5> Favorites <RGB:1,1,1> <SPACE> so you can find us easily next time!
+<SIZE:medium> Join our community on <SPACE> <RGB:0.5,0.6,1> Discord <RGB:1,1,1> <SPACE> discord.gg/Hbf4uDQ85p
 <PAGE>
 Safehouse & Vehicles
 <SIZE:large> <RGB:0.4,0.8,1> Safehouse & Vehicles <RGB:1,1,1>
