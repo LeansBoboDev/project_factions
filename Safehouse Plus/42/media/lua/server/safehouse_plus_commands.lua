@@ -166,7 +166,6 @@ local function setHome(player, args)
             if cost == false then return end
             h.x, h.y, h.z = player:getX(), player:getY(), player:getZ()
             saveHomes(player, homes)
-            player:save()
             msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
             DebugPrintSafehousePlus("[Commands] setHome (overwrite): " .. player:getUsername() ..
                 " '" .. name .. "' at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
@@ -184,7 +183,6 @@ local function setHome(player, args)
 
     table.insert(homes, { x = player:getX(), y = player:getY(), z = player:getZ(), name = name })
     saveHomes(player, homes)
-    player:save()
     msgPlayer(player, "IGUI_SafehousePlus_HomeSet", name, nil, cost)
     DebugPrintSafehousePlus("[Commands] setHome: " .. player:getUsername() ..
         " '" .. name .. "' at " .. player:getX() .. "," .. player:getY() .. " (" .. #homes .. "/" .. maxHomes .. ")")
@@ -271,7 +269,6 @@ local function buyHome(player)
     end
 
     md.SafehousePlusBoughtHomes = bought + 1
-    player:save()
 
     local newMax = getEffectiveMaxHomes(player)
     msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax), nil, cost)
@@ -327,7 +324,6 @@ local function delHome(player, args)
         if h.name == name then
             table.remove(homes, i)
             saveHomes(player, homes)
-            player:save()
             msgPlayer(player, "IGUI_SafehousePlus_HomeDeleted", name)
             DebugPrintSafehousePlus("[Commands] delHome: " .. player:getUsername() .. " deleted '" .. name .. "'")
             return
