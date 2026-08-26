@@ -36,6 +36,9 @@ copy_module() {
     fi
 }
 
+echo "Copying server config files to Zomboid/Lua/"
+cp -rv "./Server Configuration/Lua/42/"* "/home/leans/Zomboid/Lua/"
+
 copy_mod "Factions"
 copy_mod "Factions Economy"
 copy_mod "Factions Plus"

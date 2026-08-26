@@ -282,17 +282,9 @@ OnSafehousesChanged = function()
         currentIds[id] = true
 
         if not FactionsEconomySafehouseCurrencyData[id] then
-            DebugPrintFactionsEconomy(string.format(
-                "[SafehouseTracking] New safehouse claimed: %s (owner: %s, id: %d, created: %s)",
-                safehouse:getTitle(), owner, id, safehouse:getDatetimeCreatedStr()))
-
             AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseClaimed", safehouse)
         else
-            DebugPrintFactionsEconomy(string.format(
-                "[SafehouseTracking] Safehouse updated: %s (owner: %s, id: %d, created: %s)",
-                safehouse:getTitle(), owner, id, safehouse:getDatetimeCreatedStr()))
-
             AddSafehouseToData(safehouse)
             triggerEvent("OnFactionsEconomySafehouseUpdated", safehouse)
         end
@@ -300,8 +292,6 @@ OnSafehousesChanged = function()
 
     for id, data in pairs(FactionsEconomySafehouseCurrencyData) do
         if not currentIds[id] then
-            DebugPrintFactionsEconomy(string.format("[SafehouseTracking] Safehouse removed: %s (id: %s)", data.Owner,
-                id))
             FactionsEconomySafehouseCurrencyData[id] = nil
 
             triggerEvent("OnFactionsEconomySafehouseUnclaimed", data.Owner)
