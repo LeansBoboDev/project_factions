@@ -6,6 +6,14 @@ local pendingTPA     = {}
 local homeCooldowns  = {}
 local pendingConfirm = {}  -- username -> callback applied only when client confirms teleport
 
+-- Global ModData table: { [username] = { bought = N, homes = { {x,y,z,name}, ... } } }
+-- PZ persists this automatically, same mechanism as FactionsEconomy currency.
+SafehousePlusHomesData = {}
+
+Events.OnInitGlobalModData.Add(function()
+    SafehousePlusHomesData = ModData.getOrCreate("SafehousePlusHomes")
+end)
+
 local function getSandboxBool(name)
     local opt = getSandboxOptions():getOptionByName(name)
     return opt and opt:getValue()
@@ -69,82 +77,81 @@ local function tryDeductCurrency(player, costOption)
     return cost
 end
 
--- Persists homes as flat primitive keys so PZ serializes them correctly on save.
--- Keys: SafehousePlusHomeCount, SafehousePlusHome_N_x/y/z/name
-local function saveHomes(player, homes)
-    local md = player:getModData()
-    local oldCount = md.SafehousePlusHomeCount or 0
-    for i = 1, oldCount do
-        local p = "SafehousePlusHome_" .. i .. "_"
-        md[p .. "x"] = nil
-        md[p .. "y"] = nil
-        md[p .. "z"] = nil
-        md[p .. "name"] = nil
+-- Returns or creates the player's entry in the global ModData table.
+local function getPlayerData(username)
+    if not SafehousePlusHomesData[username] then
+        SafehousePlusHomesData[username] = { bought = 0, homes = {} }
     end
-    md.SafehousePlusHomeCount = #homes
-    for i, h in ipairs(homes) do
-        local p = "SafehousePlusHome_" .. i .. "_"
-        md[p .. "x"]    = h.x
-        md[p .. "y"]    = h.y
-        md[p .. "z"]    = h.z or 0
-        md[p .. "name"] = h.name
-    end
+    return SafehousePlusHomesData[username]
 end
 
--- Returns homes as a plain Lua table, migrating legacy formats if needed.
--- Callers that mutate the result MUST call saveHomes() then player:save().
+-- Returns the player's homes list, migrating from old player:getModData() formats if needed.
 local function getHomes(player)
-    local md = player:getModData()
+    local username = player:getUsername()
+    local pdata    = getPlayerData(username)
+    local md       = player:getModData()
 
-    -- Migration: old nested-table format (didn't survive PZ serialization)
-    if md.SafehousePlusHomes ~= nil then
-        local legacy = md.SafehousePlusHomes
-        md.SafehousePlusHomes = nil
+    -- Migration: any old player:getModData() key present → move to global ModData
+    if md.SafehousePlusHomes ~= nil or md.SafehousePlusHomeX ~= nil or md.SafehousePlusHomeCount ~= nil then
         local migrated = {}
-        if type(legacy) == "table" then
-            for i, h in ipairs(legacy) do
-                table.insert(migrated, {
-                    x = h.x, y = h.y, z = h.z or 0,
-                    name = h.name or ("home" .. i),
-                })
+
+        if md.SafehousePlusHomes ~= nil then
+            -- oldest format: nested table (didn't survive player ModData serialization)
+            local legacy = md.SafehousePlusHomes
+            md.SafehousePlusHomes = nil
+            if type(legacy) == "table" then
+                for i, h in ipairs(legacy) do
+                    table.insert(migrated, { x = h.x, y = h.y, z = h.z or 0, name = h.name or ("home" .. i) })
+                end
             end
+        elseif md.SafehousePlusHomeX ~= nil then
+            -- single-home primitives format
+            table.insert(migrated, { x = md.SafehousePlusHomeX, y = md.SafehousePlusHomeY, z = md.SafehousePlusHomeZ or 0, name = "home1" })
+            md.SafehousePlusHomeX = nil
+            md.SafehousePlusHomeY = nil
+            md.SafehousePlusHomeZ = nil
+        elseif md.SafehousePlusHomeCount ~= nil then
+            -- flat-key primitives format
+            local count = md.SafehousePlusHomeCount
+            for i = 1, count do
+                local p = "SafehousePlusHome_" .. i .. "_"
+                local x = md[p .. "x"]
+                local y = md[p .. "y"]
+                if x and y then
+                    table.insert(migrated, { x = x, y = y, z = md[p .. "z"] or 0, name = md[p .. "name"] or ("home" .. i) })
+                else
+                    DebugPrintSafehousePlus("[getHomes] WARN: migration: " .. username ..
+                        " slot " .. i .. "/" .. count .. " has nil coords (x=" .. tostring(x) .. " y=" .. tostring(y) .. ") — skipped")
+                end
+                md[p .. "x"] = nil
+                md[p .. "y"] = nil
+                md[p .. "z"] = nil
+                md[p .. "name"] = nil
+            end
+            md.SafehousePlusHomeCount = nil
         end
-        saveHomes(player, migrated)
-        return migrated
+
+        local bought = md.SafehousePlusBoughtHomes or 0
+        md.SafehousePlusBoughtHomes = nil
+
+        pdata.homes  = migrated
+        pdata.bought = math.max(pdata.bought or 0, bought)
+        DebugPrintSafehousePlus("[getHomes] migrated " .. username .. ": " .. #migrated .. " homes, " .. pdata.bought .. " bought slots")
     end
 
-    -- Migration: single-home x/y/z primitives (pre-named-homes)
-    if md.SafehousePlusHomeX then
-        local migrated = {{ x = md.SafehousePlusHomeX, y = md.SafehousePlusHomeY, z = md.SafehousePlusHomeZ or 0, name = "home1" }}
-        md.SafehousePlusHomeX = nil
-        md.SafehousePlusHomeY = nil
-        md.SafehousePlusHomeZ = nil
-        saveHomes(player, migrated)
-        return migrated
-    end
+    return pdata.homes
+end
 
-    -- Normal read from flat primitive keys
-    local count = md.SafehousePlusHomeCount or 0
-    local homes = {}
-    for i = 1, count do
-        local p = "SafehousePlusHome_" .. i .. "_"
-        local x = md[p .. "x"]
-        local y = md[p .. "y"]
-        if x and y then
-            table.insert(homes, {
-                x = x, y = y, z = md[p .. "z"] or 0,
-                name = md[p .. "name"] or ("home" .. i),
-            })
-        end
-    end
-    return homes
+local function saveHomes(player, homes)
+    local pdata = getPlayerData(player:getUsername())
+    pdata.homes = homes
 end
 
 -- Base slots (sandbox) + slots purchased by the player with /buyhome
 local function getEffectiveMaxHomes(player)
-    local base   = getSandboxInt("SafehousePlus.MaxHomes", 1)
-    local bought = player:getModData().SafehousePlusBoughtHomes or 0
-    return base + bought
+    local base  = getSandboxInt("SafehousePlus.MaxHomes", 1)
+    local pdata = getPlayerData(player:getUsername())
+    return base + (pdata.bought or 0)
 end
 
 -- ── /sethome [name] ───────────────────────────────────────────
@@ -248,15 +255,15 @@ local function buyHome(player)
         return
     end
 
-    local md        = player:getModData()
-    local bought    = md.SafehousePlusBoughtHomes or 0
-    local base      = getSandboxInt("SafehousePlus.BuyHomeCost", 5)
+    local username = player:getUsername()
+    local pdata    = getPlayerData(username)
+    local bought   = pdata.bought or 0
+    local base     = getSandboxInt("SafehousePlus.BuyHomeCost", 5)
     local increment = getSandboxInt("SafehousePlus.BuyHomeCostIncrement", 0)
-    local cost      = base + (bought * increment)
+    local cost     = base + (bought * increment)
 
     if cost > 0 and FactionsEconomyCompatibility then
-        local username = player:getUsername()
-        local balance  = FactionsEconomyCurrencyData and FactionsEconomyCurrencyData[username] or 0
+        local balance = FactionsEconomyCurrencyData and FactionsEconomyCurrencyData[username] or 0
         if balance < cost then
             msgPlayer(player, "IGUI_SafehousePlus_NoFunds", tostring(cost))
             return
@@ -268,11 +275,11 @@ local function buyHome(player)
         cost = 0
     end
 
-    md.SafehousePlusBoughtHomes = bought + 1
+    pdata.bought = bought + 1
 
     local newMax = getEffectiveMaxHomes(player)
     msgPlayer(player, "IGUI_SafehousePlus_BuyHomeSuccess", tostring(newMax), nil, cost)
-    DebugPrintSafehousePlus("[Commands] buyHome: " .. player:getUsername() ..
+    DebugPrintSafehousePlus("[Commands] buyHome: " .. username ..
         " bought a slot (cost=" .. cost .. "), total max=" .. newMax)
 end
 

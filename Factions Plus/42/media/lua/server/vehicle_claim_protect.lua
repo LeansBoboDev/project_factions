@@ -122,7 +122,6 @@ local function protectClaimedVehicles()
             local keyId = vehicle:getKeyId()
             if isVehicleOccupied(vehicle) then
                 claim.Condition = captureConditions(vehicle)
-                DebugPrintFactionsPlus(string.format("[VehicleProtect] keyId %d occupied — snapshot updated", keyId))
             elseif claim.Condition then
                 restoreConditions(vehicle, claim.Condition)
             else
