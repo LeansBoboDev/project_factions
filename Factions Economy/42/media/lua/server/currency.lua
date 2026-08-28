@@ -335,9 +335,23 @@ Events.OnClientCommand.Add(function(module, command, player, args)
             amount = safeData.Currency
         })
     elseif command == "getScoreboard" then
+        -- Staff roles are only known while the player is online (no offline role
+        -- lookup is exposed to Lua on dedicated servers), so build the lookup from
+        -- the current online player list before filtering.
+        local excludedRoles = { admin = true, observer = true }
+        local onlineRoles = {}
+        local onlinePlayers = getOnlinePlayers()
+        for i = 0, onlinePlayers:size() - 1 do
+            local onlinePlayer = onlinePlayers:get(i)
+            onlineRoles[onlinePlayer:getUsername()] = onlinePlayer:getAccessLevel()
+        end
+
         local entries = {}
         for username, balance in pairs(FactionsEconomyCurrencyData) do
-            table.insert(entries, { username = username, balance = balance })
+            local role = onlineRoles[username]
+            if not (role and excludedRoles[role:lower()]) then
+                table.insert(entries, { username = username, balance = balance })
+            end
         end
         table.sort(entries, function(a, b) return a.balance > b.balance end)
         local top = {}

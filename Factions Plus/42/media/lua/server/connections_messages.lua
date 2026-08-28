@@ -28,8 +28,14 @@ if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerDeathMessages")
     Events.OnPlayerDeath.Add(OnPlayerDeath);
 end
 
+-- Roles hidden from join/leave chat messages
+local excludedRoles = { admin = true, observer = true };
+
 -- Stores any old online players, is a List<string> with the username
 local previousOnlinePlayers = {};
+-- Role each previousOnlinePlayers entry had while online, keyed by username
+-- (needed at disconnect time since the player object is no longer available)
+local previousOnlinePlayerRoles = {};
 local lastTimeSeconds = 0;
 
 -- Player message handler
@@ -70,11 +76,13 @@ if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerJoinMessages"):
             -- Checking if player disconnected
             if isDisconnected then
                 -- Sending a message to all players about the disconnected player
-                if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerLeaveMessages"):getValue() then
+                local role = previousOnlinePlayerRoles[selectedPreviousPlayer];
+                if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerLeaveMessages"):getValue() and not (role and excludedRoles[role:lower()]) then
                     sendMessageToAllPlayers("playerdisconnected", selectedPreviousPlayer);
                 end
                 -- Removing the player from the previousOnlinePlayers table
                 table.remove(previousOnlinePlayers, i);
+                previousOnlinePlayerRoles[selectedPreviousPlayer] = nil;
                 i = i - 1; -- Adjusting index due to table.remove
             end
         end
@@ -97,8 +105,10 @@ if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerJoinMessages"):
             if isNew then
                 -- Adding it to the previous players
                 table.insert(previousOnlinePlayers, selectedPlayer:getUsername());
+                local role = selectedPlayer:getAccessLevel();
+                previousOnlinePlayerRoles[selectedPlayer:getUsername()] = role;
                 -- Sending a message to all players about the new connected player
-                if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerJoinMessages"):getValue() then
+                if getSandboxOptions():getOptionByName("FactionsPlus.EnablePlayerJoinMessages"):getValue() and not excludedRoles[role:lower()] then
                     sendMessageToAllPlayers("playerconnected", selectedPlayer:getUsername());
                 end
             end

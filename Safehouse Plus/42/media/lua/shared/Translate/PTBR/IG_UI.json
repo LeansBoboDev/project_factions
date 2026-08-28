@@ -12,10 +12,10 @@
     "IGUI_SafehousePlus_CostSuffix": " (Cost: %1)",
 
     "IGUI_SafehousePlus_TeleportPending": "Teleporting in %1 seconds. Do not move.",
-    "IGUI_SafehousePlus_TeleportingIn": "Teleporting in %1...",
     "IGUI_SafehousePlus_TeleportCancelled": "Teleport cancelled.",
 
     "IGUI_SafehousePlus_HomeSet": "Home '%1' set!",
+    "IGUI_SafehousePlus_SetHomeUsage": "Usage: /sethome <name>",
     "IGUI_SafehousePlus_HomeDuplicateName": "A home named '%1' already exists.",
     "IGUI_SafehousePlus_HomeNotFound": "No home named '%1' found.",
     "IGUI_SafehousePlus_MaxHomesReached": "You have reached the maximum of %1 home slots. Use /buyhome to unlock more.",
@@ -28,6 +28,7 @@
     "IGUI_SafehousePlus_HomeList": "Your homes (%1): %2",
     "IGUI_SafehousePlus_HomeDeleted": "Home '%1' deleted.",
     "IGUI_SafehousePlus_DelHomeUsage": "Usage: /delhome <name>",
+    "IGUI_SafehousePlus_HomeUsage": "Usage: /home <name>",
 
     "IGUI_SafehousePlus_TpaUsage": "Usage: /tpa <player>",
     "IGUI_SafehousePlus_TpaSent": "Teleport request sent to %1.",

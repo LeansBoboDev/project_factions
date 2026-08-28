@@ -27,7 +27,6 @@ function ISPendingTeleport:new(player, dest)
     o.dest          = dest
     o.maxTime       = dest.delay * 60
     o.startTime     = os.time()
-    o.lastShown     = dest.delay + 1
     o.stopOnWalk    = false
     o.stopOnRun     = false
     o.stopOnAim     = false
@@ -52,16 +51,6 @@ function ISPendingTeleport:start()
     local bd = self.character:getBodyDamage()
     self.startHealth = bd and bd:getHealth() or nil
     chatMsg(getText("IGUI_SafehousePlus_TeleportPending", tostring(self.dest.delay)))
-end
-
-function ISPendingTeleport:update()
-    local elapsed    = os.time() - self.startTime
-    local remaining  = self.dest.delay - elapsed
-    local displaySec = math.max(0, math.ceil(remaining))
-    if displaySec > 0 and displaySec < self.lastShown then
-        self.lastShown = displaySec
-        chatMsg(getText("IGUI_SafehousePlus_TeleportingIn", tostring(displaySec)))
-    end
 end
 
 function ISPendingTeleport:perform()
@@ -103,7 +92,14 @@ ISChat.onCommandEntered = function(self)
                 ISChat.instance:unfocus()
                 return
             end
-            sendClientCommand("SafehousePlus", "setHome", { name = parts[2] })
+            local name = parts[2]
+            if not name then
+                chatMsg(getText("IGUI_SafehousePlus_SetHomeUsage"))
+                ISChat.instance.textEntry:setText("")
+                ISChat.instance:unfocus()
+                return
+            end
+            sendClientCommand("SafehousePlus", "setHome", { name = name })
             ISChat.instance.textEntry:setText("")
             ISChat.instance:unfocus()
             return
@@ -115,7 +111,14 @@ ISChat.onCommandEntered = function(self)
                 ISChat.instance:unfocus()
                 return
             end
-            sendClientCommand("SafehousePlus", "goHome", { name = parts[2] })
+            local name = parts[2]
+            if not name then
+                chatMsg(getText("IGUI_SafehousePlus_HomeUsage"))
+                ISChat.instance.textEntry:setText("")
+                ISChat.instance:unfocus()
+                return
+            end
+            sendClientCommand("SafehousePlus", "goHome", { name = name })
             ISChat.instance.textEntry:setText("")
             ISChat.instance:unfocus()
             return

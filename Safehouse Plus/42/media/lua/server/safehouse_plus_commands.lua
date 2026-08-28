@@ -154,7 +154,7 @@ local function getEffectiveMaxHomes(player)
     return base + (pdata.bought or 0)
 end
 
--- ── /sethome [name] ───────────────────────────────────────────
+-- ── /sethome <name> ───────────────────────────────────────────
 
 local function setHome(player, args)
     if not getSandboxBool("SafehousePlus.EnableSetHome") then
@@ -162,10 +162,14 @@ local function setHome(player, args)
         return
     end
 
+    local name = args and args.name
+    if not name then
+        msgPlayer(player, "IGUI_SafehousePlus_SetHomeUsage")
+        return
+    end
+
     local maxHomes = getEffectiveMaxHomes(player)
     local homes    = getHomes(player)
-
-    local name = (args and args.name) or ("home" .. tostring(#homes + 1))
 
     for _, h in ipairs(homes) do
         if h.name == name then
@@ -209,25 +213,26 @@ local function goHome(player, args)
         return
     end
 
-    local home
     local name = args and args.name
-    if name then
-        for _, h in ipairs(homes) do
-            if h.name == name then home = h; break end
-        end
-        if not home then
-            msgPlayer(player, "IGUI_SafehousePlus_HomeNotFound", name)
-            return
-        end
-    else
-        home = homes[1]
+    if not name then
+        msgPlayer(player, "IGUI_SafehousePlus_HomeUsage")
+        return
+    end
+
+    local home
+    for _, h in ipairs(homes) do
+        if h.name == name then home = h; break end
+    end
+    if not home then
+        msgPlayer(player, "IGUI_SafehousePlus_HomeNotFound", name)
+        return
     end
 
     local cooldown = getSandboxInt("SafehousePlus.HomeCooldown", 300)
     if cooldown > 0 then
         local username  = player:getUsername()
         local lastUse   = homeCooldowns[username] or 0
-        local remaining = cooldown - (os.time() - lastUse)
+        local remaining = math.ceil(cooldown - (os.time() - lastUse))
         if remaining > 0 then
             msgPlayer(player, "IGUI_SafehousePlus_HomeCooldown", tostring(remaining))
             return
