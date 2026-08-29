@@ -223,3 +223,21 @@ option FactionsPlus.EnableMOTD
     page = FactionsPlus,
     translation = FactionsPlus_EnableMOTD,
 }
+
+option FactionsPlus.EnableFastXPBook
+{
+	type = boolean,
+	default = true,
+	page = FactionsPlus,
+	translation = FactionsPlus_EnableFastXPBook,
+}
+
+option FactionsPlus.XPBookReadMultiplier
+{
+	type = double,
+	default = 0.5,
+	min = 0.1,
+	max = 2.0,
+	page = FactionsPlus,
+	translation = FactionsPlus_XPBookReadMultiplier,
+}

@@ -47,5 +47,11 @@
     "Sandbox_FactionsPlus_VehicleProtectTickInterval": "Vehicle Protect Tick Interval",
     "Sandbox_FactionsPlus_VehicleProtectTickInterval_tooltip": "How many server ticks between each vehicle condition check and restore. Lower = more responsive but more CPU. At 15 FPS, 15 = ~1 second, 150 = ~10 seconds",
     "Sandbox_FactionsPlus_EnableMOTD": "Enable MOTD",
-    "Sandbox_FactionsPlus_EnableMOTD_tooltip": "Enables the /motd command. Admins configure the message in Zomboid/Lua/FP/motd.txt on the server"
+    "Sandbox_FactionsPlus_EnableMOTD_tooltip": "Enables the /motd command. Admins configure the message in Zomboid/Lua/FP/motd.txt on the server",
+
+    "Sandbox_FactionsPlus_EnableFastXPBook": "Enable Fast XP Book Reading",
+    "Sandbox_FactionsPlus_EnableFastXPBook_tooltip": "Speed up reading of skill books (books that grant XP multipliers). Does not affect regular literature.",
+
+    "Sandbox_FactionsPlus_XPBookReadMultiplier": "XP Book Read Time Multiplier",
+    "Sandbox_FactionsPlus_XPBookReadMultiplier_tooltip": "Multiplier applied to skill book reading time. Values below 1.0 make reading faster (e.g. 0.5 = 2x faster). Values above 1.0 make it slower (e.g. 2.0 = 2x slower). Default: 0.5"
 }

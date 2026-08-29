@@ -15,18 +15,6 @@ doorlocksystem.onFillWorldObjectContextMenu = function(playerId, context, worldo
 	local player = getSpecificPlayer(playerId)
 
 	-- Swipe objects
-	for a, door in ipairs(worldobjects) do
-		-- If is a door
-		if instanceof(door, 'IsoDoor') then
-			-- Add the key option
-			local KeyMenu = context:addOption(getText("IGUI_Door_Lock"), worldobjects);
-			local subMenu = ISContextMenu:getNew(context);
-			doorlocksystem.context = context
-			doorlocksystem.subMenu = subMenu
-			context:addSubMenu(KeyMenu, subMenu);
-			subMenu:addOption(getText("IGUI_Door_Create_Key"), worldobjects, doorlocksystem.userGetKey, player, door)
-		end
-	end
 end
 
 -- Returns true if the door's square belongs to a safehouse the player owns or is a member of
