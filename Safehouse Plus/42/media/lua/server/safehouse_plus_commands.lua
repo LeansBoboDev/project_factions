@@ -85,61 +85,8 @@ local function getPlayerData(username)
     return SafehousePlusHomesData[username]
 end
 
--- Returns the player's homes list, migrating from old player:getModData() formats if needed.
 local function getHomes(player)
-    local username = player:getUsername()
-    local pdata    = getPlayerData(username)
-    local md       = player:getModData()
-
-    -- Migration: any old player:getModData() key present → move to global ModData
-    if md.SafehousePlusHomes ~= nil or md.SafehousePlusHomeX ~= nil or md.SafehousePlusHomeCount ~= nil then
-        local migrated = {}
-
-        if md.SafehousePlusHomes ~= nil then
-            -- oldest format: nested table (didn't survive player ModData serialization)
-            local legacy = md.SafehousePlusHomes
-            md.SafehousePlusHomes = nil
-            if type(legacy) == "table" then
-                for i, h in ipairs(legacy) do
-                    table.insert(migrated, { x = h.x, y = h.y, z = h.z or 0, name = h.name or ("home" .. i) })
-                end
-            end
-        elseif md.SafehousePlusHomeX ~= nil then
-            -- single-home primitives format
-            table.insert(migrated, { x = md.SafehousePlusHomeX, y = md.SafehousePlusHomeY, z = md.SafehousePlusHomeZ or 0, name = "home1" })
-            md.SafehousePlusHomeX = nil
-            md.SafehousePlusHomeY = nil
-            md.SafehousePlusHomeZ = nil
-        elseif md.SafehousePlusHomeCount ~= nil then
-            -- flat-key primitives format
-            local count = md.SafehousePlusHomeCount
-            for i = 1, count do
-                local p = "SafehousePlusHome_" .. i .. "_"
-                local x = md[p .. "x"]
-                local y = md[p .. "y"]
-                if x and y then
-                    table.insert(migrated, { x = x, y = y, z = md[p .. "z"] or 0, name = md[p .. "name"] or ("home" .. i) })
-                else
-                    DebugPrintSafehousePlus("[getHomes] WARN: migration: " .. username ..
-                        " slot " .. i .. "/" .. count .. " has nil coords (x=" .. tostring(x) .. " y=" .. tostring(y) .. ") — skipped")
-                end
-                md[p .. "x"] = nil
-                md[p .. "y"] = nil
-                md[p .. "z"] = nil
-                md[p .. "name"] = nil
-            end
-            md.SafehousePlusHomeCount = nil
-        end
-
-        local bought = md.SafehousePlusBoughtHomes or 0
-        md.SafehousePlusBoughtHomes = nil
-
-        pdata.homes  = migrated
-        pdata.bought = math.max(pdata.bought or 0, bought)
-        DebugPrintSafehousePlus("[getHomes] migrated " .. username .. ": " .. #migrated .. " homes, " .. pdata.bought .. " bought slots")
-    end
-
-    return pdata.homes
+    return getPlayerData(player:getUsername()).homes
 end
 
 local function saveHomes(player, homes)

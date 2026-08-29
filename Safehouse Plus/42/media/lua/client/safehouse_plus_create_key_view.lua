@@ -2,6 +2,14 @@ if not getSandboxOptions():getOptionByName("SafehousePlus.EnableSafehouseCreateK
 
 local UI_BORDER_SPACING = 10
 
+local function isPlayerInSafehouse(player, safehouse)
+    local px = math.floor(player:getX())
+    local py = math.floor(player:getY())
+    local x0 = safehouse:getX()
+    local y0 = safehouse:getY()
+    return px >= x0 and px < x0 + safehouse:getW() and py >= y0 and py < y0 + safehouse:getH()
+end
+
 local function chatMsg(text)
     if not ISChat or not ISChat.instance then return end
     local mock = {
@@ -107,6 +115,7 @@ ISSafehouseUI.updateButtons = function(self)
     self.createKeySafehouse:setVisible(isOwner or isMember)
     self.createKeySafehouse:setTitle(buildCreateKeyTitle())
     self.createKeySafehouse:setWidthToTitle(70)
+    self.createKeySafehouse:setEnable(isPlayerInSafehouse(self.player, self.safehouse))
 
     -- Position: after redeemSafehouse (Economy) if visible, else after releaseSafehouse, else left edge
     if self.redeemSafehouse and self.redeemSafehouse:isVisible() then

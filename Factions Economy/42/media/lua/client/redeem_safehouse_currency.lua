@@ -5,6 +5,14 @@
 local UI_BORDER_SPACING = 10
 local safehousePendingCurrency = nil
 
+local function isPlayerInSafehouse(player, safehouse)
+    local px = math.floor(player:getX())
+    local py = math.floor(player:getY())
+    local x0 = safehouse:getX()
+    local y0 = safehouse:getY()
+    return px >= x0 and px < x0 + safehouse:getW() and py >= y0 and py < y0 + safehouse:getH()
+end
+
 function FactionsEconomySetSafehousePendingCurrency(amount)
     safehousePendingCurrency = amount
 end
@@ -68,6 +76,7 @@ ISSafehouseUI.updateButtons = function(self)
 
     self.redeemSafehouse:setTitle(buildButtonTitle())
     self.redeemSafehouse:setWidthToTitle(70)
+    self.redeemSafehouse:setEnable(isPlayerInSafehouse(self.player, self.safehouse))
 
     if self.releaseSafehouse:isVisible() then
         self.redeemSafehouse:setX(self.releaseSafehouse:getRight() + 5)
