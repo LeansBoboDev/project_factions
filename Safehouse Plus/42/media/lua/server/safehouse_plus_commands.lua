@@ -5,6 +5,7 @@ local TPA_EXPIRY = 60
 local pendingTPA     = {}
 local homeCooldowns  = {}
 local pendingConfirm = {}  -- username -> callback applied only when client confirms teleport
+local pendingDest    = {}  -- username -> {x,y,z} destination for delayed teleport
 
 -- Global ModData table: { [username] = { bought = N, homes = { {x,y,z,name}, ... } } }
 -- PZ persists this automatically, same mechanism as FactionsEconomy currency.
@@ -40,9 +41,11 @@ local function teleportPlayer(player, x, y, z, key, p1, cost, onConfirm)
         player:setZ(z)
         sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
     else
+        local username = player:getUsername()
         if onConfirm then
-            pendingConfirm[player:getUsername()] = onConfirm
+            pendingConfirm[username] = onConfirm
         end
+        pendingDest[username] = { x = x, y = y, z = z }
         sendServerCommand(player, "SafehousePlus", "teleportPending", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost, delay = delay })
     end
 end
@@ -239,6 +242,14 @@ end
 
 local function confirmTeleport(player)
     local username = player:getUsername()
+    local dest = pendingDest[username]
+    if dest then
+        player:setX(dest.x)
+        player:setY(dest.y)
+        player:setZ(dest.z)
+        pendingDest[username] = nil
+        DebugPrintSafehousePlus("[Commands] confirmTeleport: server applied position " .. dest.x .. "," .. dest.y .. " for " .. username)
+    end
     local cb = pendingConfirm[username]
     if cb then
         cb()
