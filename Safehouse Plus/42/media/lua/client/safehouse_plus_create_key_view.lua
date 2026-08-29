@@ -2,6 +2,15 @@ if not getSandboxOptions():getOptionByName("SafehousePlus.EnableSafehouseCreateK
 
 local UI_BORDER_SPACING = 10
 
+local function chatMsg(text)
+    if not ISChat or not ISChat.instance then return end
+    local mock = {
+        getTextWithPrefix = function() return "<RGB:1,1,1>" .. text end,
+        getAuthor         = function() return nil end,
+    }
+    ISChat.addLineInChat(mock, 0)
+end
+
 -- Scans all safehouse tiles looking for a door with a valid keyId.
 -- Returns the keyId or nil if no locked door was found.
 local function findKeyIdInSafehouse(safehouse)
@@ -36,14 +45,14 @@ local function createKeyInInventory(player, keycode)
     local doorkey = player:getInventory():AddItem('Base.Key1')
     doorkey:setKeyId(keycode)
     doorkey:setName('SafeHouse #' .. keycode)
-    player:Say(getText("IGUI_Door_Key_Created"))
+    chatMsg(getText("IGUI_Door_Key_Created"))
 end
 
 local function onCreateKeyClick(ui, button)
     local player = ui.player
     local keyId = findKeyIdInSafehouse(ui.safehouse)
     if not keyId then
-        player:Say(getText("IGUI_Door_Key_Not_Created"))
+        chatMsg(getText("IGUI_Door_Key_Not_Created"))
         return
     end
     if FactionsEconomyCompatibility then

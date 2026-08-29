@@ -3,6 +3,15 @@ require "ISUI/ISButton"
 
 local safehouseUI = nil;
 
+local function chatMsg(text)
+    if not ISChat or not ISChat.instance then return end
+    local mock = {
+        getTextWithPrefix = function() return "<RGB:1,1,1>" .. text end,
+        getAuthor         = function() return nil end,
+    }
+    ISChat.addLineInChat(mock, 0)
+end
+
 FactionsGUI = ISPanel:derive("FactionsGUI");
 FactionsGUI.minimized = true;
 FactionsGUI.points = 0;
@@ -456,9 +465,9 @@ local function OnServerCommand(module, command, arguments)
 		if result == "Success" then
 			UnloadUI()
 		elseif result == "Not enough points" then
-			getPlayer():Say(getText("UI_Text_SafehouseNoPoints"))
+			chatMsg(getText("UI_Text_SafehouseNoPoints"))
 		elseif result == "Safehouse already claimed" then
-			getPlayer():Say(getText("UI_Text_SafehouseEmpty"))
+			chatMsg(getText("UI_Text_SafehouseEmpty"))
 		end
 	elseif module == "Factions" and command == "receivePoints" then
 		local result = arguments[1]

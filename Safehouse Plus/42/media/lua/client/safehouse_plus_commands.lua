@@ -5,7 +5,7 @@ end
 
 local function chatMsg(text)
     local mock = {
-        getTextWithPrefix = function() return "[SafehousePlus] " .. text end,
+        getTextWithPrefix = function() return "<RGB:1,1,1>[SafehousePlus] " .. text end,
         getAuthor         = function() return nil end,
     }
     ISChat.addLineInChat(mock, 0)
