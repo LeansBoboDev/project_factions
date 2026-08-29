@@ -7,7 +7,13 @@ if not getSandboxOptions():getOptionByName("FactionsPlus.EnableFastSleep"):getVa
 local player
 
 local function OnTick()
-    if not player or not player:isAsleep() then
+    if not player then
+        Events.OnTick.Remove(OnTick)
+        return
+    end
+
+    if not player:isAsleep() then
+        sendClientCommand(player, "FastSleep", "stopSleep", {})
         Events.OnTick.Remove(OnTick)
         player = nil
         return

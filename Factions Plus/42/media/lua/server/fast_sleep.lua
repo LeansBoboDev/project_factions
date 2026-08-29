@@ -5,8 +5,10 @@
 if not isServer() then return end
 if not getSandboxOptions():getOptionByName("FactionsPlus.EnableFastSleep"):getValue() then return end
 
-local fatigueReducer = getSandboxOptions():getOptionByName("FactionsPlus.SleepFatigueReducer"):getValue() / 100
-local enduranceIncreaser = getSandboxOptions():getOptionByName("FactionsPlus.SleepEnduranceReceive"):getValue() / 100
+local fatigueReducer = getSandboxOptions():getOptionByName("FactionsPlus.SleepFatigueReducer"):getValue() / 10000
+local enduranceIncreaser = getSandboxOptions():getOptionByName("FactionsPlus.SleepEnduranceReceive"):getValue() / 10000
+local SYNC_FATIGUE_ENDURANCE = SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.FATIGUE)
+                             + SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.ENDURANCE)
 
 local sleepingPlayers = {}
 
@@ -17,24 +19,25 @@ local function onTick()
     if accumulator < 1.0 then return end
     accumulator = 0
 
-    local toRemove = {}
     for username, playerObj in pairs(sleepingPlayers) do
-        if not playerObj:isAsleep() then
-            toRemove[#toRemove + 1] = username
+        if not playerObj then
+            sleepingPlayers[username] = nil
         else
             local stats = playerObj:getStats()
-            stats:remove(CharacterStat.FATIGUE, fatigueReducer)
-            stats:add(CharacterStat.ENDURANCE, enduranceIncreaser)
-            DebugPrintFactionsPlus(string.format(
-                "[FastSleep][Server] %s fatigue=%.4f endurance=%.4f",
-                username,
-                stats:get(CharacterStat.FATIGUE),
-                stats:get(CharacterStat.ENDURANCE)
-            ))
+            if not stats then
+                sleepingPlayers[username] = nil
+            else
+                stats:remove(CharacterStat.FATIGUE, fatigueReducer)
+                stats:add(CharacterStat.ENDURANCE, enduranceIncreaser)
+                syncPlayerStats(playerObj, SYNC_FATIGUE_ENDURANCE)
+                DebugPrintFactionsPlus(string.format(
+                    "[FastSleep][Server] %s fatigue=%.4f endurance=%.4f",
+                    username,
+                    stats:get(CharacterStat.FATIGUE),
+                    stats:get(CharacterStat.ENDURANCE)
+                ))
+            end
         end
-    end
-    for _, username in ipairs(toRemove) do
-        sleepingPlayers[username] = nil
     end
 end
 Events.OnTick.Add(onTick)
@@ -53,3 +56,4 @@ local function onClientCommand(module, command, playerObj, args)
     end
 end
 Events.OnClientCommand.Add(onClientCommand)
+
