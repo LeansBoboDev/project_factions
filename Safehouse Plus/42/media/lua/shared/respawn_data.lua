@@ -341,6 +341,10 @@ local function savePlayerModel(player)
     RespawnData[id].Descriptor.VoiceType   = player:getDescriptor():getVoiceType();
     RespawnData[id].Descriptor.VoicePitch  = player:getDescriptor():getVoicePitch();
     RespawnData[id].Descriptor.VoicePrefix = player:getDescriptor():getVoicePrefix();
+    DebugPrintSafehousePlus("[Respawn] savePlayerModel: Female=" .. tostring(player:isFemale())
+        .. " VoiceType=" .. tostring(player:getDescriptor():getVoiceType())
+        .. " VoicePrefix=" .. tostring(player:getDescriptor():getVoicePrefix())
+        .. " Forename=" .. tostring(player:getDescriptor():getForename()));
 end
 
 local function savePlayerNutrition(player)
@@ -711,10 +715,16 @@ local function loadPlayerModel(player)
         local d = RespawnData[getUniqueId(player)].Descriptor;
         if d.VoiceType ~= nil then player:getDescriptor():setVoiceType(d.VoiceType) end;
         if d.VoicePitch ~= nil then player:getDescriptor():setVoicePitch(d.VoicePitch) end;
-        -- VoicePrefix must always be set; if not saved, derive from gender (matches SurvivorSwap.lua pattern).
-        -- Without this, attack/jump sounds keep the new character's prefix while isFemale() is already restored.
-        local voicePrefix = d.VoicePrefix ~= nil and d.VoicePrefix or (d.Female and "VoiceFemale" or "VoiceMale");
+        -- Always derive from gender: PZ's SurvivorDesc constructor defaults voicePrefix to
+        -- "VoiceFemale" regardless of gender, so the saved value may already be wrong.
+        local voicePrefix = d.Female and "VoiceFemale" or "VoiceMale";
+        DebugPrintSafehousePlus("[Respawn] loadPlayerModel: d.Female=" .. tostring(d.Female)
+            .. " d.VoicePrefix=" .. tostring(d.VoicePrefix)
+            .. " d.VoiceType=" .. tostring(d.VoiceType)
+            .. " computed voicePrefix=" .. tostring(voicePrefix)
+            .. " current descriptor voicePrefix=" .. tostring(player:getDescriptor():getVoicePrefix()));
         player:getDescriptor():setVoicePrefix(voicePrefix);
+        DebugPrintSafehousePlus("[Respawn] loadPlayerModel: after setVoicePrefix, descriptor returns=" .. tostring(player:getDescriptor():getVoicePrefix()));
     end
 end
 
@@ -931,9 +941,75 @@ else -- If not create a server command
         loadPlayerNutrition(player);
         loadPlayerModel(player);
         player:resetModel();
-        if player:getPlayerNum() then
-            getPlayerInfoPanel(player:getPlayerNum()).charScreen.refreshNeeded = true;
+        local playerNum = player:getPlayerNum();
+        DebugPrintSafehousePlus("[HealthPanel] playerNum=" .. tostring(playerNum) .. " isFemale=" .. tostring(player:isFemale()));
+        if playerNum then
+            getPlayerInfoPanel(playerNum).charScreen.refreshNeeded = true;
+
+            -- Target gender derived from saved descriptor (same logic as voice prefix).
+            local d = playerData.Descriptor;
+            local targetFemale = d and d.Female or false;
+
+            local tickCount = 0;
+            local function enforceHealthPanel()
+                tickCount = tickCount + 1;
+                local p = getPlayer();
+                local infoPanel = p and getPlayerInfoPanel(p:getPlayerNum());
+                local bpp = infoPanel and infoPanel.healthView and infoPanel.healthView.bodyPartPanel;
+                if bpp then
+                    if bpp.bFemale ~= targetFemale then
+                        DebugPrintSafehousePlus("[HealthPanel] tick=" .. tickCount
+                            .. " bpp.bFemale changed to " .. tostring(bpp.bFemale)
+                            .. " isFemale=" .. tostring(p:isFemale())
+                            .. ", correcting to " .. tostring(targetFemale));
+                        bpp.bFemale = targetFemale;
+                        bpp.baseTexture = targetFemale and getTexture("media/ui/BodyParts/female_base_white") or getTexture("media/ui/BodyParts/male_base_white");
+                        bpp.outlineTex = targetFemale and getTexture("media/ui/BodyParts/bps_female_outlines") or getTexture("media/ui/BodyParts/bps_male_outlines");
+                        bpp:initialise();
+                    end
+                else
+                    if tickCount == 1 then
+                        DebugPrintSafehousePlus("[HealthPanel] tick=1 bpp not found yet (infoPanel=" .. tostring(infoPanel) .. " healthView=" .. tostring(infoPanel and infoPanel.healthView) .. ")");
+                    end
+                end
+                if tickCount >= 120 then
+                    DebugPrintSafehousePlus("[HealthPanel] enforcer done after 120 ticks, final bpp.bFemale=" .. tostring(bpp and bpp.bFemale));
+                    Events.OnTick.Remove(enforceHealthPanel);
+                end
+            end
+            Events.OnTick.Add(enforceHealthPanel);
+        else
+            DebugPrintSafehousePlus("[HealthPanel] playerNum is nil, skipping panel fix");
         end
+
+        -- Compute the target voicePrefix from saved data.
+        -- PZ's network sync (HumanVisual/SyncVisuals packet from the new character spawn)
+        -- can arrive AFTER UnsafeLocallyUpdate and override setVoicePrefix.
+        -- Re-apply for ~120 ticks (~4s) to win the race against any late packets.
+        local d = playerData.Descriptor;
+        if d then
+            local targetPrefix = d.Female and "VoiceFemale" or "VoiceMale";
+            DebugPrintSafehousePlus("[Respawn] voicePrefix target=" .. tostring(targetPrefix)
+                .. " current=" .. tostring(player:getDescriptor():getVoicePrefix()));
+            local tickCount = 0;
+            local function enforceVoicePrefix()
+                tickCount = tickCount + 1;
+                local p = getPlayer();
+                if p then
+                    local cur = p:getDescriptor():getVoicePrefix();
+                    if cur ~= targetPrefix then
+                        DebugPrintSafehousePlus("[Respawn] voicePrefix overridden to " .. tostring(cur)
+                            .. " at tick " .. tickCount .. ", restoring to " .. tostring(targetPrefix));
+                        p:getDescriptor():setVoicePrefix(targetPrefix);
+                    end
+                end
+                if tickCount >= 120 then
+                    Events.OnTick.Remove(enforceVoicePrefix);
+                end
+            end
+            Events.OnTick.Add(enforceVoicePrefix);
+        end
+
         DebugPrintSafehousePlus("All necessary loades finished!");
     end
 
