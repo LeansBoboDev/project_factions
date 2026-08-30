@@ -33,7 +33,6 @@ Safehouse & Vehicles
 <SIZE:medium>  <RGB:0.4,1,0.5> 1. <RGB:1,1,1> <SPACE> Get close to a vehicle you have the key for
 <SIZE:medium>  <RGB:0.4,1,0.5> 2. <RGB:1,1,1> <SPACE> Press the radial menu key <RGB:0.4,1,0.5> V <RGB:1,1,1> (default)
 <SIZE:medium>  <RGB:0.4,1,0.5> 3. <RGB:1,1,1> <SPACE> Select <SPACE> <RGB:0.4,1,0.5> Claim Vehicle <RGB:1,1,1> <SPACE> (costs <SPACE> <RGB:1,0.7,0.2> 10 Currency <RGB:1,1,1>)
-<SIZE:medium> Once claimed, other players cannot access the trunk or glovebox.
 <SIZE:medium> Additionally, while you are <SPACE> <RGB:1,0.4,0.4> outside the vehicle <RGB:1,1,1>, it is <SPACE> <RGB:0.4,1,0.5> immune to damage <RGB:1,1,1> <SPACE> from other players,
 <SIZE:medium> keeping its condition fully intact.
 

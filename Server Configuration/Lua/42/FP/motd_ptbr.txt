@@ -33,8 +33,7 @@ Safehouse e Veículos
 <SIZE:medium>  <RGB:0.4,1,0.5> 1. <RGB:1,1,1> <SPACE> Chegue perto de um veículo que você possua a chave
 <SIZE:medium>  <RGB:0.4,1,0.5> 2. <RGB:1,1,1> <SPACE> Pressione a tecla do menu radial <RGB:0.4,1,0.5> V <RGB:1,1,1> (padrão)
 <SIZE:medium>  <RGB:0.4,1,0.5> 3. <RGB:1,1,1> <SPACE> Selecione <SPACE> <RGB:0.4,1,0.5> Claim Vehicle <RGB:1,1,1> <SPACE> (custa <SPACE> <RGB:1,0.7,0.2> 10 Currency <RGB:1,1,1>)
-<SIZE:medium> Após reivindicado, outros jogadores não conseguem acessar o porta-malas ou porta-luvas.
-<SIZE:medium> Além disso, enquanto você estiver <SPACE> <RGB:1,0.4,0.4> fora do veículo <RGB:1,1,1>, ele fica <SPACE> <RGB:0.4,1,0.5> imune a danos <RGB:1,1,1> <SPACE> causados por outros jogadores,
+<SIZE:medium> Após reivindicado, enquanto você estiver <SPACE> <RGB:1,0.4,0.4> fora do veículo <RGB:1,1,1>, ele fica <SPACE> <RGB:0.4,1,0.5> imune a danos <RGB:1,1,1> <SPACE> causados por outros jogadores,
 <SIZE:medium> preservando sua integridade.
 
 <SIZE:medium> <RGB:1,0.8,0.2> Painel do Usuário <RGB:1,1,1>

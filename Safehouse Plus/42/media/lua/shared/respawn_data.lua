@@ -711,7 +711,10 @@ local function loadPlayerModel(player)
         local d = RespawnData[getUniqueId(player)].Descriptor;
         if d.VoiceType ~= nil then player:getDescriptor():setVoiceType(d.VoiceType) end;
         if d.VoicePitch ~= nil then player:getDescriptor():setVoicePitch(d.VoicePitch) end;
-        if d.VoicePrefix ~= nil then player:getDescriptor():setVoicePrefix(d.VoicePrefix) end;
+        -- VoicePrefix must always be set; if not saved, derive from gender (matches SurvivorSwap.lua pattern).
+        -- Without this, attack/jump sounds keep the new character's prefix while isFemale() is already restored.
+        local voicePrefix = d.VoicePrefix ~= nil and d.VoicePrefix or (d.Female and "VoiceFemale" or "VoiceMale");
+        player:getDescriptor():setVoicePrefix(voicePrefix);
     end
 end
 
