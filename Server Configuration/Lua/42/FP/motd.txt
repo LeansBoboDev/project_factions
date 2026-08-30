@@ -48,14 +48,14 @@ Commands
 <SIZE:medium>  <RGB:0.4,1,0.5> /motd <RGB:1,1,1> — Opens this help panel
 
 <SIZE:medium> <RGB:1,0.8,0.2> Home <RGB:1,1,1>
-<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [name] <RGB:1,1,1> — Save your current location as a named home
-<SIZE:medium>  <RGB:0.4,1,0.5> /home [name] <RGB:1,1,1> — Teleport to a saved home
+<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [name] <RGB:1,1,1> — Save your current location as a named home <RGB:1,0.7,0.2> (costs 2 Currency) <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /home [name] <RGB:1,1,1> — Teleport to a saved home <RGB:1,0.7,0.2> (costs 5 Currency) <RGB:1,1,1>
 <SIZE:medium>  <RGB:0.4,1,0.5> /homes <RGB:1,1,1> — List all your saved homes
 <SIZE:medium>  <RGB:0.4,1,0.5> /delhome (name) <RGB:1,1,1> — Delete a saved home by name
-<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Purchase an extra home slot
+<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Purchase an extra home slot <RGB:1,0.7,0.2> (costs 5 Currency, +2 per purchase) <RGB:1,1,1>
 
 <SIZE:medium> <RGB:1,0.8,0.2> Teleport <RGB:1,1,1>
-<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (player) <RGB:1,1,1> — Send a teleport request to another player
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (player) <RGB:1,1,1> — Send a teleport request to another player <RGB:1,0.7,0.2> (costs 5 Currency) <RGB:1,1,1>
 <SIZE:medium>  <RGB:0.4,1,0.5> /tpaaccept <RGB:1,1,1> — Accept a pending teleport request
 <PAGE>
 Water & Light Cycle

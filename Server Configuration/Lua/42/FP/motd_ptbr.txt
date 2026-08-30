@@ -48,14 +48,14 @@ Comandos
 <SIZE:medium>  <RGB:0.4,1,0.5> /motd <RGB:1,1,1> — Abre este painel de informações
 
 <SIZE:medium> <RGB:1,0.8,0.2> Casa <RGB:1,1,1>
-<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [nome] <RGB:1,1,1> — Salva sua localização atual como uma casa nomeada
-<SIZE:medium>  <RGB:0.4,1,0.5> /home [nome] <RGB:1,1,1> — Teleporta para uma casa salva
+<SIZE:medium>  <RGB:0.4,1,0.5> /sethome [nome] <RGB:1,1,1> — Salva sua localização atual como uma casa nomeada <RGB:1,0.7,0.2> (custa 2 Currency) <RGB:1,1,1>
+<SIZE:medium>  <RGB:0.4,1,0.5> /home [nome] <RGB:1,1,1> — Teleporta para uma casa salva <RGB:1,0.7,0.2> (custa 5 Currency) <RGB:1,1,1>
 <SIZE:medium>  <RGB:0.4,1,0.5> /homes <RGB:1,1,1> — Lista todas as suas casas salvas
 <SIZE:medium>  <RGB:0.4,1,0.5> /delhome (nome) <RGB:1,1,1> — Remove uma casa salva pelo nome
-<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Compra um slot extra de casa
+<SIZE:medium>  <RGB:0.4,1,0.5> /buyhome <RGB:1,1,1> — Compra um slot extra de casa <RGB:1,0.7,0.2> (custa 5 Currency, +2 por compra) <RGB:1,1,1>
 
 <SIZE:medium> <RGB:1,0.8,0.2> Teleporte <RGB:1,1,1>
-<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (jogador) <RGB:1,1,1> — Envia um pedido de teleporte para outro jogador
+<SIZE:medium>  <RGB:0.4,1,0.5> /tpa (jogador) <RGB:1,1,1> — Envia um pedido de teleporte para outro jogador <RGB:1,0.7,0.2> (custa 5 Currency) <RGB:1,1,1>
 <SIZE:medium>  <RGB:0.4,1,0.5> /tpaaccept <RGB:1,1,1> — Aceita um pedido de teleporte pendente
 <PAGE>
 Ciclo da Água e Luz
