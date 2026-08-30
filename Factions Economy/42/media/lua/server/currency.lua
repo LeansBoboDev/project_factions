@@ -151,6 +151,16 @@ end
 Events.OnInitGlobalModData.Add(function(isNewGame)
     FactionsEconomyCurrencyData = ModData.getOrCreate("FactionsEconomyCurrency")
     FactionsEconomySafehouseCurrencyData = ModData.getOrCreate("FactionsEconomySafehouseCurrency")
+    FactionsEconomyPlayerRoleCache = ModData.getOrCreate("FactionsEconomyPlayerRoleCache")
+end)
+
+Events.OnPlayerConnect.Add(function(player)
+    local username = player:getUsername()
+    local role = player:getAccessLevel()
+    if role and role ~= "" then
+        FactionsEconomyPlayerRoleCache[username] = role
+        ModData.transmit("FactionsEconomyPlayerRoleCache")
+    end
 end)
 
 -- ── Recipe Functions ─────────────────────────────────────────
@@ -351,7 +361,7 @@ Events.OnClientCommand.Add(function(module, command, player, args)
 
         local entries = {}
         for username, balance in pairs(FactionsEconomyCurrencyData) do
-            local role = onlineRoles[username]
+            local role = onlineRoles[username] or FactionsEconomyPlayerRoleCache[username]
             local roleExcluded = role and excludedRoles[role:lower()]
             local nameExcluded = not role and excludedUsernames[username:lower()]
             if not roleExcluded and not nameExcluded then
