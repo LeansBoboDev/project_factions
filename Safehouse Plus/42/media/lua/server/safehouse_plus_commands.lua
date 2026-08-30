@@ -36,9 +36,7 @@ local function teleportPlayer(player, x, y, z, key, p1, cost, onConfirm)
     local delay = getSandboxInt("SafehousePlus.TeleportDelay", 3)
     if delay <= 0 then
         if onConfirm then onConfirm() end
-        player:setX(x)
-        player:setY(y)
-        player:setZ(z)
+        player:setX(x); player:setY(y); player:setZ(z)
         sendServerCommand(player, "SafehousePlus", "teleport", { x = x, y = y, z = z, key = key, p1 = p1, cost = cost })
     else
         local username = player:getUsername()
@@ -240,15 +238,14 @@ end
 
 -- ── confirmTeleport (client → server after delayed teleport) ──
 
-local function confirmTeleport(player)
+local function confirmTeleport(player, args)
     local username = player:getUsername()
     local dest = pendingDest[username]
     if dest then
-        player:setX(dest.x)
-        player:setY(dest.y)
-        player:setZ(dest.z)
+        player:setX(dest.x); player:setY(dest.y); player:setZ(dest.z)
         pendingDest[username] = nil
-        DebugPrintSafehousePlus("[Commands] confirmTeleport: server applied position " .. dest.x .. "," .. dest.y .. " for " .. username)
+        sendServerCommand(player, "SafehousePlus", "teleport", { x = dest.x, y = dest.y, z = dest.z, key = args and args.key, p1 = args and args.p1, cost = args and args.cost })
+        DebugPrintSafehousePlus("[Commands] confirmTeleport: server position set " .. dest.x .. "," .. dest.y .. " for " .. username)
     end
     local cb = pendingConfirm[username]
     if cb then
@@ -402,7 +399,7 @@ Events.OnClientCommand.Add(function(module, command, player, args)
     if module ~= "SafehousePlus" then return end
 
     if command == "confirmTeleport" then
-        confirmTeleport(player)
+        confirmTeleport(player, args)
     elseif command == "setHome" then
         setHome(player, args)
     elseif command == "goHome" then

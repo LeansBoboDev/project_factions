@@ -338,7 +338,10 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         -- Staff roles are only known while the player is online (no offline role
         -- lookup is exposed to Lua on dedicated servers), so build the lookup from
         -- the current online player list before filtering.
+        -- For offline players whose role can't be checked, "admin" is excluded by
+        -- name since the PZ dedicated server always creates that account.
         local excludedRoles = { admin = true, observer = true }
+        local excludedUsernames = { admin = true }
         local onlineRoles = {}
         local onlinePlayers = getOnlinePlayers()
         for i = 0, onlinePlayers:size() - 1 do
@@ -349,7 +352,9 @@ Events.OnClientCommand.Add(function(module, command, player, args)
         local entries = {}
         for username, balance in pairs(FactionsEconomyCurrencyData) do
             local role = onlineRoles[username]
-            if not (role and excludedRoles[role:lower()]) then
+            local roleExcluded = role and excludedRoles[role:lower()]
+            local nameExcluded = not role and excludedUsernames[username:lower()]
+            if not roleExcluded and not nameExcluded then
                 table.insert(entries, { username = username, balance = balance })
             end
         end

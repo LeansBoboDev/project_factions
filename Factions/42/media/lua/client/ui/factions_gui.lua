@@ -167,7 +167,10 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 		return
 	end
 
-	local safehouse = SafeHouse.getSafeHouse(self.player:getSquare());
+	local square = self.player:getSquare()
+	if not square then return end
+
+	local safehouse = SafeHouse.getSafeHouse(square);
 
 	-- Reload if safehouse presence changed (e.g. just claimed or someone else claimed)
 	if safehouse ~= self.safehouse then
@@ -194,8 +197,8 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 		end
 	end
 
-	local safehouseUnavailableReason = SafeHouse.canBeSafehouse(self.player:getSquare(), self.player);
-	if safehouseUnavailableReason ~= "" then
+	local safehouseUnavailableReason = SafeHouse.canBeSafehouse(square, self.player);
+	if safehouseUnavailableReason and safehouseUnavailableReason ~= "" then
 		-- Faction members can claim multiple safehouses (server enforces points limit),
 		-- so strip the vanilla "already have a safehouse" line from the reason for them.
 		local faction = GetPlayerFaction(self.player:getUsername())
@@ -212,7 +215,7 @@ function FactionsGUI:updateButtons() -- Update dynamically the buttons based in 
 		end
 	end
 
-	self.someoneInside = IsSomeoneInside(self.player:getSquare(), self.faction, self.floors);
+	self.someoneInside = IsSomeoneInside(square, self.faction, self.floors);
 
 	local playerFaction = GetPlayerFaction(self.player:getUsername())
 	local usedPoints = playerFaction and GetFactionUsedPoints(playerFaction) or 0

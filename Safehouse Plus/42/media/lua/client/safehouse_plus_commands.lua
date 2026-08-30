@@ -54,16 +54,8 @@ function ISPendingTeleport:start()
 end
 
 function ISPendingTeleport:perform()
-    sendClientCommand("SafehousePlus", "confirmTeleport", {})
-    local p = self.character
-    p:setX(self.dest.x)
-    p:setY(self.dest.y)
-    p:setZ(self.dest.z or 0)
-    local text = resolveKey(self.dest.key, self.dest.p1)
-    if self.dest.cost and self.dest.cost > 0 then
-        text = text .. getText("IGUI_SafehousePlus_CostSuffix", tostring(self.dest.cost))
-    end
-    chatMsg(text)
+    local dest = self.dest
+    sendClientCommand("SafehousePlus", "confirmTeleport", { key = dest.key, p1 = dest.p1, cost = dest.cost })
     ISBaseTimedAction.perform(self)
 end
 
@@ -217,9 +209,8 @@ Events.OnServerCommand.Add(function(module, command, args)
     elseif command == "teleport" then
         local player = getPlayer()
         if player then
-            player:setX(args.x)
-            player:setY(args.y)
-            player:setZ(args.z or 0)
+            player:setX(args.x); player:setY(args.y); player:setZ(args.z or 0)
+            player:setLastX(args.x); player:setLastY(args.y); player:setLastZ(args.z or 0)
         end
         if args.key then
             local text = resolveKey(args.key, args.p1)
